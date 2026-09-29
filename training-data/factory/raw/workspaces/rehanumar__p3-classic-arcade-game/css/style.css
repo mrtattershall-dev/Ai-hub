@@ -1,0 +1,16 @@
+body {
+  text-align: center;
+  background: #DDD;
+}
+
+h1, p {
+  margin: 5px;
+}
+
+#keyboard {
+  opacity: 0;
+}
+
+.keyboard-link {
+  display: none;
+}

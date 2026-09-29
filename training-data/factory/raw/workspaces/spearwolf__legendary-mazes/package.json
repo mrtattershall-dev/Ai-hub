@@ -1,0 +1,25 @@
+{
+  "name": "legendary-mazes",
+  "version": "1.2.0",
+  "description": "A tiny javascript module for creating legendary mazes ;-)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spearwolf/legendary-mazes.git"
+  },
+  "main": "./legendary-mazes.js",
+  "module": "./legendary-mazes.js",
+  "exports": "./legendary-mazes.js",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "make-anim": "node ./bin/make-anim.js"
+  },
+  "author": "Wolfger Schramm <wolfger@spearwolf.de>",
+  "license": "MIT",
+  "devDependencies": {
+    "canvas": "^2.6.1",
+    "gif-encoder-2": "^1.0.5",
+    "puppeteer": "^5.0.0",
+    "serve-handler": "^6.1.3"
+  }
+}

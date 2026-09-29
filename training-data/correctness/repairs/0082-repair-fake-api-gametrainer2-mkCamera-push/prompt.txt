@@ -1,0 +1,15 @@
+The following JavaScript throws "TypeError: ....append is not a function" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+function mkCamera() {
+  const gems = [];
+  const W=1800, H=1200;
+  for (let i=0;i<5;i++) gems.append({x:200+Math.random()*(W-400), y:150+Math.random()*(H-300), r:12, col:false});
+  return {
+    player:{x:W/2,y:H/2,r:14,vx:0,vy:0},
+    cam:{x:W/2-400,y:H/2-300}, gems, W, H,
+    stars: Array.from({length:120},()=>({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2})),
+    won:false
+  };
+}
+```

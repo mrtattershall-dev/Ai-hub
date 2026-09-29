@@ -1,0 +1,189 @@
+/**
+ * harvest_pipeline.mjs - clone permissive repos, extract candidate rows, throw the clone away.
+ *
+ *   node factory/harvest_pipeline.mjs <repos.json> --kind js    --out harvest_js.jsonl
+ *   node factory/harvest_pipeline.mjs <repos.json> --kind godot --out harvest_godot.jsonl
+ *   node factory/harvest_pipeline.mjs <repos.json> --kind js --limit 20 --out probe.jsonl
+ *
+ * WHY IT IS SHAPED THIS WAY
+ * -------------------------
+ * ~800 repos will not sit on disk at once, so each is shallow-cloned, mined, and deleted
+ * before the next. Rows are appended as they are found: the 32B eval lost 19 paid-for
+ * generations by holding results in memory until the end, and a 6-hour harvest is a far
+ * bigger thing to lose.
+ *
+ * Every row records its repo, path and licence. That is not bookkeeping - a dataset whose
+ * provenance cannot be reconstructed cannot be defended later, and the licence question
+ * ("may this be trained on, may it be redistributed") is answered per row or not at all.
+ */
+import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync, rmSync, readdirSync, statSync } from 'fs';
+import { extractUnits } from './extract_units.mjs';
+import { join, extname, relative, sep } from 'path';
+import { execFileSync } from 'child_process';
+import { tmpdir } from 'os';
+
+const args = process.argv.slice(2);
+const flag = (n, d) => { const i = args.indexOf('--' + n); return i > -1 && args[i + 1] ? args[i + 1] : d; };
+const REPOS = args.find((a) => !a.startsWith('--') && /\.json$/i.test(a));
+const KIND = flag('kind', 'js');
+const OUT = flag('out', null);
+const LIMIT = Number(flag('limit', 0));
+const MAX_MB = Number(flag('maxmb', 80));
+const WORK = flag('work', join(tmpdir(), 'harvest-work'));
+if (!REPOS || !OUT) {
+  console.error('usage: node factory/harvest_pipeline.mjs <repos.json> --kind js|godot --out rows.jsonl');
+  process.exit(1);
+}
+
+const SKIP_DIR = new Set(['node_modules', '.git', 'dist', 'build', 'vendor', 'addons',
+  'coverage', '.godot', '.import', 'export', 'bin', 'obj', '__pycache__', 'test', 'tests']);
+
+// ── extraction: JavaScript ──────────────────────────────────────────────────────
+const DATA_URI = /data:[a-z]+\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi;
+
+/**
+ * Rows from one JS file: whole programs AND the units inside them.
+ *
+ * Taking only whole standalone programs measured 0.24 rows per repo - 6 rows from 25 repos
+ * - because almost every real project is multi-file. The earlier "16 per repo" figure came
+ * from four hand-picked repos, one of which held 98 mini-games; generalising it to the
+ * population was extrapolation from a biased sample.
+ *
+ * The units inside those files are both far more plentiful and more relevant: editing a
+ * function inside an existing codebase is what the agent actually does, and a unit shipped
+ * with the declarations it depends on is exactly that task.
+ */
+function jsRows(code, meta) {
+  const out = [];
+  const localImport = /^\s*(?:import|export)\s[^;]*from\s+['"]\.{1,2}\//m.test(code)
+    || /require\(\s*['"]\.{1,2}\//.test(code);
+  const isPhaser = /new\s+Phaser\.Game\s*\(|Phaser\.(Scene|AUTO)/.test(code);
+  const isCanvas = /getContext\(\s*['"]2d/.test(code) && /requestAnimationFrame/.test(code);
+
+  // 1. the whole file, when it stands alone and boots a game
+  if (!localImport && (/new\s+Phaser\.Game\s*\(/.test(code) || isCanvas)
+      && code.length >= 400 && code.length <= 20000) {
+    out.push({ ...meta, axis: isPhaser ? 'phaser' : 'code', form: 'program', code });
+  }
+
+  // 2. the units inside it, each with the declarations it depends on
+  for (const u of extractUnits(code, { min: 200, max: 6000, ctxMax: 6000 })) {
+    out.push({
+      ...meta,
+      axis: isPhaser ? 'phaser' : 'code',
+      form: 'unit',
+      name: u.name,
+      unitKind: u.kind,
+      context: u.context,
+      code: u.code,
+    });
+  }
+  return out;
+}
+
+// ── extraction: GDScript ────────────────────────────────────────────────────────
+// A .gd file is already one class. The useful ones declare what they extend and define
+// behaviour; a two-line stub or a pure data table teaches nothing.
+function gdRows(code, meta) {
+  const out = [];
+  if (code.length < 300 || code.length > 12000) return out;
+  if (!/^\s*extends\s+\w/m.test(code)) return out;
+  const funcs = (code.match(/^\s*func\s+\w+/gm) || []).length;
+  if (funcs < 2) return out;
+  // Preload/load of project resources cannot resolve outside the repo.
+  if (/preload\s*\(|load\s*\(\s*["']res:\/\//.test(code)) return out;
+  out.push({ ...meta, axis: 'godot', form: 'class', code });
+  return out;
+}
+
+function walk(root) {
+  const out = [];
+  (function rec(d, depth) {
+    if (depth > 8) return;
+    let ents = [];
+    try { ents = readdirSync(d); } catch { return; }
+    for (const e of ents) {
+      if (SKIP_DIR.has(e) || e.startsWith('.')) continue;
+      const p = join(d, e);
+      let st;
+      try { st = statSync(p); } catch { continue; }
+      if (st.isDirectory()) rec(p, depth + 1);
+      else if (st.size < 300_000) out.push(p);
+    }
+  })(root, 0);
+  return out;
+}
+
+const { permissive } = JSON.parse(readFileSync(REPOS, 'utf8'));
+let repos = permissive.filter((r) => r.mb > 0 && r.mb < MAX_MB);
+if (LIMIT) repos = repos.slice(0, LIMIT);
+
+if (!existsSync(WORK)) mkdirSync(WORK, { recursive: true });
+writeFileSync(OUT, '');           // fresh file; rows are appended as they are found
+
+const EXT = KIND === 'godot' ? new Set(['.gd']) : new Set(['.js', '.mjs', '.html', '.htm']);
+const stats = { repos: 0, cloned: 0, failed: 0, files: 0, rows: 0 };
+const perRepo = [];
+const t0 = Date.now();
+
+for (const [i, repo] of repos.entries()) {
+  const dest = join(WORK, repo.name.replace(/[^\w.-]/g, '_'));
+  stats.repos++;
+  try { rmSync(dest, { recursive: true, force: true }); } catch { /* fresh */ }
+  try {
+    execFileSync('git', ['clone', '--depth', '1', '--quiet', '--no-tags',
+      `https://github.com/${repo.name}.git`, dest],
+    { stdio: ['ignore', 'ignore', 'pipe'], timeout: 300_000 });
+    stats.cloned++;
+  } catch (e) {
+    stats.failed++;
+    console.log(`  ! ${repo.name}: clone failed`);
+    continue;
+  }
+
+  let found = 0;
+  for (const f of walk(dest)) {
+    const ext = extname(f).toLowerCase();
+    if (!EXT.has(ext)) continue;
+    if (/\.min\.js$/i.test(f)) continue;
+    let code = '';
+    try { code = readFileSync(f, 'utf8'); } catch { continue; }
+    stats.files++;
+
+    const meta = {
+      repo: repo.name,
+      license: repo.license,
+      stars: repo.stars,
+      path: relative(dest, f).split(sep).join('/'),
+    };
+
+    let rows = [];
+    if (KIND === 'godot') rows = gdRows(code, meta);
+    else {
+      // An html game keeps its inline script; the payloads are stripped, not the logic.
+      const body = /\.html?$/i.test(f)
+        ? [...code.replace(DATA_URI, 'DATAURI').matchAll(/<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)]
+          .map((m) => m[1]).join('\n')
+        : code;
+      rows = jsRows(body, meta);
+    }
+    for (const r of rows) { appendFileSync(OUT, JSON.stringify(r) + '\n'); stats.rows++; found++; }
+  }
+  perRepo.push({ repo: repo.name, rows: found });
+  try { rmSync(dest, { recursive: true, force: true }); } catch { /* best effort */ }
+
+  if ((i + 1) % 10 === 0 || i === repos.length - 1) {
+    const mins = ((Date.now() - t0) / 60000).toFixed(1);
+    const rate = stats.rows / Math.max(1, stats.cloned);
+    console.log(`  ${String(i + 1).padStart(4)}/${repos.length} repos  ${String(stats.rows).padStart(5)} rows  `
+      + `${rate.toFixed(1)}/repo  ${stats.failed} failed  ${mins}m`);
+  }
+}
+
+console.log(`\n${KIND} harvest complete`);
+console.log(`  repos attempted ${stats.repos}, cloned ${stats.cloned}, failed ${stats.failed}`);
+console.log(`  files scanned   ${stats.files}`);
+console.log(`  rows written    ${stats.rows}  -> ${OUT}`);
+const top = perRepo.sort((a, b) => b.rows - a.rows).slice(0, 10);
+console.log('  best repos:');
+for (const t of top) console.log(`    ${String(t.rows).padStart(4)}  ${t.repo}`);

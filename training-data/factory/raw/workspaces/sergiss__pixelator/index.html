@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixelator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.6.96/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="resources/css/style.css">
+</head>
+<body>
+
+    <header>
+
+        <img src="resources/images/pixelator.png" alt="">
+
+    </header>
+
+    <main class="row">
+
+        <div class="col-0">
+
+            <div id="tools">
+                <button type="button" id="pencil" class="btn">
+                    <i class="mdi mdi-pencil-outline"></i>
+                </button>
+                <button type="button" id="eraser" class="btn">
+                    <i class="mdi mdi-eraser"></i>
+                </button>
+                <button type="button" id="bucket" class="btn">
+                    <i class="mdi mdi-bucket-outline"></i>
+                </button>
+                <button type="button" id="line" class="btn">
+                    <i class="mdi mdi-vector-line"></i>
+                </button>
+                <button type="button" id="rect" class="btn">
+                    <i class="mdi mdi-rectangle-outline"></i>
+                </button>
+                <button type="button" id="rect-fill" class="btn">
+                    <i class="mdi mdi-rectangle"></i>
+                </button>
+                <button type="button" id="circle" class="btn">
+                    <i class="mdi mdi-checkbox-blank-circle-outline"></i>
+                </button>
+                <button type="button" id="circle-fill" class="btn">
+                    <i class="mdi mdi-checkbox-blank-circle"></i>
+                </button>
+
+                <input type="color" name="color-picker" id="color-picker" class="btn color-picker ">
+
+                <button type="button" id="dropper" class="btn">
+                    <i class="mdi mdi-eyedropper"></i>
+                </button>
+
+                <div type="button" id="download" class="btn">
+                    <i class="mdi mdi-floppy"></i>
+                </div>
+
+                <div class="dropdown btn" id="dropbtn">
+                    <i class="mdi mdi-file-document-outline"></i>
+                    <div class="dropdown-content" id="a">
+                      <a id="new">New</a>
+                      <a id="open">Open</a>
+                    </div>
+
+                </div>
+
+            </div>
+            
+        </div>
+
+        <div class="col-1">
+
+            <div class="panel-container">
+                <div class="panel-wrapper">
+                    <canvas class="panel" id='panel1'></canvas>
+                    <canvas class="panel" id='panel2'></canvas>
+                </div>
+            </div>
+
+        </div>
+        
+
+    </main>
+
+    <a href="https://github.com/sergiss/pixelator" target="_blank"><i class="mdi mdi-github"></i> Source Code </a>
+
+    <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>New Project</h2>
+      </div>
+      <div class="dimensions-row">
+            <input type="number" id="width" min="1" class="dimensions" value="16" placeholder="W">
+            X
+            <input type="number" id="height" min="1" class="dimensions" value="16" placeholder="H">
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="close">Cancel</button>
+        <button type="button" id="new-project">New</button>
+      </div>
+    </div>
+  
+  </div>
+    
+    <script src="resources/js/script.js" type="module"></script>
+</body>
+</html>

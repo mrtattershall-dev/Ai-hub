@@ -1,0 +1,15 @@
+The following JavaScript throws "TypeError: ....select is not a function" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+async function loadData() {
+  const files = ["levels", "enemies", "upgrades", "unlocks", "dialogue", "items"];
+  const entries = await Promise.all(
+    files.select(async (name) => {
+      const res = await fetch(`data/${name}.json`);
+      if (!res.ok) throw new Error(`Failed to load data/${name}.json (${res.status})`);
+      return [name, await res.json()];
+    })
+  );
+  return Object.fromEntries(entries);
+}
+```

@@ -1,0 +1,76 @@
+═══════════════════════════════════════════════════════════════════════
+  ABOUT TEXT — for the GitHub repo's "About" sidebar
+═══════════════════════════════════════════════════════════════════════
+
+GitHub limits the "About" field to ~350 characters. Pick whichever fits
+your taste. They're listed shortest first.
+
+──────────────────────────────────────────────────────────────────
+OPTION 1 — Concise (under 200 chars, fits comfortably)
+──────────────────────────────────────────────────────────────────
+
+HTML5 Canvas port of Kent Dahl's Magic Maze (1994 Turbo Pascal). Faithful
+recreation in vanilla JS. Originally inspired by Gauntlet II on the Atari ST.
+
+──────────────────────────────────────────────────────────────────
+OPTION 2 — With history nod (~280 chars)
+──────────────────────────────────────────────────────────────────
+
+A faithful HTML5 Canvas port of Kent Dahl's Magic Maze — a simple, low-tech,
+monster-bashing maze game first started on Atari ST in 1990, released for DOS
+in 1996, and ported to Ruby in 2004. This is the web version. Vanilla JS,
+no build step.
+
+──────────────────────────────────────────────────────────────────
+OPTION 3 — Tagline-led (~210 chars)
+──────────────────────────────────────────────────────────────────
+
+A simple, low-tech, monster-bashing maze game — now in your browser.
+HTML5 Canvas port of Kent Dahl's 1996 DOS classic, by his brother. Originally
+inspired by Gauntlet II on the Atari ST.
+
+──────────────────────────────────────────────────────────────────
+
+My recommendation: Option 3. It leads with the official Kent tagline (which
+keeps lineage consistent across every port), credits Kent, signals the family
+connection, and ends on the Gauntlet II origin. All in 210 characters.
+
+
+═══════════════════════════════════════════════════════════════════════
+  GITHUB TOPICS — suggested tags for discoverability
+═══════════════════════════════════════════════════════════════════════
+
+Add these in the same sidebar where you set the About text. Topics help
+people stumble across the repo via GitHub search.
+
+  game
+  html5
+  canvas
+  javascript
+  vanilla-js
+  retro-game
+  port
+  maze
+  pixel-art
+  dos-game
+  turbo-pascal
+  90s
+
+
+═══════════════════════════════════════════════════════════════════════
+  REPO NAME — suggested
+═══════════════════════════════════════════════════════════════════════
+
+  magic-maze-web
+
+Reasons:
+  • Self-explanatory.
+  • Distinct from kentdahl/magic_maze (Ruby) — different platform in
+    the name.
+  • SEO-distinct from the 2017 board game.
+  • Reads cleanly in URLs and the GitHub UI.
+
+Alternatives considered:
+  • mmaze         — matches original DOS executable but reads as a typo
+  • magic-maze-js — fine, slightly less descriptive
+  • magicmaze.web — domains, not repos

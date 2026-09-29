@@ -1,0 +1,11 @@
+function drawFatal(app, message) {
+  const { ctx } = app;
+  ctx.fillStyle = "#05060b";
+  ctx.fillRect(0, 0, app.width, app.height);
+  ctx.fillStyle = "#ff5d8f";
+  ctx.font = "700 22px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  message.split("\n").forEach((line, i) => {
+    ctx.fillText(line, app.width / 2, app.height / 2 - 20 + i * 30);
+  });
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="author" content="Rafael Maia" />
+    <meta
+      name="description"
+      content="This is an implementation of the Snake game with a lot of fun features! Try to eat as much food as you can and have fun!"
+    />
+
+    <!-- Open Graph and Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@rafaeldevvv">
+    <meta name="twitter:creator" content="@rafaeldevvv" />
+    <meta property="og:title" content="Snake Game" />
+    <meta property="og:image" content="screenshot.png" />
+    <meta
+      property="og:description"
+      content="This is an implementation of the Snake game with a lot of fun features! Try to eat as much food as you can and have fun!"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://rafaeldevvv.github.io/snake-game/"
+    />
+
+    <!-- Title -->
+    <title>Snake Game</title>
+
+    <!-- links -->
+    <link rel="stylesheet" href="./styles/index.css" />
+    <link rel="icon" type="image/x-icon" href="./favicon.png" />
+
+    <!-- scripts -->
+    <script
+      src="https://kit.fontawesome.com/134d9c6f51.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="scripts/main.js" type="module" defer></script>
+  </head>
+  <body>
+    <main id="game-container">
+      <h1>Snake Game</h1>
+      <h2>
+        By
+        <a
+          href="https://github.com/rafaeldevvv"
+          title="Rafael Maia's GitHub profile, where you can see all his repositories and projects"
+          target="_blank"
+          >Rafael Maia</a
+        >
+      </h2>
+      <ul id="warnings">
+        <li>Press the arrow keys to start the game and control the snake.</li>
+        <li>Your goal is to eat as many fruits as you can! 🍴🍎</li>
+      </ul>
+      <div id="score-container">
+        <span class="score score-box" id="current-score"></span>
+        <span class="best-score score-box" id="best-score"></span>
+      </div>
+      <!-- ############################################################ Where the canvas goes  -->
+      <div id="canvas-container"></div>
+      <div id="buttons-below-canvas">
+        <button
+          class="btn restart-btn"
+          id="restart-btn"
+          title="Press 'R' to restart the game"
+        >
+          Restart <span class="keyboard-devices-inline">(R)</span>
+        </button>
+        <div>
+          <button
+            class="btn mute-btn"
+            id="mute-btn"
+            title="Press 'M' to mute/unmute the game"
+          ></button>
+          <button
+            class="btn pause-btn"
+            id="pause-btn"
+            title="Press 'P' to pause/resume the game"
+          ></button>
+        </div>
+      </div>
+
+      <div id="virtual-controls" class="touch-screen-devices">
+        <button title="Go up" data-direction="up">
+          <i class="fa-solid fa-chevron-up icon"></i>
+        </button>
+        <button title="Go left" data-direction="left">
+          <i class="fa-solid fa-chevron-left icon"></i>
+        </button>
+        <button title="Go down" data-direction="down">
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <button title="Go right" data-direction="right">
+          <i class="fa-solid fa-chevron-right icon"></i>
+        </button>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/entities/enemy.js: * enemy.js — data-driven enemies with simple, readable AI.

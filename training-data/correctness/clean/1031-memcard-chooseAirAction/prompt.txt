@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+chooseAirAction (from js/entities/player.js)

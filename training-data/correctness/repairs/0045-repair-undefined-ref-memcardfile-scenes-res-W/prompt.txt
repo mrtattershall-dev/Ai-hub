@@ -1,0 +1,130 @@
+The following JavaScript throws "ReferenceError: W is not defined" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+/**
+ * results.js — the animated end-of-stage rank screen.
+ *
+ * Pure payoff theatre, as the GDD asks for: score lines tally in one by one,
+ * then the rank letter stamps in with a sting. It reads the result computed by
+ * level.js (already recorded to the save) and shows the per-dimension
+ * breakdown, shards earned, any unlocks, and a NEW RECORD flash. Confirm
+ * returns to the hub.
+ *
+ * @module scenes/results
+ */
+
+import { Scene } from "../engine/scene.js";
+import { panel, text, title, bar } from "../ui/widgets.js";
+import { rankColor } from "../systems/rank.js";
+import { formatStopwatch } from "../ui/hud.js";
+import { CONFIG } from "../config.js";
+import { HubScene } from "./hub.js";
+
+
+const H = CONFIG.view.height;
+
+export class ResultsScene extends Scene {
+  constructor(app, payload) {
+    super(app);
+    this.p = payload;
+  }
+
+  onEnter() {
+    this.t = 0;
+    this.stamped = false;
+    this.app.audio.playMusic("results");
+    const { result, stats } = this.p;
+    // Rows revealed one per ~0.4s.
+    this.rows = [
+      { label: "TIME", value: formatStopwatch(stats.time), score: result.breakdown.time },
+      { label: "DAMAGE", value: `${Math.round(stats.damage)}`, score: result.breakdown.damage },
+      { label: "FOES DEFEATED", value: `${stats.kills}/${stats.totalKills}`, score: result.breakdown.kills },
+      { label: "SECRETS", value: `${stats.secrets}/${stats.totalSecrets}`, score: result.breakdown.secrets },
+      { label: "STYLE", value: `${Math.round(stats.style)}`, score: result.breakdown.style },
+    ];
+  }
+
+  update(dt) {
+    this.t += dt;
+    const revealDone = this.t > 0.4 * this.rows.length + 0.6;
+    if (revealDone && !this.stamped) {
+      this.stamped = true;
+      this.app.audio.sfx("rankup");
+    }
+    if (this.app.input.pressed("confirm") && this.stamped) {
+      this.app.audio.sfx("confirm");
+      this.app.scenes.replace(new HubScene(this.app));
+    } else if (this.app.input.pressed("confirm")) {
+      // Skip the animation.
+      this.t = 10;
+    }
+  }
+
+  render(ctx) {
+    ctx.fillStyle = "#070a14";
+    ctx.fillRect(0, 0, W, H);
+
+    title(ctx, "SECTOR RESTORED", W / 2, 60, { size: 34, glow: "#7dffb0" });
+    text(ctx, this.p.levelName.toUpperCase(), W / 2, 96, {
+      size: 14, align: "center", color: "#8b95b8",
+    });
+
+    // Score breakdown panel.
+    panel(ctx, 90, 130, 480, 280, { glow: 8 });
+    this.rows.forEach((row, i) => {
+      const reveal = this.t - i * 0.4;
+      if (reveal < 0) return;
+      const y = 175 + i * 48;
+      const a = Math.min(1, reveal * 4);
+      ctx.globalAlpha = a;
+      text(ctx, row.label, 120, y, { size: 18, color: "#b8c0e0" });
+      text(ctx, row.value, 400, y, { size: 18, color: "#fff", align: "right", weight: 700 });
+      bar(ctx, 120, y + 8, 320, 8, row.score / 100, scoreColor(row.score));
+      ctx.globalAlpha = 1;
+    });
+
+    // Rank stamp panel.
+    panel(ctx, 600, 130, 270, 280, { glow: this.stamped ? 24 : 6, edge: rankColor(this.p.result.tier) });
+    text(ctx, "RANK", 735, 165, { size: 16, align: "center", color: "#8b95b8" });
+    if (this.stamped) {
+      const pop = 1 + Math.max(0, 0.4 - (this.t - (0.4 * this.rows.length + 0.6))) * 2;
+      ctx.save();
+      ctx.translate(735, 250);
+      ctx.scale(pop, pop);
+      title(ctx, this.p.result.tier, 0, 0, {
+        size: 96, glow: rankColor(this.p.result.tier), color: rankColor(this.p.result.tier),
+      });
+      ctx.restore();
+      text(ctx, `SCORE ${this.p.result.score}`, 735, 330, { size: 16, align: "center", color: "#fff" });
+      if (this.p.newBest) {
+        const blink = Math.sin(this.t * 8) > 0;
+        if (blink) text(ctx, "★ NEW RECORD ★", 735, 360, { size: 14, align: "center", color: "#ffd86b", weight: 700 });
+      }
+    }
+
+    // Rewards row.
+    if (this.stamped) {
+      text(ctx, `+${this.p.shardsGained} MEMORY SHARDS`, W / 2, 450, {
+        size: 18, align: "center", color: "#4fd1ff", weight: 700,
+      });
+      if (this.p.unlocked?.length) {
+        text(ctx, `UNLOCKED: ${this.p.unlocked.join("   •   ")}`, W / 2, 480, {
+          size: 14, align: "center", color: "#ffd86b",
+        });
+      }
+      if (Math.sin(this.t * 4) > -0.3) {
+        text(ctx, "PRESS ENTER TO RETURN TO HUB", W / 2, H - 36, {
+          size: 15, align: "center", color: "#fff",
+        });
+      }
+    }
+  }
+}
+
+function scoreColor(s) {
+  if (s >= 85) return "#ff5d8f";
+  if (s >= 70) return "#ffd86b";
+  if (s >= 50) return "#7dffb0";
+  return "#4fd1ff";
+}
+```

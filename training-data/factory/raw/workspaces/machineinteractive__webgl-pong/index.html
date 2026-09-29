@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>webgl-pong</title>
+    <style>
+    @font-face {
+        font-family:"Pixel NES";
+        src:url("res/Pixel_NES.eot?") format("eot"),
+            url("res/Pixel_NES.otf") format("otf"),
+            url("res/Pixel_NES.ttf") format("truetype"),
+            url("res/Pixel_NES.svg#PixelNES") format("svg"),
+            url("res/Pixel_NES.woff") format("woff");
+        font-weight:normal;
+        font-style:normal;
+    }
+    p {
+        font-family: "Pixel NES";
+        font-size: 8px;
+    }
+    .container {
+        position: relative;
+    }
+    #text {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        z-index: 10;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="canvas"></canvas>
+        <canvas id="text"></canvas>    
+    </div>
+    <p>
+        KEYS<br>
+        -----<br>
+        W: PLAYER 1 UP<br>
+        S: PLAYER 1 DOWN<br>
+        I: PLAYER 2 UP<br>
+        K: PLAYER 2 DOWN<br>
+        SPACE: START / SERVE BALL<br>
+        Z: TOGGLE DEBUG MODE<br>
+        Q: RESTART GAME</br>
+    </p>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

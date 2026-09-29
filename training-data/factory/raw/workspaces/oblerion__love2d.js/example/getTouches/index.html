@@ -1,0 +1,45 @@
+<!DOCTYPE html> <html id="html" lang="fr"/>
+<title>love2d.js</title>
+<head>
+	<meta charset="UTF-8" name="viewport"content="width=device-width"/>
+	<script nomodule>
+		document.write("your old browser don't support module type : need update it");
+	</script>
+	<script type="module">
+		import {love} from "../../js/love2d.js";
+
+		love.load=function()
+		{
+			love.window_setMode(800,380);
+			love.graphics_setFont("monospace");
+			
+		}
+		love.update=function(dt)
+		{
+		}
+		love.draw=function()
+		{
+			love.graphics_setColor(5,5,5,255);
+			love.graphics_print("touch here",270,150,0,20);
+			//get list id of touches
+			let t = love.touch_getTouches();
+			if(t.length==0)
+			{
+				love.graphics_print("no touches",25,25,0,15);
+			}
+		
+			for(let i=0;i<t.length;i++)
+			{
+				// get pos of eatch touche
+				let touch=love.touch_getPosition(t[i]);
+				love.graphics_print("touche id: "+i+" state: "+touch.state+" x: "+touch.x+" y: "+touch.y,25,(i+1)*25,0,15);
+				love.graphics_rectangle("line",touch.x,touch.y,10,10);
+			}
+		}
+
+	</script>
+</head>
+<body>
+
+</body>
+</html>

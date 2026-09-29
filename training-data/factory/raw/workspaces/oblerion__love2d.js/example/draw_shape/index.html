@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html id="html" lang="fr">
+<title> love2d.js </title>
+<head>
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script nomodule>
+		document.write("your old browser don't support module type : need update it");
+	</script>
+</head>
+
+<body>
+	<script type="module">
+		import {love} from "../../js/love2d.js";
+		love.window_setMode(1000,500);
+		love.graphics_setFont("ani");
+
+		// update loop function
+		love.update=function()
+		{
+			
+		}
+		// draw loop function
+		love.draw =function()
+		{
+			let My = love.mouse_getY();
+			let Mx = love.mouse_getX();
+			love.graphics_setColor(200,2,2);
+			love.graphics_print("hello",200,250,65);
+			love.graphics_setColor(0,200,0);
+			love.graphics_rectangle("fill",200,200,20,20);
+			love.graphics_line(Mx,My,300,34);
+			if(love.keyboard_isDown("up")) love.graphics_circle("line",230,340,25);
+		}
+		
+	</script>
+</body>
+</html>

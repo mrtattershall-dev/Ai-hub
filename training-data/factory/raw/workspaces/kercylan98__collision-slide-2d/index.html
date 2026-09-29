@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>连续碰撞检测</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="toolbar">
+        <div class="toolbar-section">
+            <button class="toolbar-btn" id="btnGenerateMap" title="生成随机地图">
+                <span class="icon">🎲</span>
+                <span>生成地图</span>
+            </button>
+            <button class="toolbar-btn" id="btnClearMap" title="清空所有障碍物">
+                <span class="icon">🗑️</span>
+                <span>清空</span>
+            </button>
+            <div class="toolbar-divider"></div>
+            <select id="presetSelect" class="toolbar-select" title="选择预设场景">
+                <option value="">预设场景...</option>
+            </select>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn tool-btn active" data-tool="select" title="选择工具 (V)">
+                <span class="icon">🖱️</span>
+            </button>
+            <button class="toolbar-btn tool-btn" data-tool="rectangle" title="矩形工具">
+                <span class="icon">▭</span>
+            </button>
+            <button class="toolbar-btn tool-btn" data-tool="polygon" title="多边形工具 (P)">
+                <span class="icon">⬡</span>
+            </button>
+            <button class="toolbar-btn tool-btn" data-tool="move" title="移动工具 (M)">
+                <span class="icon">✥</span>
+            </button>
+        </div>
+        
+        <div class="toolbar-section center">
+            <h1 class="toolbar-title">连续碰撞检测</h1>
+            <span class="toolbar-subtitle">基于时间的确定性计算 | 墙面滑行算法</span>
+        </div>
+        
+        <div class="toolbar-section">
+            <button class="toolbar-btn" id="btnSaveScene" title="保存场景 (Ctrl+S)">
+                <span class="icon">💾</span>
+                <span>保存</span>
+            </button>
+            <button class="toolbar-btn" id="btnLoadScene" title="加载场景">
+                <span class="icon">📁</span>
+                <span>加载</span>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" id="btnToggleGrid" title="切换网格 (G)">
+                <span class="icon">⊞</span>
+            </button>
+            <button class="toolbar-btn" id="btnHelp" title="帮助 (H)">
+                <span class="icon">❓</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 左侧面板 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <h3>场景层级</h3>
+            </div>
+            <div class="panel-content">
+                <div class="scene-tree">
+                    <div class="tree-item active" data-type="player">
+                        <span class="tree-icon">🎮</span>
+                        <span class="tree-label">玩家</span>
+                    </div>
+                    <div class="tree-item" data-type="obstacles">
+                        <span class="tree-icon">📦</span>
+                        <span class="tree-label">障碍物</span>
+                        <span class="tree-count" id="obstacleCount">(0)</span>
+                    </div>
+                    <div class="tree-item" data-type="trajectory">
+                        <span class="tree-icon">📈</span>
+                        <span class="tree-label">轨迹</span>
+                        <span class="tree-count" id="trajectoryCount">(0)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-header">
+                <h3>显示选项</h3>
+            </div>
+            <div class="panel-content">
+                <div class="option-group">
+                    <label class="option-item">
+                        <input type="checkbox" id="showGrid" checked>
+                        <span>显示网格</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="showTrajectory" checked>
+                        <span>显示轨迹</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="showCollisionPoints" checked>
+                        <span>显示碰撞点</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="showPlayerRadius" checked>
+                        <span>显示玩家半径</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="showVectors">
+                        <span>显示向量分解</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="showStats" checked>
+                        <span>显示统计信息</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="panel-header">
+                <h3>工具选项</h3>
+            </div>
+            <div class="panel-content">
+                <div class="tool-options">
+                    <div class="option-row">
+                        <label>网格大小</label>
+                        <select id="gridSizeSelect" class="option-select">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <div class="option-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="snapToGrid" checked>
+                            <span>吸附到网格</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-header">
+                <h3>快速操作</h3>
+            </div>
+            <div class="panel-content">
+                <div class="quick-actions">
+                    <button class="action-btn" id="btnDuplicate" title="复制选中 (Ctrl+D)">
+                        <span class="icon">📋</span>
+                        <span>复制</span>
+                    </button>
+                    <button class="action-btn" id="btnSelectAll" title="全选 (Ctrl+A)">
+                        <span class="icon">◫</span>
+                        <span>全选</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas 区域 -->
+        <div class="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+            <div class="canvas-overlay">
+                <div class="stats-panel" id="statsPanel">
+                    <div class="stats-header">实时统计</div>
+                    <div class="stat-item">
+                        <span class="stat-label">FPS:</span>
+                        <span class="stat-value" id="fpsValue">60</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">帧耗时:</span>
+                        <span class="stat-value" id="frameTimeValue">16ms</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">时间:</span>
+                        <span class="stat-value" id="currentTimeDisplay">0.00s</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">位置:</span>
+                        <span class="stat-value" id="positionDisplay">(0, 0)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">距离:</span>
+                        <span class="stat-value" id="distanceDisplay">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">碰撞:</span>
+                        <span class="stat-value" id="collisionDisplay">0</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-label">计算耗时:</span>
+                        <span class="stat-value" id="calcTimeValue">0ms</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">采样点:</span>
+                        <span class="stat-value" id="samplePointsValue">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">检测次数:</span>
+                        <span class="stat-value" id="detectionCountValue">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">上次计算:</span>
+                        <span class="stat-value" id="lastCalcTime">--:--</span>
+                    </div>
+                </div>
+                
+                <div class="control-hint">
+                    <span>🖱️ 左键设置位置 | 右键调整方向 | 滚轮缩放 | 中键平移 | 双击重置视图</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <h3>属性检查器</h3>
+            </div>
+            <div class="panel-content">
+                <div class="property-section">
+                    <div class="section-header">变换</div>
+                    <div class="property-group">
+                        <div class="property-row">
+                            <label>位置 X</label>
+                            <input type="number" id="playerX" value="1500" step="1">
+                            <input type="range" id="playerXSlider" min="0" max="3000" value="1500" step="1">
+                        </div>
+                        <div class="property-row">
+                            <label>位置 Y</label>
+                            <input type="number" id="playerY" value="1000" step="1">
+                            <input type="range" id="playerYSlider" min="0" max="2000" value="1000" step="1">
+                        </div>
+                        <div class="property-row">
+                            <label>旋转角度</label>
+                            <input type="number" id="playerAngle" value="0" step="1" min="-360" max="360">
+                            <input type="range" id="playerAngleSlider" min="-360" max="360" value="0" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <div class="section-header">移动</div>
+                    <div class="property-group">
+                        <div class="property-row">
+                            <label>移动速度</label>
+                            <input type="number" id="playerSpeed" value="300" step="10" min="0" max="100000">
+                            <input type="range" id="playerSpeedSlider" min="0" max="2000" value="300" step="10">
+                        </div>
+                        <div class="property-row">
+                            <label>碰撞半径</label>
+                            <input type="number" id="playerRadius" value="25" step="1" min="1" max="1000">
+                            <input type="range" id="playerRadiusSlider" min="1" max="200" value="25" step="1">
+                        </div>
+                        <div class="property-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="playerIsMoving" checked>
+                                <span>正在移动</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <div class="section-header">模拟</div>
+                    <div class="property-group">
+                        <div class="property-row">
+                            <label>最大时间 (秒)</label>
+                            <input type="number" id="maxTime" value="30" step="1" min="1" max="100000">
+                            <input type="range" id="maxTimeSlider" min="1" max="300" value="30" step="1">
+                        </div>
+                        <div class="property-row">
+                            <label>采样间隔 (秒)</label>
+                            <input type="number" id="sampleRate" value="0.2" step="0.01" min="0.001" max="10">
+                            <input type="range" id="sampleRateSlider" min="0.01" max="1" value="0.2" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property-section">
+                    <div class="section-header">碰撞信息</div>
+                    <div class="property-group">
+                        <div class="info-item">
+                            <span class="info-label">碰撞总数:</span>
+                            <span class="info-value" id="totalCollisions">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">滑行次数:</span>
+                            <span class="info-value" id="slideEvents">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">路径长度:</span>
+                            <span class="info-value" id="pathLength">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部时间轴 -->
+    <div class="timeline-container">
+        <div class="timeline-controls">
+            <button class="timeline-btn" id="btnPlay" title="播放 (Space)">▶</button>
+            <button class="timeline-btn" id="btnPause" title="暂停 (Space)" disabled>⏸</button>
+            <button class="timeline-btn" id="btnReset" title="重置 (R)">⏮</button>
+            <div class="time-display">
+                <span id="timeDisplay">00:00.00</span>
+                <span class="time-separator">/</span>
+                <span id="maxTimeDisplay">01:00.00</span>
+            </div>
+        </div>
+        
+        <div class="timeline-track">
+            <input type="range" id="timeSlider" min="0" max="30" value="0" step="0.01">
+            <div class="timeline-markers" id="timelineMarkers"></div>
+        </div>
+        
+        <div class="timeline-info">
+            <span>播放速度: </span>
+            <button class="speed-btn" data-speed="0.25">0.25x</button>
+            <button class="speed-btn active" data-speed="1">1x</button>
+            <button class="speed-btn" data-speed="2">2x</button>
+            <button class="speed-btn" data-speed="5">5x</button>
+            <button class="speed-btn" data-speed="10">10x</button>
+        </div>
+    </div>
+
+    <!-- 帮助对话框 -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>快捷键与操作指南</h2>
+                <button class="modal-close" id="closeHelp">×</button>
+            </div>
+            <div class="modal-body">
+                <h3>鼠标操作</h3>
+                <ul>
+                    <li><kbd>左键点击</kbd> - 设置玩家位置 / 创建障碍物</li>
+                    <li><kbd>右键拖动</kbd> - 调整玩家方向</li>
+                    <li><kbd>滚轮</kbd> - 缩放视图</li>
+                    <li><kbd>中键拖动</kbd> - 平移视图</li>
+                    <li><kbd>双击</kbd> - 重置视图</li>
+                </ul>
+                <h3>键盘快捷键</h3>
+                <ul>
+                    <li><kbd>Space</kbd> - 播放/暂停</li>
+                    <li><kbd>R</kbd> - 重置时间</li>
+                    <li><kbd>G</kbd> - 切换网格</li>
+                    <li><kbd>T</kbd> - 切换轨迹</li>
+                    <li><kbd>H</kbd> - 显示帮助</li>
+                    <li><kbd>ESC</kbd> - 关闭对话框</li>
+                    <li><kbd>Delete</kbd> - 删除选中对象</li>
+                </ul>
+                <h3>编辑工具</h3>
+                <ul>
+                    <li><kbd>V</kbd> - 选择工具</li>
+                    <li><kbd>M</kbd> - 移动工具</li>
+                    <li><kbd>P</kbd> - 多边形工具（点击添加顶点，双击完成）</li>
+                </ul>
+                <h3>文件操作</h3>
+                <ul>
+                    <li><kbd>Ctrl+S</kbd> - 保存场景</li>
+                </ul>
+                <h3>核心算法</h3>
+                <p><strong>基于时间的确定性计算：</strong>只需知道起始位置、方向、速度和时间，就能精确计算任意时刻的位置。</p>
+                <p><strong>墙面滑行：</strong>通过向量分解，去除垂直分量，保留95%的平行分量，实现流畅的沿墙滑行。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <!-- 加载脚本 -->
+    <script src="js/vector2d.js"></script>
+    <script src="js/collision.js"></script>
+    <script src="js/wallslide.js"></script>
+    <script src="js/utils/spatial-grid.js"></script>
+    <script src="js/movement.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/editor/viewport.js"></script>
+    <script src="js/editor/tools.js"></script>
+    <script src="js/editor/serializer.js"></script>
+    <script src="js/debug/profiler.js"></script>
+    <script src="js/presets.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+The following JavaScript throws "ReferenceError: overlap is not defined" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+/**
+ * physics.js — AABB platformer collision resolution.
+ *
+ * A small, well-defined collision step shared by the player and enemies. We
+ * resolve the X and Y axes separately ("swept-ish" axis separation): move on X
+ * and push out of any solid overlapped, then do the same on Y. Resolving axes
+ * independently is the standard trick that prevents catching on tile seams and
+ * makes wall-vs-floor behaviour predictable.
+ *
+ * Solids are AABBs `{ x, y, w, h, oneWay? }`. One-way platforms only collide
+ * when the body is moving downward and was above them last frame.
+ *
+ * @module systems/physics
+ */
+
+/**
+ * @typedef {object} Body
+ * @property {number} x @property {number} y
+ * @property {number} w @property {number} h
+ * @property {number} vx @property {number} vy
+ * @property {boolean} grounded
+ * @property {boolean} hitCeiling
+ * @property {boolean} touchingWall
+ * @property {number} wallDir  -1 left wall, 1 right wall, 0 none
+ */
+
+/**
+ * Integrate velocity and resolve against solids in place.
+ * @param {Body} body
+ * @param {Array<{x:number,y:number,w:number,h:number,oneWay?:boolean}>} solids
+ * @param {number} dt
+ */
+export function moveAndCollide(body, solids, dt) {
+  body.grounded = false;
+  body.hitCeiling = false;
+  body.touchingWall = false;
+  body.wallDir = 0;
+
+  // --- X axis ---
+  body.x += body.vx * dt;
+  for (const s of solids) {
+    if (s.oneWay) continue; // one-way platforms never block horizontal motion
+    if (!overlap(body, s)) continue;
+    if (body.vx > 0) {
+      body.x = s.x - body.w;
+      body.touchingWall = true;
+      body.wallDir = 1;
+    } else if (body.vx < 0) {
+      body.x = s.x + s.w;
+      body.touchingWall = true;
+      body.wallDir = -1;
+    }
+    body.vx = 0;
+  }
+
+  // --- Y axis ---
+  const prevBottom = body.y + body.h; // before vertical move (for one-way test)
+  body.y += body.vy * dt;
+  for (const s of solids) {
+    if (!overlap(body, s)) continue;
+    if (s.oneWay) {
+      // Only land on top, only when descending and previously above the lip.
+      if (body.vy <= 0) continue;
+      if (prevBottom > s.y + 6) continue;
+    }
+    if (body.vy > 0) {
+      body.y = s.y - body.h;
+      body.grounded = true;
+    } else if (body.vy < 0) {
+      body.y = s.y + s.h;
+      body.hitCeiling = true;
+    }
+    body.vy = 0;
+  }
+}
+
+/** Strict overlap test between a body and a solid. */
+
+
+/**
+ * Probe whether a body is standing on something this frame without moving it —
+ * useful for coyote-time and edge detection. Returns true if a 1px downward
+ * shift would collide with a solid top.
+ */
+export function isGrounded(body, solids) {
+  const probe = { ...body, y: body.y + 1 };
+  for (const s of solids) {
+    if (s.oneWay && body.y + body.h > s.y + 6) continue;
+    if (overlap(probe, s) && body.y + body.h <= s.y + Math.abs(body.vy) + 2) return true;
+  }
+  return false;
+}
+```

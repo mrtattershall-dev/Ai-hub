@@ -1,0 +1,78 @@
+<html lang="en-US" dir="ltr">
+<link href="styles.css" rel="stylesheet">
+<title>YokosukaJS</title>
+<body>
+<div class="page">
+  <h1>YokosukaJS</h1>
+  <canvas id="canvas" style="image-rendering:pixelated; background-color: orange;" />
+</div>
+<div class="page">
+  <h2>Use arrow keys to move and 'A' and 'S' to attack</h2>
+  <input type="submit" id="pause_button" value="Pause" onclick="DidTapPause();" />
+  <input type="checkbox" id="audio_enabled" onclick="DidToggleAudio();" />
+  <label>Enable audio</label>
+  <div id="framerate">10 fps</div>
+  <input type="range" id="range" value="10" min="1" max="30" step="1" onchange="DidChangeFramerate();"/>
+  <div class="footer" style="padding-top:0.5em;">
+      <p>Visit <a href="https://github.com/allenu/YokosukaJS">github.com/allenu/YokosukaJS</a> for project info. Follow me at <a href="https://twitter.com/ussherpress">@ussherpress</a>.</p><p>Sprites are temporary and taken from River City Ransom.</p>
+  </div>
+</div>
+</body>
+<script src="./directors.js"></script>
+<script src="./presentation.js"></script>
+<script src="./script.js"></script>
+<script src="./signals.js"></script>
+<script src="./statemachine.js"></script>
+<script src="./animata.js"></script>
+<script src="./renderer.js"></script>
+<script src="./resourceloader.js"></script>
+<script src="./keyboard.js"></script>
+<script src="./external/js-yaml.min.js"></script>
+<script src="./controller.js"></script>
+<script src="./game.js"></script>
+<script src="./physics.js"></script>
+<script src="./external/synthie.js"></script>
+<script src="./external/audio-controller.js"></script>
+<script>
+  var g_canvas = document.getElementById("canvas")
+  g_canvas.width = 320
+  g_canvas.height = 240
+  g_canvas.style.width = '680px'
+  g_canvas.style.height = '440px'
+
+  window.addEventListener('keydown', HandleKeyDown, true)
+  window.addEventListener('keyup', HandleKeyUp, true)
+
+  var g_paused = false
+  var g_audio_enabled = false
+  var g_framerate = 10
+
+  StartGame()
+
+  function DidChangeFramerate() {
+    let str = document.getElementById("range").value
+    let newRate = parseInt(str, 10)
+    document.getElementById("framerate").innerHTML = "" + newRate + " fps"
+    g_framerate = newRate
+  }
+  function DidTapPause() {
+    g_paused = !g_paused
+
+    let pause_button = document.getElementById("pause_button")
+    pause_button.value = g_paused ? "Resume" : "Pause"
+  }
+  function DidToggleAudio() {
+    g_audio_enabled = !g_audio_enabled
+
+    if (g_audio_enabled) {
+        SetupAudio()
+    } else {
+        TearDownAudio()
+    }
+
+    let toggle = document.getElementById("audio_enabled")
+    toggle.value = g_audio_enabled ? "1" : "0"
+  }
+</script>
+</html>
+

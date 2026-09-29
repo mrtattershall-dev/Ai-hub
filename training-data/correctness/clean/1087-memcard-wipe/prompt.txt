@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+wipe (from js/ui/widgets.js)

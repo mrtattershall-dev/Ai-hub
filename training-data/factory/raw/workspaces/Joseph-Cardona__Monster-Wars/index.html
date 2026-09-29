@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>| Monster Wars |</title>
+    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/kKzm07w/Mushroom-Potion3.png">
+    <style>
+     html, body {
+      margin: 0;
+      padding: 0;
+     }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+<body>
+    <script>
+	    
+	    //Some variables being set
+	    let music
+	    let fuel = 200
+	    let health = 200
+	    let fuelCharge = 100
+	    let counter = 0
+	    let round = 1
+	    let roundsLived = 1
+	    //Muncher vv
+	    let muncherHealth1 = 20
+	    let muncherHealth2 = 20
+	    let muncherHealth3 = 20
+	    let muncherHealth4 = 20
+	    let muncherHealth5 = 20
+	    let muncherHealth6 = 20
+	    let muncherHealth7 = 20
+	    //Muncher ^^
+	    let angle
+	    let bulletAngle
+	    let bulletOnGun
+	    let bX
+	    let bY
+	    let radians
+	    let cursor
+	    let bounds1
+	    let bounds2
+	    //Muncher vv
+	    let muncherangle1
+	    let muncherangle2
+	    let muncherangle3
+	    let muncherangle4
+	    let muncherangle5
+	    let muncherangle6
+	    let muncherangle7
+	    let muncherVelocity
+	    let muncherVelocity2
+	    let muncherVelocity3
+	    let muncherVelocity4
+	    let muncherVelocity5
+	    let muncherVelocity6
+	    let muncherVelocity7
+	    let boundM1
+	    let boundM2
+	    let boundM3
+	    let boundM4
+	    let boundM5
+	    let boundM6
+	    let boundM7
+	    //Muncher ^^
+	    let boundsP
+	    
+	    //Used to determine whether the game is on the planet or title screen
+	    //Switch between 0 and 1 to go to title screen and planet
+	    let gameOn = 0
+	    
+	    //The preload
+	    function preload() {
+
+  //Loading the jams
+  this.load.audio('backgroundMusic', 'Monster-Wars-Metal.wav');
+  
+  //The images being loaded
+  this.load.image(
+    'bg', 
+    src='images/Screen Shot 2023-01-07 at 6.27.22 PM.png'
+  );
+  this.load.image(
+    "platform",
+    src="images/planet (1).png"
+  );
+  this.load.image(
+    "codey",
+    "https://i.ibb.co/2KV1PSv/Monster-Hunter-Squat-Walk2.png"
+  );
+  this.load.image(
+    "codeyup",
+    'images/Monster Hunter Squat Walk.png'
+  )
+  this.load.image(
+    "start", 
+    "images/start button.png"
+  );
+  this.load.image(
+    "logo", 
+    "images/Monster Wars Logo (2).png"
+  );
+  this.load.image(
+    "theGun",
+    "images/Laser Gun5.png"
+  )
+  this.load.image(
+    "theBullet",
+    "images/Orange Bullet.png"
+  )	    
+  this.load.spritesheet(
+    'muncher1', 
+    'images/output-onlinegiftools (1).png',
+    { frameWidth: 285, frameHeight: 399 }
+  );
+}
+
+//The game state being created
+const gameState = {
+	health: 100,
+ 	maxHealth: 100,
+	REALhealth: 100,
+ 	REALmaxHealth: 100,
+	score : 0
+};
+
+//The create function
+function create() {
+
+  // Create a reference to the loaded music
+  music = game.sound.add('backgroundMusic', { loop: true }); // { loop: true } will make the music loop continuously
+   
+  //Not in use
+  //var bg = this.add.image(window.innerWidth / 2, window.innerHeight / 2, 'bg');
+	
+  //Sets mouse position
+  cursor = this.input.activePointer
+	
+  //Background code
+  gameState.bg = this.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'bg').setScale(1.3);
+	
+  //Stuff for the bars
+  gameState.graphics = this.add.graphics();
+  //gameState.graphicHealth = this.add.graphics();
+	
+  //Stuff that loads if the game is on the title screen
+  if(gameOn === 0){
+	  
+	//Resets the players stats
+	fuel = 200
+	fuelCharge = 100
+	bulletOnGun = 1
+	health = 200
+	counter = 0
+	//MONSTER vv
+	muncherHealth1 = 20
+	muncherHealth2 = 20
+	muncherHealth3 = 20
+	muncherHealth4 = 20
+	muncherHealth5 = 20
+	muncherHealth6 = 20
+	muncherHealth7 = 20
+	//MONSTER ^^
+	round = 1
+	roundsLived = 1
+	//alert("You made it to round " + roundsLived)
+	  
+	//Start button code
+  	gameState.startButton = this.add.sprite(window.innerWidth / 2, window.innerHeight / 2, "start").setScale(0.65);
+	  
+	//The logo being created
+	gameState.logo = this.add.sprite(window.innerWidth / 2, window.innerHeight / 4.7, "logo").setScale(1);
+	  
+	//The button handling being clicked
+  	gameState.startButton.setInteractive()
+	gameState.startButton.on('pointerdown', function() {
+		this.cameras.main.fade(400, 0, 0, 0, false, function(camera, progress) {if(progress > .9){
+			gameOn = 1
+			this.scene.restart(this, {}, 'previous')
+		}})
+	}, this);
+  }
+  
+  //Loads player, gun, and bullet if the game is on the planet
+  if(gameOn === 1){
+  	gameState.player = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, "codey").setScale(0.5);
+	gameState.gun = this.add.sprite(window.innerWidth / 2, window.innerHeight / 2, "theGun").setScale(0.3);
+	gameState.bullet = this.add.sprite(window.innerWidth / 2, window.innerHeight / 2, "theBullet").setScale(0.25);
+	gameState.platformy = this.add.sprite(window.innerWidth / 2, window.innerHeight - window.innerHeight / 5, "platform");
+  }
+  
+  //Not in use right now
+  //gameState.scoreText = this.add.text(window.innerWidth / 40, window.innerHeight / 40, 'Fuel: 0', { fontSize: '5em', fill: 'rgb(50, 50, 50)' });
+	
+  //Loads planet if the game is on the planet
+  const platforms = this.physics.add.staticGroup();
+  if(gameOn === 1){
+ 	 platforms.create(window.innerWidth / 2, window.innerHeight - window.innerHeight / 5, "platform");
+  }
+
+
+  //Loads enemy stuff
+  if(gameOn === 1) {
+	 //Starting the jams
+	 music.play();
+	  
+	 //Loading the enemies
+	 gameState.muncher1 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher1.body.gravity.y = 0
+	 gameState.muncher1.body.velocity.y = 0;
+	 gameState.muncher1.body.setCollideWorldBounds(true);
+	 gameState.muncher2 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher2.body.gravity.y = 0
+	 gameState.muncher2.body.velocity.y = 0;
+	 gameState.muncher2.body.setCollideWorldBounds(true);
+	 gameState.muncher3 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher3.body.gravity.y = 0
+	 gameState.muncher3.body.velocity.y = 0;
+	 gameState.muncher3.body.setCollideWorldBounds(true);
+	 gameState.muncher4 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher4.body.gravity.y = 0
+	 gameState.muncher4.body.velocity.y = 0;
+	 gameState.muncher4.body.setCollideWorldBounds(true);
+	 gameState.muncher5 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher5.body.gravity.y = 0
+	 gameState.muncher5.body.velocity.y = 0;
+	 gameState.muncher5.body.setCollideWorldBounds(true);
+	 gameState.muncher6 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher6.body.gravity.y = 0
+	 gameState.muncher6.body.velocity.y = 0;
+	 gameState.muncher6.body.setCollideWorldBounds(true);
+	 gameState.muncher7 = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 3, 'muncher1').setScale(0.25);
+	 gameState.muncher7.body.gravity.y = 0
+	 gameState.muncher7.body.velocity.y = 0;
+	 gameState.muncher7.body.setCollideWorldBounds(true);
+	
+	 //Making the enemies animations
+	 this.anims.create({
+      		key: 'muncher1anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 this.anims.create({
+      		key: 'muncher2anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 this.anims.create({
+      		key: 'muncher3anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 this.anims.create({
+      		key: 'muncher4anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 this.anims.create({
+      		key: 'muncher5anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 this.anims.create({
+      		key: 'muncher6anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 this.anims.create({
+      		key: 'muncher7anim',
+      		frames: this.anims.generateFrameNumbers('muncher1', { start: 0, end: 3 }),
+      		frameRate: 10,
+      		repeat: -1
+    	 });
+	 
+  }
+	
+  //Makes sure the player and planet colide
+  this.physics.add.collider(gameState.player, platforms);
+
+  //Adds buttons
+  gameState.cursors = this.input.keyboard.createCursorKeys();
+  gameState.wasd = this.input.keyboard.addKeys({
+  up: 'W',
+  down: 'S',
+  left: 'A',
+  right: 'D'
+  });
+  
+  //For later once I learn animations
+  //gameState.player.animations = this.animations;
+  //var anim = gameState.player.animations.add('anim', ['codey', 'codeyup'], 1, true);
+  //anim.play();
+
+  //Clearing the console real quick
+  console.clear()
+}
+
+//The update function
+function update() {
+	
+  //Only updates if the game is on the title screen
+  if(gameOn === 0){
+	
+	//Code to make the background move with the mouse
+  	gameState.bg.x = window.innerWidth / 2 - game.input.mousePointer.x / -15
+	gameState.bg.y = window.innerHeight / 2 - game.input.mousePointer.y / -15
+  }
+	
+  //Only updates planet stuff if game is on the planet
+  if(gameOn === 1){
+  	 gameState.graphics.clear();
+	  
+	 //Ups the counter
+	 counter += 1
+	 //console.log(counter)
+	  
+	 //Holds back the enemies
+	 if(round === 1){
+	 	if(counter < 300 || muncherHealth1 <= 0){
+			gameState.muncher1.x = window.innerWidth / 2
+			gameState.muncher1.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 500 || muncherHealth2 <= 0) {
+			gameState.muncher2.x = window.innerWidth
+			gameState.muncher2.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 700 || muncherHealth3 <= 0) {
+			gameState.muncher3.x = 0
+			gameState.muncher3.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 900 || muncherHealth4 <= 0) {
+			gameState.muncher4.x = window.innerWidth
+			gameState.muncher4.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 1100 || muncherHealth5 <= 0) {
+			gameState.muncher5.x = 0
+			gameState.muncher5.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 1100 || muncherHealth6 <= 0) {
+			gameState.muncher6.x = window.innerWidth
+			gameState.muncher6.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 1200 || muncherHealth7 <= 0) {
+			gameState.muncher7.x = window.innerWidth / 2
+			gameState.muncher7.y = 0 - window.innerHeight / 10
+		}
+		if (counter > 1500 && muncherHealth1 <= 0 && muncherHealth2 <= 0 && muncherHealth3 <= 0 && muncherHealth4 <= 0 && muncherHealth5 <= 0 && muncherHealth6 <= 0 && muncherHealth7 <= 0){
+			round = 2
+			roundsLived += 1
+			console.log('total rounds ' + roundsLived)
+			counter = 0
+			console.clear()
+			console.log('round ' + round)
+			muncherHealth1 = 20
+			muncherHealth2 = 20
+			muncherHealth3 = 20
+			muncherHealth4 = 20
+			muncherHealth5 = 20
+			muncherHealth6 = 20
+			muncherHealth7 = 20
+		}
+	 } else if(round === 2){
+		 if(counter < 200 || muncherHealth1 <= 0){
+			gameState.muncher1.x = window.innerWidth / 2
+			gameState.muncher1.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 250 || muncherHealth2 <= 0) {
+			gameState.muncher2.x = window.innerWidth
+			gameState.muncher2.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 400 || muncherHealth3 <= 0) {
+			gameState.muncher3.x = 0
+			gameState.muncher3.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 750 || muncherHealth4 <= 0) {
+			gameState.muncher4.x = window.innerWidth
+			gameState.muncher4.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 800 || muncherHealth5 <= 0) {
+			gameState.muncher5.x = 0
+			gameState.muncher5.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 1000 || muncherHealth6 <= 0) {
+			gameState.muncher6.x = window.innerWidth
+			gameState.muncher6.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 1100 || muncherHealth7 <= 0) {
+			gameState.muncher7.x = window.innerWidth / 2
+			gameState.muncher7.y = 0 - window.innerHeight / 10
+		}
+		if (counter > 1400 && muncherHealth1 <= 0 && muncherHealth2 <= 0 && muncherHealth3 <= 0 && muncherHealth4 <= 0 && muncherHealth5 <= 0 && muncherHealth6 <= 0 && muncherHealth7 <= 0){
+			round = 3
+			roundsLived += 1
+			console.log('total rounds ' + roundsLived)
+			counter = 0
+			console.clear()
+			console.log('round ' + round)
+			muncherHealth1 = 20
+			muncherHealth2 = 20
+			muncherHealth3 = 20
+			muncherHealth4 = 20
+			muncherHealth5 = 20
+			muncherHealth6 = 20
+			muncherHealth7 = 20
+		} 
+	 } else if(round === 3){
+		 if(counter < 200 || muncherHealth1 <= 0){
+			gameState.muncher1.x = window.innerWidth / 2
+			gameState.muncher1.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 250 || muncherHealth2 <= 0) {
+			gameState.muncher2.x = window.innerWidth
+			gameState.muncher2.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 250 || muncherHealth3 <= 0) {
+			gameState.muncher3.x = 0
+			gameState.muncher3.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 600 || muncherHealth4 <= 0) {
+			gameState.muncher4.x = window.innerWidth
+			gameState.muncher4.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 450 || muncherHealth5 <= 0) {
+			gameState.muncher5.x = 0
+			gameState.muncher5.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 900 || muncherHealth6 <= 0) {
+			gameState.muncher6.x = window.innerWidth
+			gameState.muncher6.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 750 || muncherHealth7 <= 0) {
+			gameState.muncher7.x = window.innerWidth / 2
+			gameState.muncher7.y = 0 - window.innerHeight / 10
+		}
+		if (counter > 1100 && muncherHealth1 <= 0 && muncherHealth2 <= 0 && muncherHealth3 <= 0 && muncherHealth4 <= 0 && muncherHealth5 <= 0 && muncherHealth6 <= 0 && muncherHealth7 <= 0){
+			round = 4
+			roundsLived += 1
+			console.log('total rounds ' + roundsLived)
+			counter = 0
+			console.clear()
+			console.log('round ' + round)
+			muncherHealth1 = 20
+			muncherHealth2 = 20
+			muncherHealth3 = 20
+			muncherHealth4 = 20
+			muncherHealth5 = 20
+			muncherHealth6 = 20
+			muncherHealth7 = 20
+		}
+	 } else if(round === 4){
+		 if(counter < 800 || muncherHealth1 <= 0){
+			gameState.muncher1.x = window.innerWidth / 2
+			gameState.muncher1.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 500 || muncherHealth2 <= 0) {
+			gameState.muncher2.x = window.innerWidth
+			gameState.muncher2.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 400 || muncherHealth3 <= 0) {
+			gameState.muncher3.x = 0
+			gameState.muncher3.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 400 || muncherHealth4 <= 0) {
+			gameState.muncher4.x = window.innerWidth
+			gameState.muncher4.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 700 || muncherHealth5 <= 0) {
+			gameState.muncher5.x = 0
+			gameState.muncher5.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 800 || muncherHealth6 <= 0) {
+			gameState.muncher6.x = window.innerWidth
+			gameState.muncher6.y = 0 - window.innerHeight / 10
+	 	}
+	 	if (counter < 650 || muncherHealth7 <= 0) {
+			gameState.muncher7.x = window.innerWidth / 2
+			gameState.muncher7.y = 0 - window.innerHeight / 10
+		}
+		if (counter > 1000 && muncherHealth1 <= 0 && muncherHealth2 <= 0 && muncherHealth3 <= 0 && muncherHealth4 <= 0 && muncherHealth5 <= 0 && muncherHealth6 <= 0 && muncherHealth7 <= 0){
+			round = 3 //last change here
+			roundsLived += 1
+			console.log('total rounds ' + roundsLived)
+			counter = 0
+			console.clear()
+			console.log('round ' + round)
+			muncherHealth1 = 20
+			muncherHealth2 = 20
+			muncherHealth3 = 20
+			muncherHealth4 = 20
+			muncherHealth5 = 20
+			muncherHealth6 = 20
+			muncherHealth7 = 20
+		}
+	 }
+	 //Run the enemies animation
+	 gameState.muncher1.anims.play('muncher1anim', true);
+	 gameState.muncher2.anims.play('muncher2anim', true);
+	 gameState.muncher3.anims.play('muncher3anim', true);
+	 gameState.muncher4.anims.play('muncher4anim', true);
+	 gameState.muncher5.anims.play('muncher5anim', true);
+	 gameState.muncher6.anims.play('muncher6anim', true);
+	 gameState.muncher7.anims.play('muncher7anim', true);
+	  
+	 //Sets the munchers angles
+	 muncherangle1 = Math.atan2(gameState.player.y - gameState.muncher1.y, gameState.player.x - gameState.muncher1.x);
+	 gameState.muncher1.rotation = muncherangle1;
+	 muncherangle2 = Math.atan2(gameState.player.y - gameState.muncher2.y, gameState.player.x - gameState.muncher2.x);
+	 gameState.muncher2.rotation = muncherangle2;
+	 muncherangle3 = Math.atan2(gameState.player.y - gameState.muncher3.y, gameState.player.x - gameState.muncher3.x);
+	 gameState.muncher3.rotation = muncherangle3;
+	 muncherangle4 = Math.atan2(gameState.player.y - gameState.muncher4.y, gameState.player.x - gameState.muncher4.x);
+	 gameState.muncher4.rotation = muncherangle4;
+	 muncherangle5 = Math.atan2(gameState.player.y - gameState.muncher5.y, gameState.player.x - gameState.muncher5.x);
+	 gameState.muncher5.rotation = muncherangle5;
+	 muncherangle6 = Math.atan2(gameState.player.y - gameState.muncher6.y, gameState.player.x - gameState.muncher6.x);
+	 gameState.muncher6.rotation = muncherangle6;
+	 muncherangle7 = Math.atan2(gameState.player.y - gameState.muncher7.y, gameState.player.x - gameState.muncher7.x);
+	 gameState.muncher7.rotation = muncherangle7;
+	  
+	 //Making the enemy move towards the player
+         gameState.muncher1.speed = 200
+	 muncherVelocity = this.physics.velocityFromRotation(gameState.muncher1.rotation, gameState.muncher1.speed);
+	 gameState.muncher1.body.velocity.x = muncherVelocity.x;
+	 gameState.muncher1.body.velocity.y = muncherVelocity.y;
+	 gameState.muncher2.speed = 200
+	 muncherVelocity2 = this.physics.velocityFromRotation(gameState.muncher2.rotation, gameState.muncher2.speed);
+	 gameState.muncher2.body.velocity.x = muncherVelocity2.x;
+	 gameState.muncher2.body.velocity.y = muncherVelocity2.y;
+	 gameState.muncher3.speed = 200
+	 muncherVelocity3 = this.physics.velocityFromRotation(gameState.muncher3.rotation, gameState.muncher3.speed);
+	 gameState.muncher3.body.velocity.x = muncherVelocity3.x;
+	 gameState.muncher3.body.velocity.y = muncherVelocity3.y;
+	 gameState.muncher4.speed = 200
+	 muncherVelocity4 = this.physics.velocityFromRotation(gameState.muncher4.rotation, gameState.muncher4.speed);
+	 gameState.muncher4.body.velocity.x = muncherVelocity4.x;
+	 gameState.muncher4.body.velocity.y = muncherVelocity4.y;
+	 gameState.muncher5.speed = 200
+	 muncherVelocity5 = this.physics.velocityFromRotation(gameState.muncher5.rotation, gameState.muncher5.speed);
+	 gameState.muncher5.body.velocity.x = muncherVelocity5.x;
+	 gameState.muncher5.body.velocity.y = muncherVelocity5.y;
+	 gameState.muncher6.speed = 200
+	 muncherVelocity6 = this.physics.velocityFromRotation(gameState.muncher6.rotation, gameState.muncher6.speed);
+	 gameState.muncher6.body.velocity.x = muncherVelocity6.x;
+	 gameState.muncher6.body.velocity.y = muncherVelocity6.y;
+	 gameState.muncher7.speed = 200
+	 muncherVelocity7 = this.physics.velocityFromRotation(gameState.muncher7.rotation, gameState.muncher7.speed);
+	 gameState.muncher7.body.velocity.x = muncherVelocity7.x;
+	 gameState.muncher7.body.velocity.y = muncherVelocity7.y;
+	  
+         //Draw the background for the fuel bar
+ 	 gameState.graphics.fillStyle(666666, 1);
+ 	 gameState.graphics.fillRect(10, 10 + 35, 400, 20);
+	 
+	 //Draw the background for the health bar
+ 	 gameState.graphics.fillStyle(666666, 1);
+ 	 gameState.graphics.fillRect(10, 10, 400, 20);
+	  
+         //Calculate the width of the full part of the fuel bar
+ 	 const healthPercentage = fuel / gameState.maxHealth;
+ 	 const healthBarWidth = healthPercentage * 200;
+	  
+	 //Calculate the width of the full part of the health bar
+ 	 const REALhealthPercentage = health / gameState.REALmaxHealth;
+ 	 const REALhealthBarWidth = REALhealthPercentage * 200;
+	
+         //Draw the full part of the fuel bar
+  	 gameState.graphics.fillStyle(5656E1, 1);
+ 	 gameState.graphics.fillRect(10, 10 + 35, healthBarWidth, 20);
+	  
+	 //Draw the full part of the health bar
+  	 gameState.graphics.fillStyle(0x4AEE4A, 1);
+ 	 gameState.graphics.fillRect(10, 10, REALhealthBarWidth, 20);
+	  
+	 //Sets the guns position
+	 //gameState.gun.x = gameState.player.x + 43
+	 gameState.gun.y = gameState.player.y + 13
+	  
+	 //Getting the bounds for everything
+	 boundsP = gameState.player.getBounds();
+	 bounds1 = gameState.bullet.getBounds();
+	 bounds2 = gameState.platformy.getBounds();
+	 boundM1 = gameState.muncher1.getBounds();
+	 boundM2 = gameState.muncher2.getBounds();
+	 boundM3 = gameState.muncher3.getBounds();
+	 boundM4 = gameState.muncher4.getBounds();
+	 boundM5 = gameState.muncher5.getBounds();
+	 boundM6 = gameState.muncher6.getBounds();
+	 boundM7 = gameState.muncher7.getBounds();
+	  
+	 //Sets the guns rotation
+	 angle = Math.atan2(game.input.mousePointer.y - gameState.gun.y, game.input.mousePointer.x - gameState.gun.x);
+	 gameState.gun.rotation = angle;
+	 if(-1.6 > angle && angle > -3.15){
+		 gameState.gun.x = gameState.player.x + 65
+		 gameState.gun.flipY=true
+		 gameState.gun.setOrigin(0,0)
+		 
+	 } else if(1.6 < angle && angle < 3.15){
+		 gameState.gun.x = gameState.player.x + 65
+		 gameState.gun.flipY=true
+		 gameState.gun.setOrigin(0,0)
+
+	 } else{
+		 //Gun to the right
+		 gameState.gun.x = gameState.player.x + 43
+		 gameState.gun.flipY=false
+		 gameState.gun.setOrigin(0,1);
+		 
+	 }
+	 
+	 //Stuff for the bullets
+	 if (bulletOnGun === 1){
+		 bulletAngle = Math.atan2(cursor.y - gameState.bullet.y, cursor.x - gameState.bullet.x);
+	 	 gameState.bullet.rotation = bulletAngle;
+		 gameState.bullet.x = gameState.gun.originX + gameState.gun.x
+		 gameState.bullet.y = gameState.gun.originY + gameState.gun.y
+		 gameState.bullet.visible = false
+		 if(game.input.activePointer.isDown){
+			 bX = Math.cos(angle) * 30
+			 bY = Math.sin(angle) * 30
+			 this.cameras.main.shake(100, .002, false, function(camera, progress) {})
+			 bulletOnGun = 0
+
+		 }
+	 } else{
+		 gameState.bullet.visible = true
+		 gameState.bullet.x += bX
+		 gameState.bullet.y += bY
+		 
+		 //If enemies are hit
+		 if (bounds1.contains(boundM1.x, boundM1.y) || boundM1.contains(bounds1.x, bounds1.y)){
+			 muncherHealth1 -= 1
+			 bulletOnGun = 1
+		 }
+		 if (bounds1.contains(boundM2.x, boundM2.y) || boundM2.contains(bounds1.x, bounds1.y)){
+			 muncherHealth2 -= 1
+			 bulletOnGun = 1
+		 }
+		 if (bounds1.contains(boundM3.x, boundM3.y) || boundM3.contains(bounds1.x, bounds1.y)){
+			 muncherHealth3 -= 1
+			 bulletOnGun = 1
+		 }
+		 if (bounds1.contains(boundM4.x, boundM4.y) || boundM4.contains(bounds1.x, bounds1.y)){
+			 muncherHealth4 -= 1
+			 bulletOnGun = 1
+		 }
+		 if (bounds1.contains(boundM5.x, boundM5.y) || boundM5.contains(bounds1.x, bounds1.y)){
+			 muncherHealth5 -= 1
+			 bulletOnGun = 1
+		 }
+		 if (bounds1.contains(boundM6.x, boundM6.y) || boundM6.contains(bounds1.x, bounds1.y)){
+			 muncherHealth6 -= 1
+			 bulletOnGun = 1
+		 }
+		 if (bounds1.contains(boundM7.x, boundM7.y) || boundM7.contains(bounds1.x, bounds1.y)){
+			 muncherHealth7 -= 1
+			 bulletOnGun = 1
+		 }
+		 
+		 //If island is hit
+		 if (bounds1.contains(bounds2.x, bounds2.y) || bounds2.contains(bounds1.x, bounds1.y)){
+			 bulletOnGun = 1
+		 }
+		 
+		 //If walls are hit
+		 if(gameState.bullet.x < 0){
+    		 	 bulletOnGun = 1
+  		 }
+  		 if(gameState.bullet.x > window.innerWidth){
+    		 	 bulletOnGun = 1
+		 }
+		 if(gameState.bullet.y < 0){
+    		 	 bulletOnGun = 1
+  		 }
+  		 if(gameState.bullet.y > window.innerHeight){
+    		 	 bulletOnGun = 1
+		 }
+	 }
+	 
+	 //Lets the player get hurt
+	 if (boundsP.contains(boundM1.x, boundM1.y) || boundM1.contains(boundsP.x, boundsP.y)){
+	 	 health -= 1
+	 } else if (boundsP.contains(boundM2.x, boundM2.y) || boundM2.contains(boundsP.x, boundsP.y)){
+		 health -= 1
+	 } else if (boundsP.contains(boundM3.x, boundM3.y) || boundM3.contains(boundsP.x, boundsP.y)){
+		 health -= 1
+	 } else if (boundsP.contains(boundM4.x, boundM4.y) || boundM4.contains(boundsP.x, boundsP.y)){
+		 health -= 1
+	 } else if (boundsP.contains(boundM5.x, boundM5.y) || boundM5.contains(boundsP.x, boundsP.y)){
+		 health -= 1
+	 } else if (boundsP.contains(boundM6.x, boundM6.y) || boundM6.contains(boundsP.x, boundsP.y)){
+		 health -= 1
+	 } else if (boundsP.contains(boundM7.x, boundM7.y) || boundM7.contains(boundsP.x, boundsP.y)){
+		 health -= 1
+	 }
+	 
+	 //Checks if the player lost all it's health
+	 if (health <= 0){
+		 gameOn = 0
+		 music.stop();
+		 alert("You made it to round " + roundsLived)
+		 this.scene.restart(this, {}, 'previous')
+	 }
+	 
+  }
+  
+  //Makes sure the fuel runs smoothly
+  if(fuel > 200){
+	  fuel = 200
+  } else if(fuel < 1){
+	  fuelCharge = 0
+  } else{
+	  fuel += 0.25
+  }
+  if(fuelCharge < 100){
+	  fuel += 5
+	  fuelCharge += 1
+  }
+	
+  //Adds what the buttons do
+  if(gameOn === 1){
+  	if (gameState.cursors.left.isDown || gameState.wasd.left.isDown) {
+    		gameState.player.setVelocityX(-400);
+  	} else if (gameState.cursors.right.isDown || gameState.wasd.right.isDown){
+   		gameState.player.setVelocityX(400)
+  	} else{
+    		gameState.player.setVelocityX(0)
+  	}
+	
+        //Teleports the player if they go to far to the side
+	if(gameState.player.x < 0){
+    		gameState.player.x = window.innerWidth
+  	}
+  	if(gameState.player.x > window.innerWidth){
+    		gameState.player.x = 0
+	}
+  
+  	//Checks if you fall off the cliff
+	if(window.innerHeight - window.innerHeight / 15 < gameState.player.y && gameOn === 1){
+		//this.cameras.main.shake(1000, .01, false, function(camera, progress) {this.scene.restart(this, {}, 'previous')})
+		this.cameras.main.fade(200, 0, 0, 0, false, function(camera, progress) {if(progress > .9){
+			gameOn = 0
+			music.stop();
+			alert("You made it to round " + roundsLived)
+			this.scene.restart(this, {}, 'previous')
+		}})
+  	}
+  }	
+  //Not currently in use
+  //gameState.score = gameOn
+  //gameState.scoreText.setText(`Fuel: ${gameState.score}`)
+	
+  //Makes sure the fuel works more
+  if (gameState.cursors.up.isDown || gameState.wasd.up.isDown) {
+	  if(fuel > 0 && fuelCharge === 100){
+		   gameState.player.setVelocityY(-550);
+		   this.cameras.main.shake(100, .001, false, function(camera, progress) {})
+		   fuel -= 2
+	  }
+  }
+}
+
+//The config function
+const config = {
+  type: Phaser.AUTO,
+  width: window.innerWidth,
+  height: window.innerHeight,
+  backgroundColor: "rgb(0, 0, 0)",
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 2000 },
+      enableBody: true,
+    },
+  },
+  //I forget if this is in use or not
+  scene: {
+    preload: preload,
+    create: create,
+    update,
+    gameScene: {
+      create: create
+    }
+  },
+};
+
+//Starts the game
+const game = new Phaser.Game(config);
+
+    </script>
+</body>
+</html>

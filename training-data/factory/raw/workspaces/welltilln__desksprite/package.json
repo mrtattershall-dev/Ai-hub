@@ -1,0 +1,50 @@
+{
+  "name": "desksprite",
+  "version": "2.1.0",
+  "description": "A tiny zero-dependency JavaScript desktop pet / web mascot for your web page — a pixel character sits at a desk, walks around, and you can grab, throw, and toss it back into its seat. A vanilla-JS alternative to Shimeji and oneko. One script tag, no build.",
+  "main": "desksprite.js",
+  "module": "desksprite.js",
+  "unpkg": "desksprite.js",
+  "type": "commonjs",
+  "files": [
+    "desksprite.js",
+    "skins/",
+    "docs/SKIN_FORMAT.md",
+    "CONTRIBUTING.md"
+  ],
+  "scripts": {
+    "demo": "echo \"Open demo/index.html in a browser\""
+  },
+  "keywords": [
+    "desktop-pet",
+    "desk-pet",
+    "web-mascot",
+    "browser-pet",
+    "shimeji",
+    "oneko",
+    "desktop-mascot",
+    "virtual-pet",
+    "cursor-pet",
+    "mascot",
+    "pixel",
+    "pixel-art",
+    "canvas",
+    "animation",
+    "companion",
+    "buddy",
+    "widget",
+    "javascript",
+    "vanilla-js",
+    "no-dependencies",
+    "skin",
+    "sprite"
+  ],
+  "author": "welltilln",
+  "license": "MIT",
+  "homepage": "https://welltilln.github.io/desksprite/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/welltilln/desksprite.git"
+  },
+  "bugs": "https://github.com/welltilln/desksprite/issues"
+}

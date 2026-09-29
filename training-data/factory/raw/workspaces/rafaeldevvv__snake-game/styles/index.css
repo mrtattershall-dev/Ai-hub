@@ -1,0 +1,217 @@
+* {
+   padding: 0;
+   margin: 0;
+   box-sizing: border-box;
+}
+
+html {
+   font-size: 20px;
+}
+
+/* #### ELEMENTS #### */
+body {
+   font-family: sans-serif;
+}
+
+button {
+   border: 0;
+   background: none;
+   outline: 0;
+   cursor: pointer;
+}
+
+h1,
+h2 {
+   text-align: center;
+}
+
+h1 {
+   margin-bottom: .2rem;
+}
+
+h2 {
+   margin-bottom: .8rem;
+   font-size: .8rem;
+}
+
+a {
+   color: green;
+}
+
+/* #### UTILITIES #### */
+.btn {
+   position: relative;
+   padding: .5rem;
+   border-radius: .5rem;
+   font-size: 1rem;
+   border: black 2px solid;
+   box-shadow: 0 2px black;
+}
+
+.btn:active {
+   box-shadow: 0 0 black;
+   top: 2px;
+}
+
+.restart-btn {
+   background-color: blue;
+   color: white;
+}
+
+.mute-btn {
+   background-color: teal;
+   color: white;
+}
+
+.pause-btn {
+   background-color: tomato;
+   color: white;
+}
+
+[class*="keyboard-devices"] {
+   display: none;
+}
+
+/* The Page specific elements */
+main#game-container {
+   width: min-content;
+   max-width: 100%;
+   margin: 2rem auto 15rem;
+   padding-inline: 15px;
+}
+
+ul#warnings {
+   margin-bottom: .85rem;
+   list-style-type: square;
+   padding-left: 1rem;
+   font-size: .8rem;
+}
+
+#score-container {
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: .5rem;
+}
+
+.score-box {
+   padding: .5rem;
+   border-radius: .5rem;
+   display: block;
+}
+
+.score {
+   background-color: red;
+   color: white;
+}
+
+.best-score {
+   background-color: yellow;
+}
+
+#canvas-container {
+   position: relative;
+}
+
+.final-message-container {
+   position: absolute;
+   top: 50%;
+   transform: translateY(-50%);
+   background-color: rgba(0, 0, 0, 0.3);
+   color: white;
+   text-align: center;
+   padding: .8rem 2.5rem .5rem;
+   width: 100%;
+}
+
+.message {
+   text-transform: uppercase;
+   font-size: 2rem;
+   font-weight: 800;
+   margin-bottom: .5rem;
+   line-height: .9;
+}
+
+#buttons-below-canvas {
+   display: flex;
+   justify-content: space-between;
+   margin: .5rem 0;
+}
+
+#virtual-controls {
+   position: fixed;
+   bottom: 2rem;
+   left: 50%;
+   transform: translateX(-50%);
+   display: grid;
+   grid-template-areas:
+      ".... up   ....."
+      "left down right";
+   gap: .5rem;
+   width: max-content;
+   background-color: rgba(0, 0, 0, 0.3);
+   padding: .7rem;
+   border-radius: .4rem;
+   pointer-events: none;
+}
+
+#virtual-controls button {
+   position: relative;
+   padding: .5rem .6rem;
+   aspect-ratio: 1;
+   width: 75px;
+   border: 1px solid white;
+   color: white;
+   border-radius: .2rem;
+   font-size: 2.3rem;
+   pointer-events: all;
+}
+
+#virtual-controls button:active {
+   color: black;
+   background-color: white;
+}
+
+#virtual-controls button .icon {
+   position: absolute;
+   left: 50%;
+   top: 50%;
+   transform: translate(-50%, -50%);
+}
+
+button[data-direction="up"] {
+   grid-area: up;
+}
+
+button[data-direction="left"] {
+   grid-area: left;
+}
+
+button[data-direction="right"] {
+   grid-area: right;
+}
+
+button[data-direction="down"] {
+   grid-area: down;
+}
+
+@media (pointer: fine) {
+   main#game-container {
+      margin-bottom: 5rem;
+   }
+
+   #virtual-controls {
+      display: none;
+   }
+
+   .touch-screen-devices {
+      display: none;
+   }
+
+   .keyboard-devices-inline {
+      display: inline;
+   }
+
+   .keyboard-devices-block {
+      display: block;
+   }
+}

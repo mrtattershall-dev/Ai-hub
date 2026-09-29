@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Arcade Racer - Baby Edition</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #boot { text-align: center; }
+    #boot h1 { font-size: 48px; margin: 0 0 10px; color: #ff0; }
+    #boot p { font-size: 20px; margin: 0 0 20px; color: #aaa; }
+    #boot button { font-size: 24px; padding: 10 20; background: #ff0; color: #000; border: none; cursor: pointer; }
+    #game { position: relative; }
+    #screen { border: 4px solid #444; }
+    #hud { position: absolute; top: 10px; left: 10px; font-size: 16px; color: #fff; }
+    #hud div { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <div id="boot">
+    <h1>ARCADE RACER</h1>
+    <p>Baby Edition</p>
+    <button id="startBtn">START</button>
+  </div>
+  <div id="game" style="display:none;">
+    <canvas id="screen" width="640" height="480"></canvas>
+    <div id="hud">
+      <div id="speed">0 km/h</div>
+      <div id="time">00:00</div>
+      <div id="lap">LAP 1/3</div>
+    </div>
+  </div>
+
+  <script>
+    const boot = document.getElementById("boot");
+    const game = document.getElementById("game");
+    const startBtn = document.getElementById("startBtn");
+    const canvas = document.getElementById("screen");
+    const ctx = canvas.getContext("2d");
+
+    // Game state
+    let running = false;
+    let lastTime = 0;
+    let speed = 0;
+    const maxSpeed = 200;
+    let steer = 0;
+    let position = 0; // horizontal (-1 to 1)
+    let z = 0; // distance along track
+    const trackLength = 1000;
+    const segments = [];
+
+    // Input
+    const keys = { left: false, right: false, up: false, down: false };
+
+    // Build track
+    for (let i = 0; i < trackLength; i++) {
+      segments.push({
+        x: Math.sin(i * 0.01) * 0.5, // curves
+        y: Math.cos(i * 0.02) * 0.2, // hills
+        color: i % 20 === 0 ? "#333" : "#222"
+      });
+    }
+
+    // Input handlers
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") keys.left = true;
+      if (e.key === "ArrowRight") keys.right = true;
+      if (e.key === "ArrowUp") keys.up = true;
+      if (e.key === "ArrowDown") keys.down = true;
+    });
+
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowLeft") keys.left = false;
+      if (e.key === "ArrowRight") keys.right = false;
+      if (e.key === "ArrowUp") keys.up = false;
+      if (e.key === "ArrowDown") keys.down = false;
+    });
+
+    startBtn.addEventListener("click", () => {
+      boot.style.display = "none";
+      game.style.display = "block";
+      running = true;
+      lastTime = performance.now();
+      loop();
+    });
+
+    function loop() {
+      if (!running) return;
+
+      const now = performance.now();
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      update(dt);
+      render();
+
+      requestAnimationFrame(loop);
+    }
+
+    function update(dt) {
+      // Acceleration
+      if (keys.up) speed += 50 * dt;
+      else if (keys.down) speed -= 80 * dt;
+      else speed -= 20 * dt;
+
+      speed = Math.max(0, Math.min(speed, maxSpeed));
+
+      // Steering
+      steer = keys.left ? -1 : keys.right ? 1 : 0;
+
+      position += steer * speed * 0.001;
+      position = Math.max(-1, Math.min(1, position));
+
+      z += speed * dt;
+      if (z >= trackLength) z = 0;
+    }
+
+    function render() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      // Sky
+      ctx.fillStyle = "#0088ff";
+      ctx.fillRect(0, 0, w, h);
+
+      // Ground
+      ctx.fillStyle = "#2a5";
+      ctx.fillRect(0, cy, w, h - cy);
+
+      // Road
+      const segmentIndex = Math.floor(z) % segments.length;
+      const curve = segments[segmentIndex].x;
+
+      for (let y = 0; y < h / 2; y++) {
+        const depth = y / (h / 2);
+        const roadWidth = 200 * (1 - depth) + 20;
+        const roadCenter = cx + (curve * roadWidth * 0.5) - (position * roadWidth * 0.5);
+        const x1 = roadCenter - roadWidth / 2;
+        const x2 = roadCenter + roadWidth / 2;
+
+        ctx.fillStyle = segments[segmentIndex].color;
+        ctx.fillRect(x1, cy - y, x2 - x1, 2);
+      }
+
+      // HUD
+      document.getElementById("speed").textContent = Math.floor(speed) + " km/h";
+      document.getElementById("time").textContent = Math.floor(z / 10) + "m";
+      document.getElementById("lap").textContent = "LAP 1/3";
+    }
+  </script>
+</body>
+</html>

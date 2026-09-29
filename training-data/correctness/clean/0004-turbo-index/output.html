@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TURBO DRIFT — Arcade Racer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --neon-cyan:   #00f5ff;
+    --neon-pink:   #ff006e;
+    --neon-yellow: #ffbe0b;
+    --neon-green:  #06d6a0;
+    --dark-bg:     #050a0f;
+    --panel-bg:    rgba(5,15,25,0.92);
+    --grid-line:   rgba(0,245,255,0.08);
+    --font-head:   'Orbitron', monospace;
+    --font-mono:   'Share Tech Mono', monospace;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--dark-bg);
+    overflow: hidden;
+    font-family: var(--font-mono);
+    color: #cce8f4;
+  }
+
+  /* ── CANVAS ── */
+  #gameCanvas {
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+    image-rendering: pixelated;
+  }
+
+  /* ── OVERLAY SCREENS ── */
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--panel-bg);
+    z-index: 20;
+    transition: opacity 0.35s;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+  #hud.hidden { display: none; }
+
+  /* scanline effect */
+  .screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.18) 3px,
+      rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  .screen > * { position: relative; z-index: 2; }
+
+  /* grid bg */
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── TITLES ── */
+  .game-title {
+    font-family: var(--font-head);
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 900;
+    color: var(--neon-cyan);
+    text-shadow:
+      0 0 20px var(--neon-cyan),
+      0 0 60px rgba(0,245,255,0.4),
+      4px 4px 0 var(--neon-pink);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.2em;
+    animation: titlePulse 3s ease-in-out infinite;
+  }
+  @keyframes titlePulse {
+    0%,100% { text-shadow: 0 0 20px var(--neon-cyan), 0 0 60px rgba(0,245,255,0.4), 4px 4px 0 var(--neon-pink); }
+    50%      { text-shadow: 0 0 40px var(--neon-cyan), 0 0 100px rgba(0,245,255,0.6), 4px 4px 0 var(--neon-pink); }
+  }
+
+  .subtitle {
+    font-family: var(--font-head);
+    font-size: clamp(0.7rem, 2vw, 1.1rem);
+    color: var(--neon-pink);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+    text-shadow: 0 0 10px var(--neon-pink);
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: clamp(1rem, 3vw, 1.8rem);
+    font-weight: 700;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 12px var(--neon-yellow);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    font-family: var(--font-head);
+    font-size: clamp(0.75rem, 2vw, 1rem);
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.75em 2.2em;
+    border: 2px solid var(--neon-cyan);
+    background: transparent;
+    color: var(--neon-cyan);
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+  .btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--neon-cyan);
+    opacity: 0;
+    transition: opacity 0.18s;
+    clip-path: inherit;
+  }
+  .btn:hover { color: var(--dark-bg); text-shadow: none; box-shadow: 0 0 20px var(--neon-cyan); }
+  .btn:hover::before { opacity: 1; }
+  .btn span { position: relative; z-index: 1; }
+  .btn.pink  { border-color: var(--neon-pink);   color: var(--neon-pink);   }
+  .btn.pink:hover  { color: var(--dark-bg); box-shadow: 0 0 20px var(--neon-pink); }
+  .btn.pink::before  { background: var(--neon-pink); }
+  .btn.green { border-color: var(--neon-green);  color: var(--neon-green);  }
+  .btn.green:hover { color: var(--dark-bg); box-shadow: 0 0 20px var(--neon-green); }
+  .btn.green::before { background: var(--neon-green); }
+  .btn.yellow{ border-color: var(--neon-yellow); color: var(--neon-yellow); }
+  .btn.yellow:hover{ color: var(--dark-bg); box-shadow: 0 0 20px var(--neon-yellow); }
+  .btn.yellow::before{ background: var(--neon-yellow); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn:disabled:hover { color: inherit; box-shadow: none; }
+  .btn:disabled:hover::before { opacity: 0; }
+
+  .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+
+  /* ── PANELS ── */
+  .panel {
+    border: 1px solid rgba(0,245,255,0.3);
+    background: rgba(0,10,20,0.7);
+    padding: 1.5rem 2rem;
+    min-width: min(380px, 90vw);
+    max-width: min(600px, 94vw);
+  }
+
+  /* ── CURRENCY BADGE ── */
+  .currency-badge {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 8px var(--neon-yellow);
+    margin-bottom: 1.5rem;
+    text-align: right;
+  }
+
+  /* ── TRACK LIST ── */
+  .track-list { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
+  .track-item {
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid rgba(0,245,255,0.2);
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: rgba(0,20,40,0.5);
+  }
+  .track-item:hover:not(.locked) { border-color: var(--neon-cyan); background: rgba(0,245,255,0.06); }
+  .track-item.selected { border-color: var(--neon-cyan); background: rgba(0,245,255,0.12); box-shadow: 0 0 10px rgba(0,245,255,0.2); }
+  .track-item.locked { opacity: 0.4; cursor: not-allowed; }
+  .track-name { font-family: var(--font-head); font-size: 0.85rem; color: #ddd; }
+  .track-meta { font-size: 0.75rem; color: #888; }
+  .track-tag {
+    font-size: 0.7rem; padding: 2px 8px;
+    border: 1px solid; letter-spacing: 0.1em;
+    font-family: var(--font-head);
+  }
+  .tag-easy   { color: var(--neon-green);  border-color: var(--neon-green);  }
+  .tag-medium { color: var(--neon-yellow); border-color: var(--neon-yellow); }
+  .tag-hard   { color: var(--neon-pink);   border-color: var(--neon-pink);   }
+  .tag-champ  { color: #bf5fff;            border-color: #bf5fff;            }
+  .tag-locked { color: #555; border-color: #555; }
+
+  /* ── UPGRADE SHOP ── */
+  .upgrade-grid { display: flex; flex-direction: column; gap: 0.7rem; }
+  .upgrade-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; border: 1px solid rgba(0,245,255,0.15);
+    padding: 0.6rem 1rem; background: rgba(0,10,25,0.6);
+  }
+  .upgrade-label { font-family: var(--font-head); font-size: 0.8rem; color: #aad4e8; width: 100px; }
+  .upgrade-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.08); position: relative; }
+  .upgrade-bar { height: 100%; background: var(--neon-cyan); transition: width 0.3s; }
+  .upgrade-level { font-size: 0.75rem; color: var(--neon-cyan); width: 40px; text-align: center; }
+
+  /* ── HUD ── */
+  #hud {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .hud-corner {
+    position: absolute;
+    padding: 0.6rem 1rem;
+    background: rgba(5,10,20,0.75);
+    border: 1px solid rgba(0,245,255,0.2);
+    backdrop-filter: blur(2px);
+  }
+  #hud-tl { top: 12px; left: 12px; }
+  #hud-tr { top: 12px; right: 12px; text-align: right; }
+  #hud-bl { bottom: 12px; left: 12px; }
+  .hud-label { font-size: 0.65rem; letter-spacing: 0.15em; color: #5599aa; text-transform: uppercase; }
+  .hud-value { font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); line-height: 1.1; }
+  .hud-value.big { font-size: 2rem; }
+  .hud-pos-badge {
+    font-family: var(--font-head); font-size: 2rem; font-weight: 900;
+    color: var(--neon-yellow); text-shadow: 0 0 12px var(--neon-yellow);
+  }
+  .hud-pos-suffix { font-size: 1rem; vertical-align: super; }
+
+  /* boost bar */
+  #boost-wrap {
+    position: absolute; bottom: 12px; right: 12px;
+    background: rgba(5,10,20,0.75);
+    border: 1px solid rgba(0,245,255,0.2);
+    padding: 0.6rem 1rem;
+    width: 140px;
+  }
+  #boost-bar-bg { width: 100%; height: 10px; background: rgba(255,255,255,0.08); margin-top: 4px; }
+  #boost-bar { height: 100%; background: var(--neon-pink); width: 100%; transition: width 0.1s; }
+
+  /* Live race leaderboard */
+  #race-leaderboard {
+    position: absolute;
+    top: 145px;
+    left: 12px;
+    width: 136px;
+    background: rgba(0,5,20,0.75);
+    border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+    backdrop-filter: blur(4px);
+  }
+  #race-lb-title {
+    font-family: var(--font-head);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: #4488aa;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: opacity 0.3s;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row.lb-player { background: rgba(255,190,11,0.08); border-radius: 2px; }
+  .lb-row.lb-elim { opacity: 0.35; text-decoration: line-through; }
+  .lb-pos { font-family: var(--font-head); font-size: 0.6rem; color: #4488aa; width: 16px; flex-shrink: 0; }
+  .lb-name { flex: 1; color: #aac; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-name.lb-you { color: var(--neon-yellow); font-family: var(--font-head); }
+  .lb-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* minimap */
+  #minimap-wrap {
+    position: absolute; bottom: 72px; right: 12px;
+    background: rgba(5,10,20,0.8);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 4px;
+    padding: 4px;
+  }
+  #minimap { display: block; }
+
+  /* race mode selector */
+  .mode-selector {
+    display: flex;
+    gap: 0;
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 0.6rem;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 0.4em 0;
+    background: transparent;
+    border: none;
+    color: #5599aa;
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mode-btn.active {
+    background: rgba(0,245,255,0.12);
+    color: var(--neon-cyan);
+  }
+  .mode-btn.elim-active {
+    background: rgba(255,0,110,0.15);
+    color: var(--neon-pink);
+  }
+  .mode-desc {
+    font-size: 0.68rem;
+    color: #5599aa;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    min-height: 1.1em;
+    letter-spacing: 0.05em;
+  }
+
+  /* elimination countdown overlay */
+  #elim-warn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-head);
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--neon-pink);
+    text-shadow: 0 0 20px var(--neon-pink);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 30;
+    text-align: center;
+    letter-spacing: 0.08em;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  #elim-warn.show { opacity: 1; }
+  #drift-meter {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    min-width: 160px;
+  }
+  #drift-combo-label {
+    font-family: var(--font-head);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
+  }
+  #drift-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  #drift-score-val {
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 10px var(--neon-pink);
+    min-width: 60px;
+    text-align: right;
+  }
+  #drift-mult {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 8px var(--neon-yellow);
+  }
+  #drift-bar-bg {
+    width: 160px;
+    height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #drift-bar {
+    height: 100%;
+    background: var(--neon-pink);
+    width: 0%;
+    border-radius: 3px;
+    transition: width 0.08s, background 0.3s;
+  }
+  #drift-meter.mult2 #drift-bar { background: var(--neon-yellow); }
+  #drift-meter.mult3 #drift-bar { background: var(--neon-green); }
+  #drift-meter.mult4 #drift-bar { background: #fff; box-shadow: 0 0 6px #fff; }
+  #rival-callout {
+    position: absolute;
+    bottom: 80px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,5,20,0.92);
+    border: 1px solid #ff006e;
+    padding: 10px 20px;
+    text-align: center;
+    font-family: var(--font-head);
+    letter-spacing: 0.07em;
+    line-height: 1.6;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s;
+    z-index: 25;
+  }
+  #rival-callout.show { opacity: 1; }
+
+  #lap-flash {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-head);
+    font-size: clamp(2rem, 8vw, 5rem);
+    font-weight: 900;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 30px var(--neon-yellow);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  #lap-flash.show { opacity: 1; }
+
+  /* countdown */
+  #countdown-display {
+    position: absolute;
+    top: 45%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-head);
+    font-size: clamp(4rem, 18vw, 12rem);
+    font-weight: 900;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 40px var(--neon-cyan), 0 0 80px rgba(0,245,255,0.4);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 15;
+    transition: opacity 0.1s;
+  }
+  #countdown-display.show { opacity: 1; }
+
+  /* ── RESULTS ── */
+  .results-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .results-table th {
+    font-family: var(--font-head); font-size: 0.7rem;
+    color: #557788; text-transform: uppercase; letter-spacing: 0.15em;
+    padding: 0.4rem 0.6rem; text-align: left;
+    border-bottom: 1px solid rgba(0,245,255,0.15);
+  }
+  .results-table td { padding: 0.5rem 0.6rem; font-size: 0.9rem; }
+  .results-table tr.player-row td { color: var(--neon-yellow); font-family: var(--font-head); font-size: 0.95rem; }
+  .results-table .place-1 { color: #ffd700; }
+  .results-table .place-2 { color: #c0c0c0; }
+  .results-table .place-3 { color: #cd7f32; }
+
+  .earn-badge {
+    text-align: center; margin: 0.8rem 0;
+    font-family: var(--font-head);
+    font-size: 1.4rem; color: var(--neon-yellow);
+    text-shadow: 0 0 12px var(--neon-yellow);
+  }
+  .pts-badge {
+    text-align: center;
+    font-size: 0.85rem; color: var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── PAUSE ── */
+  #pause-screen .panel { text-align: center; }
+
+  /* ── GAMEOVER ── */
+  #gameover-screen .panel { text-align: center; }
+  .gameover-msg {
+    font-family: var(--font-head);
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-weight: 900;
+    color: var(--neon-pink);
+    text-shadow: 0 0 20px var(--neon-pink);
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── VICTORY ── */
+  #victory-screen .panel { text-align: center; }
+  .victory-title {
+    font-family: var(--font-head);
+    font-size: clamp(1.8rem, 6vw, 4rem);
+    font-weight: 900;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 30px var(--neon-yellow), 0 0 60px rgba(255,190,11,0.4);
+    animation: titlePulse 2s ease-in-out infinite;
+  }
+
+  /* ── CHAMP PROGRESS ── */
+  #champ-bar-wrap {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    background: rgba(5,10,20,0.8); border: 1px solid rgba(0,245,255,0.2);
+    padding: 0.5rem 1.2rem; display: flex; align-items: center; gap: 0.8rem;
+    pointer-events: none; z-index: 10;
+  }
+  #champ-pts-label { font-family: var(--font-head); font-size: 0.7rem; color: #5599aa; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+  #champ-pts-val { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
+
+  /* ── SCROLLABLE PANELS ── */
+  .scroll-panel { max-height: 55vh; overflow-y: auto; padding-right: 4px; }
+  .scroll-panel::-webkit-scrollbar { width: 4px; }
+  .scroll-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+  .scroll-panel::-webkit-scrollbar-thumb { background: var(--neon-cyan); }
+
+  /* ── CHECKBOX TOGGLE ── */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.8rem; }
+  .toggle-label { font-size: 0.85rem; color: #aac; }
+  .toggle-btn {
+    font-family: var(--font-head); font-size: 0.75rem;
+    padding: 0.3em 1em; border: 1px solid rgba(0,245,255,0.4);
+    background: transparent; color: #aac; cursor: pointer; transition: all 0.15s;
+  }
+  .toggle-btn.on { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,255,0.08); }
+
+  /* ── NAV TABS ── */
+  .tab-row { display: flex; gap: 0; margin-bottom: 1.2rem; }
+  .tab-btn {
+    font-family: var(--font-head); font-size: 0.75rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.5em 1.4em;
+    border: 1px solid rgba(0,245,255,0.2); border-right: none;
+    background: transparent; color: #557; cursor: pointer; transition: all 0.15s;
+  }
+  .tab-btn:last-child { border-right: 1px solid rgba(0,245,255,0.2); }
+  .tab-btn.active { background: rgba(0,245,255,0.1); color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+  /* control hints */
+  .controls-hint {
+    font-size: 0.72rem; color: #445; text-align: center; margin-top: 0.8rem; line-height: 1.8;
+  }
+  .key { display: inline-block; background: rgba(0,245,255,0.1); border: 1px solid rgba(0,245,255,0.3); padding: 1px 6px; font-family: var(--font-head); font-size: 0.7rem; color: var(--neon-cyan); }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+<div id="hud" class="hidden">
+  <div class="hud-corner" id="hud-tl">
+    <div class="hud-label">LAP</div>
+    <div class="hud-value" id="hud-lap">1 / 3</div>
+    <div class="hud-label" style="margin-top:6px">TIME</div>
+    <div class="hud-value" id="hud-time">0:00.0</div>
+  </div>
+  <div class="hud-corner" id="hud-tr">
+    <div class="hud-label">POSITION</div>
+    <div class="hud-pos-badge"><span id="hud-pos">1</span><span class="hud-pos-suffix" id="hud-pos-suf">ST</span></div>
+    <div class="hud-label" style="margin-top:6px">SPEED</div>
+    <div class="hud-value" id="hud-speed">0 KM/H</div>
+  </div>
+  <div id="boost-wrap">
+    <div class="hud-label">BOOST &nbsp;<span id="car-class-label" style="font-family:var(--font-head);font-size:0.65rem"></span></div>
+    <div id="boost-bar-bg"><div id="boost-bar"></div></div>
+  </div>
+
+  <div id="elim-bar-wrap" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:220px;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+      <div style="font-family:var(--font-head);font-size:0.6rem;letter-spacing:0.15em;color:var(--neon-pink)">✕ NEXT ELIM</div>
+      <div id="elim-bar-label" style="font-family:var(--font-head);font-size:0.6rem;color:var(--neon-pink)"></div>
+    </div>
+    <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden">
+      <div id="elim-bar" style="height:100%;background:var(--neon-pink);width:100%;border-radius:3px;transition:width 0.15s"></div>
+    </div>
+  </div>
+  <div id="minimap-wrap">
+    <canvas id="minimap" width="100" height="100"></canvas>
+  </div>
+  <div id="elim-warn"></div>
+
+  <div id="drift-meter" style="opacity:0">
+    <div id="drift-combo-label">DRIFT COMBO</div>
+    <div id="drift-score-row">
+      <div id="drift-score-val">0</div>
+      <div id="drift-mult">x1</div>
+    </div>
+    <div id="drift-bar-bg"><div id="drift-bar"></div></div>
+  </div>
+
+  <div id="rival-callout"></div>
+  <div id="lap-flash"></div>
+  <button id="mute-btn" onclick="UI.toggleMute()" style="
+    position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    background:rgba(0,5,20,0.7);border:1px solid rgba(0,245,255,0.15);
+    color:#5599aa;font-family:var(--font-head);font-size:0.6rem;
+    padding:4px 12px;cursor:pointer;letter-spacing:0.12em;border-radius:3px;
+    pointer-events:all;z-index:11;
+  ">🔊 SOUND</button>
+  <!-- Live Race Leaderboard -->
+  <div id="race-leaderboard" style="display:none">
+    <div id="race-lb-title">POSITIONS</div>
+    <div id="race-lb-rows"></div>
+  </div>
+
+  <div id="champ-bar-wrap" style="display:none">
+    <div id="champ-pts-label">CHAMP PTS</div>
+    <div id="champ-pts-val">0</div>
+  </div>
+</div>
+<div id="countdown-display"></div>
+
+<!-- ══ MAIN MENU ══ -->
+<div class="screen" id="menu-screen">
+  <canvas id="menu-bg-canvas" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.35;pointer-events:none;z-index:0"></canvas>
+  <div class="game-title">TURBO<br>DRIFT</div>
+  <div class="subtitle">Arcade Racing · Championship Series</div>
+  <div class="btn-row" style="gap:1.2rem">
+    <button class="btn" style="min-width:160px" onclick="UI.showScreen('garage-screen')"><span>🏎 GARAGE</span></button>
+    <button class="btn yellow" style="min-width:160px" onclick="UI.startQuickRace()"><span>⚡ QUICK RACE</span></button>
+  </div>
+  <div class="controls-hint" style="margin-top:2rem">
+    <span class="key">W/↑</span> Accelerate &nbsp;
+    <span class="key">S/↓</span> Brake/Reverse &nbsp;
+    <span class="key">A/D ←/→</span> Steer &nbsp;
+    <span class="key">SPACE</span> Boost &nbsp;
+    <span class="key">P/ESC</span> Pause
+  </div>
+  <div style="position:absolute;bottom:1rem;right:1.2rem;font-size:0.6rem;color:#223;font-family:var(--font-mono)">v2.7</div>
+</div>
+
+<!-- ══ GARAGE ══ -->
+<div class="screen hidden" id="garage-screen">
+  <div class="section-title">GARAGE</div>
+  <div class="panel">
+    <div class="currency-badge" id="garage-currency">💰 0 CR</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="UI.garageTab('tracks')" id="tab-tracks"><span>TRACKS</span></button>
+      <button class="tab-btn" onclick="UI.garageTab('cars')" id="tab-cars"><span>CARS</span></button>
+      <button class="tab-btn" onclick="UI.garageTab('upgrades')" id="tab-upgrades"><span>UPGRADES</span></button>
+      <button class="tab-btn" onclick="UI.garageTab('champ')" id="tab-champ"><span>CHAMP</span></button>
+    </div>
+
+    <!-- TRACKS TAB -->
+    <div id="tab-content-tracks" class="scroll-panel">
+      <div class="mode-selector" id="mode-selector">
+        <button class="mode-btn active" id="mode-btn-normal" onclick="UI.setRaceMode('normal')">⚑ NORMAL</button>
+        <button class="mode-btn" id="mode-btn-elim" onclick="UI.setRaceMode('elimination')">✕ ELIMINATION</button>
+      </div>
+      <div class="mode-desc" id="mode-desc">Standard race — finish all laps.</div>
+      <div class="track-list" id="track-list"></div>
+    </div>
+
+    <!-- CARS TAB -->
+    <div id="tab-content-cars" class="scroll-panel" style="display:none">
+      <div id="car-select-list"></div>
+    </div>
+
+    <!-- UPGRADES TAB -->
+    <div id="tab-content-upgrades" class="scroll-panel" style="display:none">
+      <div class="upgrade-grid" id="upgrade-grid"></div>
+    </div>
+
+    <!-- CHAMPIONSHIP TAB -->
+    <div id="tab-content-champ" style="display:none">
+      <div id="champ-status" style="font-size:0.85rem;line-height:1.8;color:#aac;"></div>
+    </div>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn green" id="race-btn" onclick="UI.launchRace()"><span>RACE!</span></button>
+      <button class="btn pink" onclick="UI.showScreen('menu-screen')"><span>BACK</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAUSE ══ -->
+<div class="screen hidden" id="pause-screen">
+  <div class="panel" id="pause-panel">
+    <div class="section-title">PAUSED</div>
+    <div class="btn-row" style="flex-direction:column; align-items:center;">
+      <button class="btn green" onclick="Game.resume()"><span>RESUME</span></button>
+      <button class="btn" onclick="Game.restartRace()"><span>RESTART</span></button>
+      <button class="btn pink" onclick="Game.quitToMenu()"><span>QUIT TO MENU</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div class="screen hidden" id="results-screen">
+  <div class="panel">
+    <div class="section-title" id="results-title">RACE RESULTS</div>
+    <table class="results-table" id="results-table">
+      <thead><tr><th>#</th><th>DRIVER</th><th>TIME</th><th>PTS</th></tr></thead>
+      <tbody id="results-body"></tbody>
+    </table>
+    <div class="earn-badge" id="earn-badge"></div>
+    <div class="pts-badge" id="pts-badge"></div>
+    <div id="drift-earn-badge" style="text-align:center;color:var(--neon-pink);font-family:var(--font-head);font-size:0.85rem;letter-spacing:0.1em;margin:0.2rem 0;display:none"></div>
+    <div id="best-time-badge" style="text-align:center;margin:0.4rem 0 0.6rem;font-size:0.9rem;min-height:1.4em"></div>
+    <div class="btn-row">
+      <button class="btn green" id="next-btn" onclick="UI.afterResults()"><span>CONTINUE</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAME OVER ══ -->
+<div class="screen hidden" id="gameover-screen">
+  <div class="panel">
+    <div class="gameover-msg" id="gameover-msg">RACE OVER</div>
+    <div id="gameover-sub" style="color:#778;font-size:0.9rem;margin-bottom:1.5rem;line-height:1.7;"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="Game.restartRace()"><span>RETRY</span></button>
+      <button class="btn pink" onclick="Game.quitToMenu()"><span>QUIT</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VICTORY ══ -->
+<div class="screen hidden" id="victory-screen">
+  <div class="panel" style="text-align:center">
+    <div class="victory-title">🏆 CHAMPION!</div>
+    <div style="color:#aac;font-size:0.9rem;margin:1rem 0 1.5rem;line-height:1.8;" id="victory-sub"></div>
+    <div class="btn-row">
+      <button class="btn yellow" onclick="Game.newGame()"><span>PLAY AGAIN</span></button>
+      <button class="btn pink" onclick="Game.quitToMenu()"><span>MENU</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/tracks.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/drift.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

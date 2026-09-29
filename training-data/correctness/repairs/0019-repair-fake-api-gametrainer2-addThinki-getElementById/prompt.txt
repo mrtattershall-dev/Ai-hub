@@ -1,0 +1,10 @@
+The following JavaScript throws "TypeError: ....getById is not a function" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+function addThinking(){
+  const c=document.getById('chatMessages'),d=document.createElement('div');
+  d.className='chatmsg'; d.id='thinking';
+  d.innerHTML=`<div class="avatar ai">🤖</div><div class="bubble ai"><div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+```

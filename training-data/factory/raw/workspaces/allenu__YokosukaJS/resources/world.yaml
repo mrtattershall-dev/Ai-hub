@@ -1,0 +1,172 @@
+map:
+  bounds:
+    x: 0
+    y: 160
+    width: 640
+    height: 64
+  boundaries:
+    - id: boundary_1
+      boundary_type: less_than_x
+      x: 360
+      enabled: true
+
+billboards:
+    - filename: images/rivercity-school.gif
+      id: backdrop
+      position:
+        x: 0
+        y: 0
+      origin:
+        x: 0
+        y: 0
+      scale:
+        x: 1.5
+        y: 1.5
+    - filename: images/game-over.png
+      id: game-over
+      billboard_type: ui
+      hidden: true
+      position:
+        x: 160
+        y: 120
+      origin:
+        x: 192
+        y: 30
+      scale:
+        x: 0.7
+        y: 0.7
+
+actors:
+  - id: npc_1
+    actor_type: npc
+    model: resources/model.yaml
+    sprites: images/ryan.png
+    spritesheet: resources/spritesheet.json
+    state_name: standing
+    frame_index: 0
+    director: bot_1
+    position: 
+      x: 128
+      y: 96
+    health: 2
+    full_health: 2
+    facing_left: true
+    enabled: true
+  - id: pc
+    actor_type: player
+    model: resources/model.yaml
+    sprites: images/alex.png
+    spritesheet: resources/spritesheet.json
+    state_name: standing
+    frame_index: 0
+    director: user_1
+    position: 
+      x: 64 
+      y: 128
+    health: 10
+    full_health: 10
+    facing_left: false
+    enabled: true
+  - id: npc_2
+    actor_type: npc
+    model: resources/model.yaml
+    sprites: images/ryan.png
+    spritesheet: resources/spritesheet.json
+    state_name: standing
+    frame_index: 0
+    director: bot_2
+    position: 
+      x: 512 
+      y: 64
+    health: 3
+    full_health: 3
+    facing_left: true
+    enabled: false
+  - id: npc_3
+    actor_type: npc
+    model: resources/model.yaml
+    sprites: images/ryan.png
+    spritesheet: resources/spritesheet.json
+    state_name: standing
+    frame_index: 0
+    director: bot_2
+    scale: 
+      x: 2.0
+      y: 2.0
+    position: 
+      x: 650 
+      y: 64
+    health: 5
+    full_health: 5
+    facing_left: false
+    enabled: false
+
+triggers:
+  - id: crossed_line
+    trigger_type: left_right_cross
+    actor_type: player
+    x: 364
+    signal: crossed_line
+
+scripts:
+    - id: turn_off_boundary
+      signal: 
+        id: disable_sender
+        sender_id: npc_1
+      command:
+        target: boundary
+        command_type: boundary
+        boundary_id: boundary_1
+        enable_boundary: false
+    - id: enable_npc_2
+      signal:
+        id: crossed_line
+      command:
+        target: actor
+        command_type: enable_actor
+        actor_id: npc_2
+    - id: disable_sender
+      signal: 
+        id: disable_sender
+        multimatch: true
+        sender_type: actor
+      command:
+        target: actor
+        command_type: disable_sender
+    - id: enable_npc_3
+      signals:
+        - id: Died
+          sender_id: npc_1
+        - id: Died
+          sender_id: npc_2
+      command:
+        target: actor
+        command_type: enable_actor
+        actor_id: npc_3
+    - id: show-game-over
+      signal: 
+        id: disable_sender
+        sender_id: npc_3
+      command:
+        target: billboard
+        command_type: toggle_billboard
+        billboard_id: game-over
+        hidden: false
+    - id: delay-hide
+      signal:
+        id: disable_sender
+        sender_id: npc_3
+      command:
+        target: future_signal
+        command_type: future_signal
+        delay: 2.0
+        signal: hide-game-over
+    - id: hide-game-over
+      signal:
+        id: hide-game-over
+      command:
+        target: billboard
+        command_type: toggle_billboard
+        billboard_id: game-over
+        hidden: true
+

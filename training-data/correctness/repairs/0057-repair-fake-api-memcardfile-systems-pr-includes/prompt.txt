@@ -1,0 +1,222 @@
+The following JavaScript throws "TypeError: ....has is not a function" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+/**
+ * progression.js — the meaning layer on top of a raw save.
+ *
+ * Holds the *active* save in memory and exposes:
+ *   - mutations (earn/spend shards, buy upgrades, collect emblems, record ranks)
+ *   - derived player stats (max HP, dodge i-frames, whether air-dash is owned)
+ *   - completion math for the "restoration %" the hub shows
+ *
+ * Every mutation emits an event on the bus and autosaves, so UI and audio can
+ * react and progress is never lost. The three progression "tracks" from the
+ * GDD — story (cleared levels), upgrades (currency), and completion (emblems) —
+ * all flow through here.
+ *
+ * @module systems/progression
+ */
+
+import { CONFIG, COMBAT, PHYSICS } from "../config.js";
+
+const HEALTH_PER_HEART = 30;
+
+export class Progression {
+  /** @param {import('../main.js').App} app */
+  constructor(app) {
+    this.app = app;
+    /** @type {object|null} active save object */
+    this.data = null;
+  }
+
+  /** Bind an active save (from new game or load) and recompute completion. */
+  attach(saveData) {
+    this.data = saveData;
+    this.recomputeCompletion();
+    return this;
+  }
+
+  // ---- derived player stats ----------------------------------------------
+
+  maxHP() {
+    return this.data.maxHearts * HEALTH_PER_HEART;
+  }
+
+  /** Total i-frame duration on dodge (base + upgrade). */
+  dodgeIFrames() {
+    return COMBAT.dodgeIFrames + (this.has("dodge_up") ? 0.12 : 0);
+  }
+
+  /** Max light-combo length (3 base, 5 with the combo extender). */
+  comboMax() {
+    return this.has("combo_up") ? 5 : 3;
+  }
+
+  hasAirDash() {
+    return this.has("air_dash");
+  }
+
+  /** Ranged-burst cooldown, reduced by the cooldown upgrade. */
+  burstCooldown() {
+    return COMBAT.burstCooldown * (this.has("cd_up") ? 0.6 : 1);
+  }
+
+  /** Run speed, mildly boosted by the "fleet" upgrade. */
+  runSpeed() {
+    return PHYSICS.runSpeed * (this.has("fleet") ? 1.12 : 1);
+  }
+
+  // ---- currency & upgrades ------------------------------------------------
+
+  addShards(n) {
+    this.data.shards += n;
+    this.app.bus.emit("shards:changed", this.data.shards);
+    this._autosave();
+  }
+
+  canAfford(cost) {
+    return this.data.shards >= cost;
+  }
+
+  has(upgradeId) {
+    return this.data.upgrades.has(upgradeId);
+  }
+
+  /**
+   * Attempt to purchase an upgrade definition. Returns true on success.
+   * Heart upgrades increase maxHearts; everything else is a flag the derived
+   * stat getters above read.
+   */
+  buyUpgrade(def) {
+    if (this.has(def.id) || !this.canAfford(def.cost)) return false;
+    this.data.shards -= def.cost;
+    this.data.upgrades.push(def.id);
+    if (def.id.startsWith("hp_up")) this.data.maxHearts += 1;
+    this.app.bus.emit("upgrade:bought", def);
+    this.app.bus.emit("shards:changed", this.data.shards);
+    this.recomputeCompletion();
+    this._autosave();
+    return true;
+  }
+
+  // ---- collectibles & unlocks --------------------------------------------
+
+  hasEmblem(id) {
+    return this.data.emblems.includes(id);
+  }
+
+  collectEmblem(id) {
+    if (this.hasEmblem(id)) return false;
+    this.data.emblems.push(id);
+    this.app.bus.emit("emblem:collected", id);
+    this.recomputeCompletion();
+    this._autosave();
+    return true;
+  }
+
+  /** Record a one-time world pickup (e.g. a heart cell) so it never respawns. */
+  markPickedUp(id) {
+    if (id && !this.data.pickedUp.includes(id)) this.data.pickedUp.push(id);
+  }
+
+  wasPickedUp(id) {
+    return this.data.pickedUp.includes(id);
+  }
+
+  collectEcho(id) {
+    if (this.data.echoLogs.includes(id)) return false;
+    this.data.echoLogs.push(id);
+    this.app.bus.emit("echo:collected", id);
+    this._autosave();
+    return true;
+  }
+
+  isUnlocked(id) {
+    return this.data.unlocks.includes(id);
+  }
+
+  unlock(id) {
+    if (this.isUnlocked(id)) return false;
+    this.data.unlocks.push(id);
+    this.app.bus.emit("unlock:earned", id);
+    this._autosave();
+    return true;
+  }
+
+  setCheat(id, on) {
+    this.data.cheats[id] = on;
+    this._autosave();
+  }
+
+  cheatOn(id) {
+    return !!this.data.cheats[id];
+  }
+
+  // ---- level results ------------------------------------------------------
+
+  isLevelCleared(levelId) {
+    return !!this.data.levelRanks[levelId];
+  }
+
+  /**
+   * Record a level result, keeping the *best* rank if replayed. Returns true if
+   * this was a new best (used to decide whether to flash "NEW RECORD").
+   */
+  recordRank(levelId, result) {
+    const order = ["D", "C", "B", "A", "S", "SS"];
+    const prev = this.data.levelRanks[levelId];
+    const isBest = !prev || order.indexOf(result.rank) > order.indexOf(prev.rank);
+    if (isBest) this.data.levelRanks[levelId] = result;
+    this.recomputeCompletion();
+    this._autosave();
+    return isBest;
+  }
+
+  // ---- completion ---------------------------------------------------------
+
+  /**
+   * Restoration % blends three tracks (levels, emblems, upgrades) so every kind
+   * of progress moves the bar. Weighted to favour story completion.
+   */
+  recomputeCompletion() {
+    const d = this.app.data;
+    if (!d || !this.data) return;
+    const levels = d.levels.filter((l) => l.type === "stage");
+    const totalEmblems = levels.reduce((n, l) => n + (l.emblems?.length ?? 0), 0) || 1;
+    const totalUpgrades = d.upgrades.length || 1;
+    const clearedRatio = levels.length
+      ? levels.filter((l) => this.isLevelCleared(l.id)).length / levels.length
+      : 0;
+    const emblemRatio = this.data.emblems.length / totalEmblems;
+    const upgradeRatio = this.data.upgrades.length / totalUpgrades;
+    this.data.completion = Math.min(
+      100,
+      Math.round((clearedRatio * 0.55 + emblemRatio * 0.3 + upgradeRatio * 0.15) * 100)
+    );
+    this.app.bus.emit("completion:changed", this.data.completion);
+  }
+
+  // ---- time + persistence -------------------------------------------------
+
+  addPlayTime(dt) {
+    this.data.playTime += dt;
+  }
+
+  setLastArea(area) {
+    this.data.lastArea = area;
+  }
+
+  /** Persist the active save to its slot. */
+  persist() {
+    if (this.data) this.app.save.save(this.data.slot, this.data);
+  }
+
+  _autosave() {
+    // Cheap autosave on every mutation; localStorage writes are synchronous but
+    // small. Time-only changes are flushed periodically by the main loop.
+    this.persist();
+  }
+}
+
+export { HEALTH_PER_HEART };
+```

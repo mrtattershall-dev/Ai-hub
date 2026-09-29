@@ -1,0 +1,77 @@
+function _drawGuideCover() {
+  const canvas = document.getElementById('guideCoverCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const W = 320, H = 240;
+
+  // Sky
+  for (let y = 0; y < 80; y++) {
+    const t = y / 80;
+    ctx.fillStyle = `rgb(${Math.round(10+t*45)},${Math.round(8+t*28)},${Math.round(4+t*8)})`;
+    ctx.fillRect(0, y, W, 1);
+  }
+  // Sun
+  [22, 18, 12].forEach((r, i) => {
+    ctx.fillStyle = [`rgb(240,160,40)`,`rgb(255,190,60)`,`rgb(255,230,120)`][i];
+    ctx.beginPath(); ctx.arc(220, 58, r, 0, Math.PI*2); ctx.fill();
+  });
+  // Mesa silhouettes
+  function mesa(pts, col) {
+    ctx.fillStyle = col; ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    pts.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath(); ctx.fill();
+  }
+  mesa([[0,90],[0,H],[80,H],[80,110],[60,100],[40,88],[20,92]], `rgb(55,32,15)`);
+  mesa([[60,75],[80,68],[110,78],[130,62],[155,70],[175,55],[200,70],[210,75],[210,H],[60,H]], `rgb(70,40,18)`);
+  mesa([[190,62],[220,50],[255,65],[280,58],[310,68],[320,62],[320,H],[190,H]], `rgb(90,52,22)`);
+  // Ground
+  for (let y = 140; y < H; y++) {
+    const t = (y-140)/100;
+    ctx.fillStyle = `rgb(${Math.round(55+t*15)},${Math.round(35+t*8)},${Math.round(12+t*4)})`;
+    ctx.fillRect(0, y, W, 1);
+  }
+  // Road
+  ctx.fillStyle=`rgb(80,55,25)`;
+  ctx.beginPath(); ctx.moveTo(W/2-4,120); ctx.lineTo(W/2+4,120); ctx.lineTo(W/2+55,H); ctx.lineTo(W/2-55,H); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=`rgb(65,42,18)`; ctx.fillRect(W/2-2,120,2,H-120); ctx.fillRect(W/2+1,120,2,H-120);
+  // Cacti
+  function cactus(x,y,h) {
+    ctx.fillStyle=`rgb(35,75,28)`;
+    ctx.fillRect(x-2,y-h,4,h); ctx.fillRect(x-8,y-h+Math.floor(h*.35),8,3); ctx.fillRect(x+2,y-h+Math.floor(h*.55),7,3);
+    ctx.fillRect(x-8,y-h+Math.floor(h*.35)-5,3,7); ctx.fillRect(x+7,y-h+Math.floor(h*.55)-5,3,7);
+  }
+  cactus(48,168,32); cactus(260,155,28); cactus(38,175,18); cactus(272,162,20);
+  // Farmhouse
+  ctx.fillStyle=`rgb(40,25,10)`; ctx.fillRect(22,146,36,20); ctx.fillRect(24,150,7,16); ctx.fillRect(37,150,8,16);
+  ctx.fillStyle=`rgb(50,28,12)`; ctx.beginPath(); ctx.moveTo(20,147); ctx.lineTo(40,130); ctx.lineTo(60,147); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=`rgb(220,160,40)`; ctx.fillRect(37,150,8,8);
+  ctx.fillStyle=`rgb(180,120,30)`; ctx.fillRect(38,151,3,3); ctx.fillRect(42,151,3,3);
+  // Fence
+  ctx.fillStyle=`rgb(80,55,28)`;
+  for(let fx=80;fx<240;fx+=14) ctx.fillRect(fx,150,3,12);
+  ctx.fillRect(80,152,160,2); ctx.fillRect(80,158,160,1);
+  // Stars
+  ctx.fillStyle=`rgb(255,240,200)`;
+  [[20,10],[45,5],[72,18],[95,8],[140,15],[175,6],[198,20],[240,10],[265,16],[295,5],[305,22]].forEach(([sx,sy])=>{ ctx.fillRect(sx,sy,1,1); });
+  // Rider silhouette
+  ctx.fillStyle=`rgb(22,14,6)`;
+  ctx.fillRect(155,118,22,8); ctx.fillRect(157,114,6,5); ctx.fillRect(158,110,5,5);
+  ctx.fillRect(157,126,3,7); ctx.fillRect(161,126,3,7); ctx.fillRect(165,126,3,7); ctx.fillRect(169,126,3,7);
+  ctx.fillRect(159,107,7,8); ctx.fillRect(160,102,5,6);
+  // Tumbleweed
+  ctx.strokeStyle=`rgb(140,90,40)`; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(88,H-12,6,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(82,H-12); ctx.lineTo(94,H-12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(88,H-18); ctx.lineTo(88,H-6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(83,H-17); ctx.lineTo(93,H-7); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(93,H-17); ctx.lineTo(83,H-7); ctx.stroke();
+  // Vignette
+  const vig = ctx.createRadialGradient(W/2,H/2,80,W/2,H/2,W*.7);
+  vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.45)');
+  ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+  // Border
+  ctx.strokeStyle=`rgba(180,120,40,0.7)`; ctx.lineWidth=2; ctx.strokeRect(1,1,W-2,H-2);
+  ctx.strokeStyle=`rgba(100,70,20,0.4)`; ctx.lineWidth=1; ctx.strokeRect(5,5,W-10,H-10);
+}

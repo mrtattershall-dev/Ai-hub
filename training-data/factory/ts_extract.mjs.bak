@@ -1,0 +1,298 @@
+/**
+ * ts_extract.mjs - extract code units with real ASTs instead of regex.
+ *
+ *   node factory/ts_extract.mjs <file> [--lang js|ts|tsx|gdscript]
+ *
+ * WHY THIS REPLACES THE REGEX EXTRACTOR
+ * ------------------------------------
+ * The first extractor matched declarations with regex and found the end of a block by
+ * counting braces while trying to skip strings, comments and template literals by hand.
+ * It worked, but it broke once already on an escaped quote inside a character class, and
+ * every fix made the next one likelier. More importantly its free-identifier analysis -
+ * the check that decides whether a row is usable at all - was an approximation over
+ * string-stripped source.
+ *
+ * tree-sitter gives exact node boundaries and real identifier positions, and it costs
+ * nothing extra to gain TypeScript and GDScript with it. TypeScript matters: 64% of the
+ * Phaser files in the repo survey are .ts, and the regex path skipped all of them.
+ *
+ * Grammars: JS/TS/TSX come from tree-sitter-wasms (prebuilt, via web-tree-sitter).
+ * GDScript has no prebuilt wasm, so it uses the native binding, which ships a win32-x64
+ * prebuild - no compiler needed either way.
+ */
+import { readFileSync } from 'fs';
+import { createRequire } from 'module';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from 'url';
+
+const require = createRequire(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const NM = resolve(__dirname, '..', 'node_modules');
+
+/** Names a browser/game script may use without declaring them. */
+const GLOBALS = new Set([
+  'window', 'document', 'console', 'Math', 'JSON', 'Date', 'Array', 'Object', 'String',
+  'Number', 'Boolean', 'Map', 'Set', 'WeakMap', 'WeakSet', 'Promise', 'Symbol', 'RegExp',
+  'Error', 'TypeError', 'RangeError', 'SyntaxError', 'parseInt', 'parseFloat', 'isNaN',
+  'isFinite', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'encodeURIComponent',
+  'decodeURIComponent', 'requestAnimationFrame', 'cancelAnimationFrame', 'localStorage',
+  'sessionStorage', 'fetch', 'Image', 'Audio', 'AudioContext', 'webkitAudioContext',
+  'Float32Array', 'Float64Array', 'Uint8Array', 'Uint8ClampedArray', 'Int8Array', 'Int16Array',
+  'Uint16Array', 'Int32Array', 'Uint32Array', 'BigInt', 'ArrayBuffer', 'DataView',
+  'TextEncoder', 'TextDecoder', 'structuredClone', 'performance', 'navigator', 'location',
+  'history', 'alert', 'confirm', 'prompt', 'URL', 'URLSearchParams', 'Blob', 'FileReader',
+  'devicePixelRatio', 'Infinity', 'NaN', 'undefined', 'globalThis', 'Intl', 'Proxy', 'Reflect',
+  'queueMicrotask', 'CustomEvent', 'Event', 'EventTarget', 'MutationObserver', 'DOMParser',
+  'Phaser', 'PIXI', 'THREE', 'p5', 'ROT', 'Matter', 'Howl', 'io',
+]);
+
+/**
+ * A .gd file IS a class, so splitting it into functions is the wrong shape - and the
+ * functions legitimately read inherited members (`velocity`, `position`) and engine
+ * singletons (`Input`, `Engine`) that no local declaration will ever satisfy. Extracting
+ * units from GDScript rejected 100% of them for that reason. Whole-file rows, validated by
+ * the parser, are the right unit; this set exists so the validator can tell an engine
+ * builtin from a genuinely dangling reference.
+ */
+const GODOT_GLOBALS = new Set([
+  'self', 'Input', 'Engine', 'OS', 'Time', 'JSON', 'ResourceLoader', 'ProjectSettings',
+  'Vector2', 'Vector2i', 'Vector3', 'Vector3i', 'Rect2', 'Rect2i', 'Transform2D', 'Color',
+  'Node', 'Node2D', 'Node3D', 'Control', 'CharacterBody2D', 'RigidBody2D', 'Area2D',
+  'Sprite2D', 'AnimatedSprite2D', 'CollisionShape2D', 'Timer', 'Tween', 'Camera2D',
+  'PackedScene', 'Resource', 'RefCounted', 'Object', 'Signal', 'Callable', 'Array',
+  'Dictionary', 'String', 'StringName', 'NodePath', 'PI', 'TAU', 'INF', 'NAN',
+  'velocity', 'position', 'global_position', 'rotation', 'scale', 'visible', 'name',
+  'delta', 'print', 'push_error', 'push_warning', 'randi', 'randf', 'randf_range',
+  'randi_range', 'clamp', 'lerp', 'abs', 'min', 'max', 'floor', 'ceil', 'round', 'sign',
+  'move_toward', 'move_and_slide', 'queue_free', 'get_node', 'get_tree', 'get_parent',
+  'add_child', 'emit_signal', 'connect', 'is_instance_valid', 'preload', 'load', 'range',
+  'len', 'str', 'int', 'float', 'bool', 'typeof', 'assert', 'sqrt', 'sin', 'cos', 'atan2',
+]);
+
+/**
+ * Validate a GDScript file as a single row. Returns { ok, why, funcs }.
+ * The bar: it parses without error, it extends something (so it is a real script and not
+ * a fragment), it defines behaviour, and it does not load project resources that cannot
+ * exist outside its own repo.
+ */
+export function checkGdScript(source) {
+  let tree;
+  try { tree = gdscript().parse(source); } catch (e) { return { ok: false, why: 'parse threw' }; }
+  const root = tree.rootNode;
+  if (root.hasError) return { ok: false, why: 'syntax error' };
+  let extends_ = false;
+  let funcs = 0;
+  for (let i = 0; i < root.namedChildCount; i++) {
+    const t = root.namedChild(i).type;
+    if (t === 'extends_statement') extends_ = true;
+    if (t === 'function_definition') funcs++;
+  }
+  if (!extends_) return { ok: false, why: 'no extends - not a standalone script', funcs };
+  if (funcs < 2) return { ok: false, why: 'fewer than 2 functions', funcs };
+  if (/(?:preload|load)\s*\(\s*["']res:\/\//.test(source)) {
+    return { ok: false, why: 'loads a res:// path that cannot resolve outside its repo', funcs };
+  }
+  return { ok: true, funcs };
+}
+
+// ── grammar loading ─────────────────────────────────────────────────────────────
+let wasmReady = null;
+const wasmLangs = new Map();
+
+async function jsLike(lang) {
+  if (!wasmReady) {
+    const { Parser } = await import(join(NM, 'web-tree-sitter', 'tree-sitter.js').replace(/\\/g, '/'))
+      .catch(() => import('web-tree-sitter'));
+    await Parser.init();
+    wasmReady = Parser;
+  }
+  if (!wasmLangs.has(lang)) {
+    const { Language } = await import('web-tree-sitter');
+    const file = { js: 'javascript', ts: 'typescript', tsx: 'tsx' }[lang];
+    wasmLangs.set(lang, await Language.load(join(NM, 'tree-sitter-wasms', 'out', `tree-sitter-${file}.wasm`)));
+  }
+  const p = new wasmReady();
+  p.setLanguage(wasmLangs.get(lang));
+  return p;
+}
+
+let gdParser = null;
+function gdscript() {
+  if (!gdParser) {
+    const Parser = require(join(NM, 'tree-sitter'));
+    const GD = require(join(NM, 'tree-sitter-gdscript'));
+    gdParser = new Parser();
+    gdParser.setLanguage(GD);
+  }
+  return gdParser;
+}
+
+export async function parserFor(lang) {
+  return lang === 'gdscript' ? gdscript() : jsLike(lang);
+}
+
+export function langOf(path) {
+  if (/\.tsx$/i.test(path)) return 'tsx';
+  if (/\.ts$/i.test(path)) return 'ts';
+  if (/\.gd$/i.test(path)) return 'gdscript';
+  return 'js';
+}
+
+// ── AST helpers ─────────────────────────────────────────────────────────────────
+const walk = (node, fn) => {
+  if (fn(node) === false) return;
+  for (let i = 0; i < node.namedChildCount; i++) walk(node.namedChild(i), fn);
+};
+
+const DECL_NAME_PARENTS = new Set([
+  'function_declaration', 'generator_function_declaration', 'class_declaration',
+  'variable_declarator', 'method_definition', 'function_expression', 'class',
+  'import_specifier', 'namespace_import', 'import_clause', 'labeled_statement',
+]);
+
+/** Every name a subtree introduces: declarations, parameters, patterns, catch bindings. */
+function declaredIn(node) {
+  const names = new Set();
+  walk(node, (n) => {
+    const t = n.type;
+    if (DECL_NAME_PARENTS.has(t)) {
+      const nm = n.childForFieldName && n.childForFieldName('name');
+      if (nm) {
+        if (nm.type === 'identifier' || nm.type === 'property_identifier') names.add(nm.text);
+        else walk(nm, (x) => { if (x.type === 'identifier') names.add(x.text); });
+      }
+    }
+    if (t === 'formal_parameters' || t === 'parameters') {
+      walk(n, (x) => { if (x.type === 'identifier' || x.type === 'shorthand_property_identifier_pattern') names.add(x.text); });
+    }
+    if (t === 'catch_clause') {
+      const p = n.childForFieldName && n.childForFieldName('parameter');
+      if (p) walk(p, (x) => { if (x.type === 'identifier') names.add(x.text); });
+    }
+    if (t === 'for_in_statement') {
+      const l = n.childForFieldName && n.childForFieldName('left');
+      if (l) walk(l, (x) => { if (x.type === 'identifier') names.add(x.text); });
+    }
+    if (t === 'arrow_function') {
+      const p = n.childForFieldName && n.childForFieldName('parameter');
+      if (p && p.type === 'identifier') names.add(p.text);
+    }
+    return true;
+  });
+  return names;
+}
+
+/** Identifiers a subtree READS. Property names and declaration names are not reads. */
+function readIn(node) {
+  const used = new Set();
+  walk(node, (n) => {
+    if (n.type !== 'identifier') return true;
+    const p = n.parent;
+    if (!p) return true;
+    // `a.b` - b is a property, not a free variable
+    if (p.type === 'member_expression' && p.childForFieldName('property')?.id === n.id) return true;
+    if (p.type === 'property_identifier' || p.type === 'pair' && p.childForFieldName('key')?.id === n.id) return true;
+    // a declaration's own name is not a read
+    if (DECL_NAME_PARENTS.has(p.type) && p.childForFieldName('name')?.id === n.id) return true;
+    if (p.type === 'formal_parameters' || p.type === 'parameters') return true;
+    used.add(n.text);
+    return true;
+  });
+  return used;
+}
+
+const UNIT_TYPES = {
+  js: new Set(['function_declaration', 'generator_function_declaration', 'class_declaration']),
+  ts: new Set(['function_declaration', 'generator_function_declaration', 'class_declaration']),
+  tsx: new Set(['function_declaration', 'generator_function_declaration', 'class_declaration']),
+  gdscript: new Set(['function_definition', 'class_definition']),
+};
+
+/** Top-level declarations by name, so a unit's free identifiers can be given as context. */
+function topLevelDecls(root, lang) {
+  const map = new Map();
+  for (let i = 0; i < root.namedChildCount; i++) {
+    const n = root.namedChild(i);
+    const t = n.type;
+    if (UNIT_TYPES[lang].has(t)) {
+      const nm = n.childForFieldName && n.childForFieldName('name');
+      if (nm && !map.has(nm.text)) map.set(nm.text, n.text);
+    } else if (t === 'lexical_declaration' || t === 'variable_declaration') {
+      walk(n, (x) => {
+        if (x.type !== 'variable_declarator') return true;
+        const nm = x.childForFieldName('name');
+        if (nm && nm.type === 'identifier' && !map.has(nm.text)) map.set(nm.text, n.text);
+        return true;
+      });
+    } else if (lang === 'gdscript' && (t === 'variable_statement' || t === 'const_statement')) {
+      const nm = n.childForFieldName && n.childForFieldName('name');
+      if (nm && !map.has(nm.text)) map.set(nm.text, n.text);
+    }
+  }
+  return map;
+}
+
+/**
+ * Extract units with dependencies resolved.
+ * Returns [{ kind, name, code, context, deps }].
+ */
+export async function extractUnits(source, { lang = 'js', min = 200, max = 6000, ctxMax = 6000 } = {}) {
+  let tree;
+  try {
+    const parser = await parserFor(lang);
+    tree = parser.parse(source);
+  } catch { return []; }
+  if (!tree || !tree.rootNode) return [];
+  const root = tree.rootNode;
+
+  const decls = topLevelDecls(root, lang);
+  const out = [];
+
+  for (let i = 0; i < root.namedChildCount; i++) {
+    const n = root.namedChild(i);
+    if (!UNIT_TYPES[lang].has(n.type)) continue;
+    const nameNode = n.childForFieldName && n.childForFieldName('name');
+    const name = nameNode ? nameNode.text : null;
+    const code = n.text;
+    if (code.length < min || code.length > max) continue;
+
+    const declared = declaredIn(n);
+    const used = readIn(n);
+    const free = [...used].filter((id) => !declared.has(id) && !GLOBALS.has(id) && id !== name);
+
+    const context = [];
+    let unresolved = 0;
+    for (const id of free) {
+      const d = decls.get(id);
+      if (!d || d === code) { unresolved++; continue; }
+      context.push(d);
+    }
+    if (unresolved) continue;
+    if (context.reduce((a, c) => a + c.length, 0) > ctxMax) continue;
+
+    out.push({
+      kind: n.type.replace(/_declaration|_definition/, ''),
+      name,
+      code,
+      context,
+      deps: free.length,
+    });
+  }
+  return out;
+}
+
+// ── CLI ─────────────────────────────────────────────────────────────────────────
+const invoked = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('ts_extract.mjs');
+if (invoked) {
+  const args = process.argv.slice(2);
+  const file = args.find((a) => !a.startsWith('--'));
+  if (!file) { console.error('usage: node factory/ts_extract.mjs <file> [--lang js|ts|tsx|gdscript]'); process.exit(1); }
+  const li = args.indexOf('--lang');
+  const lang = li > -1 ? args[li + 1] : langOf(file);
+  const src = readFileSync(file, 'utf8');
+  const units = await extractUnits(src, { lang });
+  console.log(`${file}  lang=${lang}  ${units.length} unit(s)`);
+  for (const u of units.slice(0, 25)) {
+    console.log(`  ${String(u.kind).padEnd(10)} ${String(u.name).padEnd(28)} ${String(u.code.length).padStart(5)}ch  deps ${u.deps}  ctx ${u.context.length}`);
+  }
+}

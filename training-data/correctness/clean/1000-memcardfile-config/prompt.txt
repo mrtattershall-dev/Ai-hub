@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/config.js: * config.js — central tuning + constants.

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="src/styles.css"></link>
+</head>
+<body>
+    <div id="menu">
+        <button class="minimize-button" onclick="toggleMenuSize()">&#8211</button>
+        <div class="menubar">
+            <button class="menuItem" onclick="exportSpritesheet()">exp</button>
+            <button class="menuItem" onclick="exportJson()">Json</button>
+        </div>
+    </div>
+
+    <div id="toolbox">
+        <button class="minimize-button" onclick="toggleToolboxSize()">&#8211</button>
+        <div class="toolbar">
+            <input type="color" class="tool" id="colorInput" data-tool="pen">
+            <button class="tool" data-tool="pen">p</button>
+            <button class="tool" data-tool="eraser">e</button>
+            <button class="tool" data-tool="filler">f</button>
+        </div>
+    </div>
+  
+  <div class="container">
+
+    <div id="canvas-container">
+      <canvas id="myCanvas" width="400" height="400"></canvas>
+    </div>
+    <div id="right-box">
+      <!-- Add your right box content here -->
+      <!-- Add your shortcut box content here -->
+        <div class="preview">
+            <strong>Preview</strong>
+            <div class="preview-window">    
+                <canvas id="preview-canvas" ></canvas>
+            </div>
+        </div>
+        
+        <div class="layers">
+            <strong>Layers</strong>
+            <br>
+            <div id="ui-box">
+                <button onclick="addLayer()">+</button>
+            </div>
+            <br>
+            <div id="layers"></div>
+        </div>
+    </div>
+    <div id="bottom-box">
+        <div id="ui-box">
+            <button onclick="addFile()">+</button>
+            <button onclick="duplicateFile()">D</button>
+            <button >-</button>
+            <button onclick="toggleAnim(event)">i></button> 
+            <input type="number"  onchange="changeTimeInterval()" max="5" min="0.05" value="1" id="preview-canvas-time-input">
+        </div>
+        <div id="bottom-files">
+        </div>
+        <div id="bottom-timeline">
+            <input type="range" min="0" max="0" id="timeline">
+        </div>
+    </div>
+  </div>
+
+  <script src="src/right.js"></script>
+  <script src="src/bottom.js"></script>
+  <script src="src/main.js"></script>
+  <script src="src/animation.js"></script>
+    </body>
+</html>
+
+

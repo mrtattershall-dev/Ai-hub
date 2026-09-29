@@ -1,0 +1,26 @@
+NOTICE — Fan Project Disclaimer
+================================
+
+This project ("以撒的结合 · 网页复刻版" / isaac-roguelike) is an unofficial,
+non-commercial fan project created for the purpose of studying procedural
+graphics generation and roguelike level-generation algorithms.
+
+It is NOT affiliated with, authorized by, endorsed by, sponsored by, or in any
+way officially connected with Edmund McMillen, Nicalis, Inc., or any entity
+involved in the development or publication of "The Binding of Isaac".
+
+"The Binding of Isaac" and all associated names, characters, and setting
+elements are trademarks and/or property of their respective owners. This
+project independently reimplements *gameplay mechanics* only.
+
+No assets from the original game are included in this repository:
+
+  * Every graphic is drawn procedurally in code at runtime (see src/gfx.js,
+    src/sprites.js, src/tiles.js). There are no image files.
+  * Every sound effect and the background music are synthesized at runtime via
+    the Web Audio API (see src/audio.js). There are no audio files.
+
+The MIT License in the LICENSE file applies solely to the original source code
+in this repository. It grants no rights whatsoever in any third-party
+intellectual property. If you intend to use this code commercially, you are
+responsible for evaluating the associated legal risks yourself.

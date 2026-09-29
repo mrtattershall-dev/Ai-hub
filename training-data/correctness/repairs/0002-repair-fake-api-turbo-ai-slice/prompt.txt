@@ -1,0 +1,386 @@
+The following JavaScript throws "TypeError: ....sub is not a function" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+// ═══════════════════════════════════════════════════════
+//  AI MODULE  – Pure Pursuit path follower + personalities
+//
+//  Technique: Pure Pursuit (Coulter 1992) adapted for 2D
+//  racing games. The controller picks a "lookahead point"
+//  on the track centerline at distance L ahead, then
+//  computes the arc needed to reach it. This naturally
+//  handles corners: at high speed L is large (stable),
+//  at low speed L is small (responsive). Combined with
+//  a curvature-based speed controller for braking.
+//
+//  References:
+//    Coulter (1992) "Implementation of the Pure Pursuit
+//      Path Tracking Algorithm"
+//    Snider (2009) "Automatic Steering Methods for
+//      Autonomous Automobile Path Tracking"
+// ═══════════════════════════════════════════════════════
+const AI = (() => {
+
+  // ── Driver personalities ─────────────────────────────
+  const PERSONALITIES = {
+    VIPER:   { aggOffset:+0.25, ramming:0.65, boostHoard:false, consistency:0.90, laneHug: 0.00, color:'#ff006e', icon:'🐍',
+      callout:"VIPER is in this race. Watch your bumper.",
+      taunt:{win:["Lucky line, rookie.","Don't get used to it."],lose:["You actually beat me? Huh.","Fine. You earned that."],near:["Too close for comfort."]}},
+    BLAZE:   { aggOffset:+0.10, ramming:0.15, boostHoard:false, consistency:0.78, laneHug:+0.15, color:'#fb5607', icon:'🔥',
+      callout:"BLAZE is unpredictable. Could win, could spin out.",
+      taunt:{win:["WOOOOO YEAH LET'S GOOO","Fire doesn't wait!"],lose:["ugh i blew it AGAIN","my boost ran out i SWEAR"],near:["neck and neck baby!!"]}},
+    'NEON X':{ aggOffset:-0.10, ramming:0.05, boostHoard:true,  consistency:0.96, laneHug:-0.20, color:'#00f5ff', icon:'✦',
+      callout:"NEON X. Clinical. Efficient. Hates wasted movement.",
+      taunt:{win:["Optimal line. Optimal result.","Predicted this outcome."],lose:["...Recalculating.","Anomalous result. Will not recur."],near:["Processing."]}},
+    STORM:   { aggOffset:+0.20, ramming:0.35, boostHoard:false, consistency:0.80, laneHug: 0.00, color:'#4cc9f0', icon:'⚡',
+      callout:"STORM hits hard and hits often.",
+      taunt:{win:["Thunder doesn't apologize.","The storm rolls through."],lose:["Respect. You weathered it.","The forecast was wrong."],near:["Lightning strikes twice!"]}},
+    RAZOR:   { aggOffset:+0.20, ramming:0.10, boostHoard:true,  consistency:0.92, laneHug:-0.25, color:'#ffbe0b', icon:'⟋',
+      callout:"RAZOR cuts corners and saves boost for the last lap.",
+      taunt:{win:["Precision beats power.","Sharp lines. Sharper reflexes."],lose:["Cut too deep that time.","Your line was cleaner."],near:["Every millisecond matters."]}},
+    GHOST:   { aggOffset:-0.15, ramming:0.00, boostHoard:true,  consistency:1.00, laneHug:-0.15, color:'#e0e0ff', icon:'👻',
+      callout:"GHOST won't touch you. Doesn't need to.",
+      taunt:{win:["You never saw me coming.","Invisible until first place."],lose:["...You saw me.","Rare. Very rare."],near:["You can't catch what you can't see."]}},
+    PULSE:   { aggOffset: 0.00, ramming:0.25, boostHoard:false, consistency:0.82, laneHug:+0.10, color:'#bf5fff', icon:'◈',
+      callout:"PULSE has rhythm. Break their flow and they fall apart.",
+      taunt:{win:["Feel the beat.","Boom. Boom. Boom. First."],lose:["You disrupted my flow.","Off-beat this race."],near:["Stay in the groove!"]}},
+    CIRCUIT: { aggOffset:-0.05, ramming:0.08, boostHoard:true,  consistency:0.90, laneHug:-0.15, color:'#06d6a0', icon:'⬡',
+      callout:"CIRCUIT runs a perfect system. Hard to shake.",
+      taunt:{win:["Every lap was calculated.","Methodical beats reckless."],lose:["System failure. Reviewing data.","Anomaly logged."],near:["The gap is shrinking."]}},
+    CHROME:  { aggOffset:+0.15, ramming:0.45, boostHoard:false, consistency:0.82, laneHug:+0.15, color:'#c0c0c0', icon:'⬟',
+      callout:"CHROME is heavy, mean, and doesn't care about your paint.",
+      taunt:{win:["Polish that dent.","Chrome don't scratch."],lose:["You're tougher than you look.","Hm."],near:["MOVE."]}},
+    ARC:     { aggOffset:+0.05, ramming:0.20, boostHoard:false, consistency:0.85, laneHug: 0.00, color:'#ff4d6d', icon:'⌒',
+      callout:"ARC is well-rounded. No obvious weakness.",
+      taunt:{win:["Clean race. See you next time.","That's how it's done."],lose:["Good drive.","I'll be back stronger."],near:["This isn't over."]}},
+  };
+
+  // ── Difficulty presets ───────────────────────────────
+  // speedMult: top speed vs player  brakeMult: how early they brake (lower = later = faster through corners)
+  // lookaheadMult: how far ahead they plan (higher = smoother lines but faster)
+  const DIFFICULTY = {
+    easy:  { speedMult:0.72, rbStr:0.45, rbMin:0.55, rbMax:1.08, lookaheadMult:0.65, brakeMult:0.55, wobble:0.35 },
+    medium:{ speedMult:0.88, rbStr:0.25, rbMin:0.70, rbMax:1.30, lookaheadMult:0.85, brakeMult:0.82, wobble:0.14 },
+    hard:  { speedMult:0.96, rbStr:0.12, rbMin:0.82, rbMax:1.42, lookaheadMult:1.05, brakeMult:1.05, wobble:0.06 },
+    expert:{ speedMult:1.05, rbStr:0.05, rbMin:0.92, rbMax:1.55, lookaheadMult:1.25, brakeMult:1.28, wobble:0.01 },
+  };
+
+  let currentDiff = DIFFICULTY.medium;
+  function setDifficulty(k) { currentDiff = DIFFICULTY[k] || DIFFICULTY.medium; }
+  function getDifficulty()  { return currentDiff; }
+  function getPersonality(n){ return PERSONALITIES[n] || null; }
+  function getCallout(n)    { return PERSONALITIES[n]?.callout || null; }
+  function getTaunt(name, cat) {
+    const p = PERSONALITIES[name];
+    if (!p || !p.taunt[cat]?.length) return null;
+    const l = p.taunt[cat];
+    return l[Math.floor(Math.random() * l.length)] || null;
+  }
+  function getNames(count) {
+    const all = Object.keys(PERSONALITIES);
+    return [...all].sort(() => Math.random()-0.5).sub(0, Math.min(count, all.length));
+  }
+
+  // ── Build racing line for a track (call once per track) ──
+  // Inspired by techniques from iRacing/Reiza racing line generators:
+  // slightly cut the inside of each corner by computing curvature
+  // and nudging the path toward the apex.
+  function buildRacingLine(track) {
+    const pts  = track.pts;
+    const n    = pts.length;
+    const hw   = track.halfWidth;
+    const line = []; // { x, y, maxSpeed, curvature }
+
+    // Step 1: compute curvature at each point using 3-point method
+    const curv = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const a = pts[(i - 2 + n) % n];
+      const b = pts[i];
+      const c = pts[(i + 2) % n];
+      // Menger curvature: 4*TriangleArea / (|ab|*|bc|*|ac|)
+      const ab = Math.sqrt((b.x-a.x)**2+(b.y-a.y)**2);
+      const bc = Math.sqrt((c.x-b.x)**2+(c.y-b.y)**2);
+      const ac = Math.sqrt((c.x-a.x)**2+(c.y-a.y)**2);
+      const area = Math.abs((b.x-a.x)*(c.y-a.y)-(c.x-a.x)*(b.y-a.y)) * 0.5;
+      const denom = ab * bc * ac;
+      curv[i] = denom > 0.001 ? (4 * area) / denom : 0;
+    }
+
+    // Step 2: smooth curvature (5-point moving average)
+    const smoothCurv = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      let s = 0;
+      for (let k = -2; k <= 2; k++) s += curv[(i+k+n)%n];
+      smoothCurv[i] = s / 5;
+    }
+
+    // Step 3: build racing line — nudge toward inside of corners
+    // Apex nudge: at high curvature points, shift toward inside
+    for (let i = 0; i < n; i++) {
+      const prev = pts[(i-1+n)%n];
+      const curr = pts[i];
+      const next = pts[(i+1)%n];
+      // Track-perpendicular direction
+      const dx = next.x - prev.x, dy = next.y - prev.y;
+      const len = Math.sqrt(dx*dx+dy*dy) || 1;
+      const perpX = -dy/len, perpY = dx/len;
+      // Cross product sign tells us which side is inside the corner
+      const cross = (next.x-curr.x)*(prev.y-curr.y)-(next.y-curr.y)*(prev.x-curr.x);
+      const insideSign = cross > 0 ? 1 : -1;
+      // Apex offset: proportional to curvature, capped at 40% halfWidth
+      const apexOff = Math.min(smoothCurv[i] * hw * 18, hw * 0.42) * insideSign;
+      line.push({
+        x: curr.x + perpX * apexOff,
+        y: curr.y + perpY * apexOff,
+        curvature: smoothCurv[i],
+      });
+    }
+
+    // Step 4: compute max speed at each point based on curvature
+    // v_max = sqrt(a_lateral / curvature), where a_lateral ≈ 3 m/s² normalised
+    const BASE_LAT_ACCEL = 600; // px/s² — lower = AI brakes earlier into corners
+    for (const pt of line) {
+      const c = Math.max(pt.curvature, 0.0001);
+      pt.maxSpeed = Math.min(Math.sqrt(BASE_LAT_ACCEL / c), 450);
+    }
+
+    return line;
+  }
+
+  // Cache racing lines per track id
+  const racingLineCache = new Map();
+  function getRacingLine(track) {
+    if (!racingLineCache.has(track.id)) {
+      racingLineCache.set(track.id, buildRacingLine(track));
+    }
+    return racingLineCache.get(track.id);
+  }
+
+  // ── Forward-only nearest point search ────────────────
+  // Never snaps backward — critical for preventing reverse-driving loops
+  function forwardNearestIdx(car, pts, lastIdx, windowSize) {
+    const n = pts.length;
+    let best = lastIdx, bestD = Infinity;
+    for (let w = 0; w < windowSize; w++) {
+      const i = (lastIdx + w) % n;
+      const dx = car.x - pts[i].x, dy = car.y - pts[i].y;
+      const d = dx*dx + dy*dy;
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  }
+
+  // ── Pure Pursuit lookahead point ──────────────────────
+  // Given a lookahead distance L, walk ahead along the racing line
+  // until cumulative arc length >= L.
+  function getLookaheadPoint(line, fromIdx, lookaheadDist, n) {
+    let dist = 0;
+    let i = fromIdx;
+    for (let step = 0; step < n; step++) {
+      const ni = (i + 1) % n;
+      const dx = line[ni].x - line[i].x;
+      const dy = line[ni].y - line[i].y;
+      const segLen = Math.sqrt(dx*dx+dy*dy);
+      if (dist + segLen >= lookaheadDist) {
+        // Interpolate exact point on this segment
+        const t = (lookaheadDist - dist) / (segLen || 1);
+        return {
+          x: line[i].x + dx * t,
+          y: line[i].y + dy * t,
+          idx: i,
+        };
+      }
+      dist += segLen;
+      i = ni;
+    }
+    return { x: line[fromIdx].x, y: line[fromIdx].y, idx: fromIdx };
+  }
+
+  // ── Create AI agent ──────────────────────────────────
+  function createAI(car, track, name) {
+    const p   = PERSONALITIES[name] || {};
+    const diff = currentDiff;
+    if (p.color) { car.color = p.color; car.trailColor = p.color; }
+    car.stats.maxSpeed *= diff.speedMult;
+    const line = getRacingLine(track);
+    // Full scan for starting position (only at init, not per-frame)
+    let startIdx = 0, startDist = Infinity;
+    for (let si = 0; si < line.length; si++) {
+      const sdx = car.x - line[si].x, sdy = car.y - line[si].y;
+      const sd = sdx*sdx + sdy*sdy;
+      if (sd < startDist) { startDist = sd; startIdx = si; }
+    }
+    const aggression = Math.max(0.2, diff.lookaheadMult * 0.75 + (p.aggOffset || 0) + (Math.random()-0.5)*0.08);
+    return {
+      car, name,
+      personality: p,
+      line,                       // reference to pre-built racing line
+      nearIdx: startIdx,          // forward-only tracked position
+      baseMaxSpeed: car.stats.maxSpeed,
+      rbFactor: 1,
+      // Pure pursuit state
+      lookaheadBase: 40 + aggression * 22,  // base lookahead distance in px
+      // Speed control
+      targetSpeed: car.stats.maxSpeed,
+      // Recovery
+      offTrackTimer: 0,
+      stuckTimer: 0,
+      lastX: car.x, lastY: car.y,
+      // Boost
+      boostCooldown: Math.random() * 3,
+      boostUsing: false,
+      // Personality wobble (much smaller now — just subtle human imperfection)
+      wobble: 0,
+      wobbleTimer: Math.random() * 2,
+    };
+  }
+
+  // ── Update AI for one frame ──────────────────────────
+  function update(ai, dt, track, player) {
+    const car = ai.car;
+    if (car.finished || car.eliminated) {
+      return { accel:false, brake:false, left:false, right:false, boost:false };
+    }
+
+    const line = ai.line;
+    const n    = line.length;
+    const diff = currentDiff;
+    const p    = ai.personality || {};
+
+    // ── Rubber-band speed scaling ────────────────────────
+    if (player) {
+      const playerTotal = (player.lap - 1) + player.progress;
+      const aiTotal     = (car.lap   - 1) + car.progress;
+      const gap         = playerTotal - aiTotal;
+      const targetRb    = 1 + gap * diff.rbStr;
+      const clampedRb   = Math.max(diff.rbMin, Math.min(diff.rbMax, targetRb));
+      ai.rbFactor      += (clampedRb - ai.rbFactor) * dt * 2.0;
+      car.stats.maxSpeed = ai.baseMaxSpeed * ai.rbFactor;
+    }
+
+    // ── Forward-only position tracking ──────────────────
+    // Minimum 80 steps to handle overlapping start areas
+    const searchWindow = Math.min(n, Math.floor(80 + car.speed * 0.25));
+    ai.nearIdx = forwardNearestIdx(car, line, ai.nearIdx, searchWindow);
+    const nearPt = line[ai.nearIdx];
+
+    // ── Off-track / stuck detection ──────────────────────
+    if (!car.onTrack) {
+      ai.offTrackTimer += dt;
+    } else {
+      ai.offTrackTimer = Math.max(0, ai.offTrackTimer - dt * 3);
+    }
+    const dx0 = car.x - ai.lastX, dy0 = car.y - ai.lastY;
+    const moved = Math.sqrt(dx0*dx0+dy0*dy0);
+    ai.lastX = car.x; ai.lastY = car.y;
+    if (car.speed < 15 && !car.finished) {
+      ai.stuckTimer += dt;
+    } else {
+      ai.stuckTimer = 0;
+    }
+    const recovering = ai.offTrackTimer > 0.4;
+    const stuck      = ai.stuckTimer > 1.2;
+
+    // ── Pure Pursuit target ──────────────────────────────
+    // Lookahead distance scales with speed: faster = look further
+    // This is the core of Pure Pursuit — variable lookahead
+    const L = (ai.lookaheadBase + car.speed * 0.45) * diff.lookaheadMult;
+
+    let targetX, targetY;
+    if (recovering || stuck) {
+      // Recovery: aim directly at the nearest racing line point, no lookahead
+      targetX = nearPt.x;
+      targetY = nearPt.y;
+      if (stuck) {
+        // Reset near index wider to escape a stuck loop
+        ai.nearIdx = (ai.nearIdx + 8) % n;
+        ai.stuckTimer = 0;
+      }
+    } else {
+      const lookahead = getLookaheadPoint(line, ai.nearIdx, L, n);
+      targetX = lookahead.x;
+      targetY = lookahead.y;
+    }
+
+    // ── Pure Pursuit steering angle ──────────────────────
+    // Pure Pursuit computes the curvature κ = 2y / L² where y is
+    // the lateral offset of the lookahead point in the vehicle frame.
+    // We translate this into left/right commands.
+    const toTargetX = targetX - car.x;
+    const toTargetY = targetY - car.y;
+    // Transform to vehicle frame
+    const cosA = Math.cos(car.angle), sinA = Math.sin(car.angle);
+    // lateral offset (right = positive)
+    const lateral = -toTargetX * sinA + toTargetY * cosA;
+    // forward offset
+    const forward = toTargetX * cosA + toTargetY * sinA;
+
+    // Heading error (desired angle to target vs current heading)
+    let angleDiff = Math.atan2(lateral, Math.max(forward, 1));
+
+    // Add small personality wobble (much more subtle than before)
+    ai.wobbleTimer -= dt;
+    if (ai.wobbleTimer <= 0) {
+      ai.wobble = (Math.random()-0.5) * diff.wobble * (1 - (p.consistency || 0.85));
+      ai.wobbleTimer = 0.8 + Math.random() * 1.4;
+    }
+    if (!recovering) angleDiff += ai.wobble;
+
+    const left  = angleDiff < -0.04;
+    const right = angleDiff >  0.04;
+
+    // ── Speed control (racing line curvature-based) ──────
+    // Look ahead at the WORST curvature in the next ~2 lookaheads
+    // and compute the target speed from the pre-computed maxSpeed
+    let lookaheadMaxSpeed = car.stats.maxSpeed;
+    const checkSteps = Math.floor(12 + car.speed * 0.12);
+    for (let s = 0; s < checkSteps; s++) {
+      const idx = (ai.nearIdx + s) % n;
+      const ms  = line[idx].maxSpeed * (diff.brakeMult * ai.rbFactor);
+      if (ms < lookaheadMaxSpeed) lookaheadMaxSpeed = ms;
+    }
+
+    // Smoothly approach target speed
+    ai.targetSpeed += (lookaheadMaxSpeed - ai.targetSpeed) * dt * 3.0;
+
+    const brake = car.speed > ai.targetSpeed * 0.98; // 2% tolerance — brake decisively
+    const accel = !brake && car.speed < ai.targetSpeed * 1.25;
+
+    // ── Ramming ──────────────────────────────────────────
+    // Aggressive personalities nudge toward player when close ahead
+    const rammingChance = p.ramming || 0;
+    if (player && rammingChance > 0 && !recovering) {
+      const rx = player.x - car.x, ry = player.y - car.y;
+      const rDist = Math.sqrt(rx*rx+ry*ry);
+      const rFwd  = rx * cosA + ry * sinA;
+      if (rDist < 100 && rFwd > 0 && Math.random() < rammingChance * dt * 1.5) {
+        ai._ramming = true;
+      }
+      if (rDist > 180 || rFwd <= 0) ai._ramming = false;
+      // Don't adjust angleDiff here — instead, add a small lateral bias
+      // by tweaking the targetX. Safe: only shifts target slightly, never off-track.
+    }
+
+    // ── Boost ────────────────────────────────────────────
+    ai.boostCooldown -= dt;
+    const boostHoard   = p.boostHoard || false;
+    // Only boost on straights (low curvature ahead)
+    const fwdCurv = line[(ai.nearIdx + Math.floor(checkSteps * 0.5)) % n].curvature;
+    const straightEnough = fwdCurv < (boostHoard ? 0.006 : 0.012);
+    const boostThresh    = boostHoard ? 78 : 55;
+    if (ai.boostCooldown <= 0 && car.boost > boostThresh && straightEnough && !recovering) {
+      ai.boostUsing    = true;
+      ai.boostCooldown = (1.5 + Math.random() * 2.5) / Math.max(0.5, p.aggOffset + 0.75);
+    }
+    if (car.boost < 12 || !straightEnough) ai.boostUsing = false;
+
+    return { accel, brake, left, right, boost: ai.boostUsing };
+  }
+
+  return {
+    createAI, update, getNames,
+    setDifficulty, getDifficulty,
+    getPersonality, getTaunt, getCallout,
+    DIFFICULTY,
+  };
+})();
+```

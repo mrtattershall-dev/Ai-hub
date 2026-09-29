@@ -1,0 +1,281 @@
+// ═══════════════════════════════════════════════════════
+//  AUDIO MODULE  –  WebAudio synthesized sounds
+// ═══════════════════════════════════════════════════════
+const Audio = (() => {
+  let ctx = null;
+  let masterGain = null;
+  let engineOsc = null;
+  let engineGain = null;
+  let engineStarted = false;
+  let muted = false;
+  let currentRPM = 0;
+  let boostActive = false;
+  let musicNodes = null;
+  let musicTimer = null;
+  let musicBeat = 0;
+  const BPM = 128;
+  const BEAT_MS = (60 / BPM) * 1000;
+  const MUSIC_SCALES = {
+    '#00f5ff': [57,60,64,67,69],
+    '#bf5fff': [55,58,62,65,67],
+    '#06d6a0': [52,55,59,62,64],
+    '#ffbe0b': [45,48,52,55,57],
+    '#ff006e': [48,52,55,57,60],
+    '#fb5607': [47,50,53,57,59],
+  };
+  function midiHz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+  function init() {
+    if (ctx) return;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = 0.35;
+      masterGain.connect(ctx.destination);
+    } catch (e) {
+      console.warn('WebAudio not available');
+    }
+  }
+
+  function resume() {
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+  }
+
+  // ── Engine drone ──────────────────────────────────────
+  function startEngine() {
+    if (!ctx || engineStarted) return;
+    engineStarted = true;
+
+    // Layered oscillators for engine texture
+    const sawOsc = ctx.createOscillator();
+    sawOsc.type = 'sawtooth';
+    sawOsc.frequency.value = 55;
+
+    const squareOsc = ctx.createOscillator();
+    squareOsc.type = 'square';
+    squareOsc.frequency.value = 110;
+
+    const waveShaper = ctx.createWaveShaper();
+    waveShaper.curve = makeDistortionCurve(60);
+
+    const lowpass = ctx.createBiquadFilter();
+    lowpass.type = 'lowpass';
+    lowpass.frequency.value = 800;
+    lowpass.Q.value = 2;
+
+    engineGain = ctx.createGain();
+    engineGain.gain.value = 0;
+
+    sawOsc.connect(waveShaper);
+    squareOsc.connect(waveShaper);
+    waveShaper.connect(lowpass);
+    lowpass.connect(engineGain);
+    engineGain.connect(masterGain);
+
+    sawOsc.start();
+    squareOsc.start();
+    engineOsc = { saw: sawOsc, square: squareOsc, lowpass, gain: engineGain };
+  }
+
+  function stopEngine() {
+    if (!engineOsc) return;
+    engineGain.gain.setTargetAtTime(0, ctx.currentTime, 0.3);
+    setTimeout(() => {
+      try { engineOsc.saw.stop(); engineOsc.square.stop(); } catch(e){}
+      engineOsc = null;
+      engineStarted = false;
+    }, 500);
+  }
+
+  function setEngineRPM(rpm, onBoost) {
+    if (!ctx || !engineOsc) return;
+    currentRPM = rpm;
+    boostActive = onBoost;
+    // Map rpm 0-1 to frequency range
+    const baseFreq = 50 + rpm * 280;
+    const boostMult = onBoost ? 1.4 : 1;
+    engineOsc.saw.frequency.setTargetAtTime(baseFreq * boostMult, ctx.currentTime, 0.05);
+    engineOsc.square.frequency.setTargetAtTime(baseFreq * 2 * boostMult, ctx.currentTime, 0.05);
+    // Filter sweep
+    const cutoff = 300 + rpm * 2200 + (onBoost ? 800 : 0);
+    engineOsc.lowpass.frequency.setTargetAtTime(cutoff, ctx.currentTime, 0.04);
+    const vol = muted ? 0 : (0.05 + rpm * 0.55 + (onBoost ? 0.2 : 0));
+    engineOsc.gain.gain.setTargetAtTime(vol, ctx.currentTime, 0.04);
+  }
+
+  function makeDistortionCurve(amount) {
+    const n = 256, curve = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = (i * 2) / n - 1;
+      curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
+    }
+    return curve;
+  }
+
+  // ── One-shot sounds ───────────────────────────────────
+  function playBeep(freq, duration, type = 'sine', vol = 0.4) {
+    if (!ctx || muted) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = vol;
+    gain.gain.setTargetAtTime(0, ctx.currentTime + duration * 0.7, 0.05);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }
+
+  function playBoop(freq, freq2, duration, type = 'sine', vol = 0.35) {
+    if (!ctx || muted) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq2, ctx.currentTime + duration);
+    gain.gain.value = vol;
+    gain.gain.setTargetAtTime(0, ctx.currentTime + duration * 0.6, 0.05);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(ctx.currentTime + duration + 0.1);
+  }
+
+  function playCollision() {
+    if (!ctx || muted) return;
+    // White noise burst
+    const bufSize = ctx.sampleRate * 0.12;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 600;
+    const g = ctx.createGain(); g.gain.value = muted ? 0 : 0.5;
+    src.connect(lp); lp.connect(g); g.connect(masterGain);
+    src.start();
+  }
+
+  function playBoostPickup() { playBoop(300, 900, 0.18, 'square', 0.3); }
+  function playBoostUse()    { playBoop(200, 600, 0.25, 'sawtooth', 0.25); }
+  function playLapComplete() {
+    playBeep(440, 0.12, 'square', 0.35);
+    setTimeout(() => playBeep(880, 0.18, 'square', 0.35), 130);
+    setTimeout(() => playBeep(1320, 0.25, 'square', 0.35), 280);
+  }
+  function playCountdownTick() { playBeep(440, 0.15, 'square', 0.4); }
+  function playCountdownGo()   {
+    playBeep(880, 0.08, 'square', 0.5);
+    setTimeout(() => playBeep(1320, 0.35, 'square', 0.5), 80);
+  }
+  function playMenuSelect()  { playBeep(660, 0.08, 'sine', 0.2); }
+  function playMenuBack()    { playBoop(660, 330, 0.1, 'sine', 0.2); }
+  function playUpgrade()     {
+    [220,330,440,660,880].forEach((f,i) => setTimeout(() => playBeep(f, 0.1, 'square', 0.25), i * 70));
+  }
+  function playWin()         {
+    const melody = [523,659,784,1047];
+    melody.forEach((f,i) => setTimeout(() => playBeep(f, 0.22, 'square', 0.35), i * 180));
+  }
+  function playLose()        { playBoop(440, 110, 0.6, 'sawtooth', 0.35); }
+  function playSkid()        {
+    if (!ctx || muted) return;
+    const bufSize = Math.floor(ctx.sampleRate * 0.05);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.15;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1000;
+    const g = ctx.createGain(); g.gain.value = 0.3;
+    src.connect(hp); hp.connect(g); g.connect(masterGain);
+    src.start();
+  }
+
+  function startMusic(trackColor) {
+    if (!ctx || musicNodes) return;
+    const scale = MUSIC_SCALES[trackColor] || MUSIC_SCALES['#00f5ff'];
+    const master = ctx.createGain();
+    master.gain.value = muted ? 0 : 0.15;
+    master.connect(masterGain);
+
+    // Bass
+    const bassOsc = ctx.createOscillator();
+    bassOsc.type = 'square';
+    bassOsc.frequency.value = midiHz(scale[0] - 12);
+    const bassFilter = ctx.createBiquadFilter();
+    bassFilter.type = 'lowpass'; bassFilter.frequency.value = 200;
+    const bassGain = ctx.createGain(); bassGain.gain.value = 0.5;
+    bassOsc.connect(bassFilter); bassFilter.connect(bassGain); bassGain.connect(master);
+    bassOsc.start();
+
+    // Pad
+    const padFilter = ctx.createBiquadFilter();
+    padFilter.type = 'lowpass'; padFilter.frequency.value = 800;
+    const padGain = ctx.createGain(); padGain.gain.value = 0.1;
+    padFilter.connect(padGain); padGain.connect(master);
+    const padOscs = [scale[0], scale[2], scale[4]].map(note => {
+      const o = ctx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = midiHz(note);
+      o.connect(padFilter);
+      o.start();
+      return o;
+    });
+
+    // Arpeggio
+    const arpOsc = ctx.createOscillator();
+    arpOsc.type = 'square';
+    arpOsc.frequency.value = midiHz(scale[0] + 24);
+    const arpGain = ctx.createGain(); arpGain.gain.value = 0;
+    const arpFilter = ctx.createBiquadFilter();
+    arpFilter.type = 'bandpass'; arpFilter.frequency.value = 2400; arpFilter.Q.value = 4;
+    arpOsc.connect(arpFilter); arpFilter.connect(arpGain); arpGain.connect(master);
+    arpOsc.start();
+
+    musicNodes = { bassOsc, padOscs, arpOsc, arpGain, master, scale };
+    musicBeat = 0;
+    const arpPat = [0,2,4,2,1,3,4,3];
+    musicTimer = setInterval(() => {
+      if (!ctx || !musicNodes || muted) return;
+      const note = musicNodes.scale[arpPat[musicBeat % arpPat.length]] + 24;
+      musicNodes.arpOsc.frequency.setValueAtTime(midiHz(note), ctx.currentTime);
+      musicNodes.arpGain.gain.cancelScheduledValues(ctx.currentTime);
+      musicNodes.arpGain.gain.setValueAtTime(0.25, ctx.currentTime);
+      musicNodes.arpGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      musicBeat++;
+    }, BEAT_MS / 2);
+  }
+
+  function stopMusic() {
+    if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+    if (!musicNodes) return;
+    try {
+      musicNodes.master.gain.setTargetAtTime(0, ctx.currentTime, 0.2);
+      const nodes = musicNodes;
+      musicNodes = null;
+      setTimeout(() => {
+        try { nodes.bassOsc.stop(); nodes.arpOsc.stop(); nodes.padOscs.forEach(o => o.stop()); } catch(e) {}
+      }, 500);
+    } catch(e) { musicNodes = null; }
+  }
+
+  function setMuted(v) {
+    muted = v;
+    if (masterGain) masterGain.gain.value = muted ? 0 : 0.35;
+    if (musicNodes) musicNodes.master.gain.setTargetAtTime(muted ? 0 : 0.15, ctx.currentTime, 0.1);
+  }
+  function isMuted() { return muted; }
+
+  return {
+    init, resume, startEngine, stopEngine, setEngineRPM,
+    playCollision, playBoostPickup, playBoostUse,
+    playLapComplete, playCountdownTick, playCountdownGo,
+    playMenuSelect, playMenuBack, playUpgrade,
+    playWin, playLose, playSkid,
+    startMusic, stopMusic,
+    setMuted, isMuted
+  };
+})();

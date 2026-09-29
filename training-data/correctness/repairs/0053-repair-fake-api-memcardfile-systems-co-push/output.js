@@ -1,0 +1,84 @@
+/**
+ * combat.js — hitbox construction + hit resolution shared by attacks.
+ *
+ * Attacks (player or enemy) describe a hitbox relative to the attacker; this
+ * module turns that into a world-space AABB respecting facing, then tests it
+ * against a list of targets and applies damage + knockback to each, exactly
+ * once per swing. "Hitstop" — a few frames of freeze on impact — is exposed as
+ * a tiny global the main loop honours, giving hits their satisfying crunch.
+ *
+ * @module systems/combat
+ */
+
+import { aabb } from "../engine/mathx.js";
+
+/**
+ * Build a world-space hitbox in front of an attacker.
+ * @param {{x,y,w,h,facing}} owner
+ * @param {{reach:number,width:number,height:number,yOffset?:number,
+ *          damage:number,knockback:number,launch?:number,type?:string}} def
+ */
+export function makeHitbox(owner, def) {
+  const cx = owner.x + owner.w / 2;
+  const cy = owner.y + owner.h / 2 + (def.yOffset ?? 0);
+  const w = def.width;
+  const h = def.height;
+  // Place the box on the facing side, slightly overlapping the body.
+  const x = owner.facing >= 0 ? cx - 4 : cx - w + 4;
+  return {
+    x,
+    y: cy - h / 2,
+    w,
+    h,
+    damage: def.damage,
+    knockback: def.knockback,
+    launch: def.launch ?? 0,
+    type: def.type ?? "light",
+    facing: owner.facing,
+    _hit: new Set(), // targets already struck by this instance
+  };
+}
+
+/**
+ * Apply a hitbox to candidate targets. Targets must implement
+ * `hurt(amount, knockX, launch, type)` and expose an AABB ({x,y,w,h}) and
+ * `alive`. The attack `type` is forwarded so targets can react to it (e.g. the
+ * Shield Brute blocks light attacks from the front but not slams).
+ * @returns {Array<object>} the targets that were actually damaged this call
+ */
+export function resolveHits(hitbox, targets) {
+  const hits = [];
+  for (const target of targets) {
+    if (!target.alive || hitbox._hit.has(target)) continue;
+    if (!aabb(hitbox, target)) continue;
+    hitbox._hit.add(target);
+    const knockX = hitbox.facing * hitbox.knockback;
+    const damaged = target.hurt(hitbox.damage, knockX, hitbox.launch, hitbox.type);
+    // A target may return false to signal "blocked / no damage" (still consumed).
+    if (damaged !== false) hits.push(target);
+  }
+  return hits;
+}
+
+/**
+ * Global hitstop: a brief simulation freeze on impact. The main loop calls
+ * `Hitstop.consume(dt)` and skips gameplay updates while time remains, which
+ * makes every hit feel weighty without per-entity bookkeeping.
+ */
+export const Hitstop = {
+  _remaining: 0,
+  add(seconds) {
+    this._remaining = Math.max(this._remaining, seconds);
+  },
+  get active() {
+    return this._remaining > 0;
+  },
+  consume(dt) {
+    if (this._remaining <= 0) return false;
+    this._remaining -= dt;
+    return true;
+  },
+  clear() {
+    this._remaining = 0;
+  },
+};
