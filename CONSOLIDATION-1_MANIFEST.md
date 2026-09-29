@@ -87,3 +87,94 @@ Six hours of archaeology demonstrated that **test count is a terrible proxy for 
 Hundreds of passing tests surrounded mechanisms whose product reachability was zero. The tests were
 not fake — they established their local propositions correctly. The error was entirely in the
 inference drawn from them, and it is now two distinct gates rather than one.
+
+---
+
+# HOLD — recorded 2026-09-29, before 0A
+
+**Nothing further is built until the active integration slice commits and releases its files.**
+Written down because the failure mode here is a future session reading this manifest, feeling the
+momentum, and starting 0A against a tree that is about to move.
+
+## The line, explicitly
+
+No new subsystem. No LegaScreen connection. **No identity reconciliation.** No production flag
+activation. No generalized ADMIT design. No "while we're here" cleanup.
+
+## Why row 7 must NOT be reconciled yet
+
+Two implementations of identity is the shallow reading. They are potentially **two different
+propositions**:
+
+```
+I_stamp(W)    = f(path, size, mtime)
+I_revision(W) = sha256(content)
+```
+
+Not interchangeable. The same bytes copied elsewhere preserve `revisionOf` and change
+`workspaceStamp`. A metadata change alters the stamp without touching content. Reconciling them now
+would be choosing an answer before knowing whether the question is load-bearing — the disagreement is
+**preregistered as a predicted composition failure**, and TEST-(-1) should be allowed to tell us
+whether it ever becomes authority-bearing on the exercised path. If it doesn't, that is also a result.
+
+## The env-fact trichotomy — the only three legitimate answers
+
+`prepareGoverned` requires an execution worker and bound routes. There are exactly three honest
+positions, and the fourth is the defect:
+
+1. the ordinary launch already establishes those facts somehow;
+2. PRODUCT-0 must **acquire or establish** them;
+3. the ordinary launch **cannot** satisfy the governed contract — a finding, and a legitimate one.
+
+**Not legitimate: asserting them because the test needs green.** That constructs
+`ordinary Legasus ✗ special configuration → a perfectly functioning "production" test` and
+congratulates us for proving something users cannot execute.
+
+## How 0A gets designed, when it is time — backward, not forward
+
+The temptation is to design generic production admission. That is **ontology design disguised as
+plumbing**, and it is how a new policy enters under cover of a bridge.
+
+Instead, derive it from the already-frozen TEST-(-1). Ask the bounded question:
+
+> **What single proposition must be admitted for this one trivial edit to proceed?**
+
+and trace backward from the contract that actually needs it:
+
+```
+GOVERN requires P
+      ↑
+AUTHORITY depends on P
+      ↑
+therefore ADMIT must establish P
+      ↑
+what observation can actually establish P?
+```
+
+That keeps 0A microscopic and stops it from becoming an ontology.
+
+## 0A's own preregistered composition failure
+
+**ADMIT may establish exactly the proposition its observation justifies. It does not authorize an
+effect merely because a fact was admitted.**
+
+So after 0A, behaviour must be **unchanged**. If connecting ADMIT alone suddenly allows a write, that
+is an architectural collapse between epistemic and normative authority — and it would be an excellent
+failure to find at the smallest possible scale rather than at 0C.
+
+## The order, and why it is not negotiable
+
+```
+active slice commits and releases
+        ↓
+manifest updated FROM COMMITTED EVIDENCE   (not from a working tree, not from a message)
+        ↓
+smallest 0A required by the frozen TEST-(-1)
+        ↓
+three columns re-scored
+        ↓
+repeat
+```
+
+The first row to read `COMPONENT ESTABLISHED / PRODUCT LIVE / COMPOSITION ESTABLISHED` will be the
+first mechanism in this project that has ever earned all three. None has today.
