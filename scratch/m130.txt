@@ -1,0 +1,46 @@
+Audit 2026-09-29: the verified fix has no consumer, and step 5 has nothing to remove
+
+Every claim re-verified by reading the file or running the command, including the ones taken from peer
+commit messages, because a commit message is a report.
+
+THE APPEND FIX IS NOWHERE ANYONE WOULD RUN IT. git branch --contains finds c96f21a on
+fix/append-preservation and nothing else, and the fixed gate greps to zero on main,
+fix/unverified-finish-recorded, fix-tolerant-indent, consolidation/connect-components and
+phase2-d2-intervention. Two hub processes and a fuzzForever fuzzer are running; the one serving from
+the trunk checkout is on fix/unverified-finish-recorded, so the reproduced corruption route is open on
+the revision being exercised continuously. A finished, verified artifact with no consumer.
+
+THE GOVERNED BOUNDARY IS WIRED AND INERT, and this confirms a peer's audit rather than discovering it.
+AGENT_GOVERNED_WRITES occurs twice in the whole repository, both in agent.js, one comment and one read,
+and is set nowhere. governWrite has 8 call sites across write_file, append_file and edit_file;
+governedEdit is called from exactly one place inside it; setRunAuthority's only callers outside its own
+definition are in a test-harness child; createWorkspace has zero non-test importers. Read off the guard
+body: with the flag on and no authority installed, all three write tools refuse every write. The code
+says this about itself accurately and the audit confirms it. In the boundary's favour, its 8 sites
+include append_file, which the native check does not cover.
+
+SO THE TWO MECHANISMS FAIL IN OPPOSITE DIRECTIONS. The native preservation check is LIVE and
+route-incomplete. The governed boundary is route-complete over the three write tools and INERT. That is
+a cleaner statement of the A and B split than step 4 produced, because it shows route coverage and live
+enforcement are independent properties and this repository currently has each one without the other.
+
+STEP 5 CANNOT BE RUN AS DESIGNED. An inert mechanism has no benefit to remove, so a removal control
+would report the same result whether Legasus were sound or absent - an assertion that cannot fail. And
+the two halves sit on disjoint branches: appendFix 1 with governWrite 0 on one, appendFix 0 with
+governWrite 9 on the other, so no revision contains both. Steps 3 and 5 were never written; no
+DESTRUCTION_STEP3 or STEP5 record was ever added on any branch.
+
+THE WORK IS NOT CONVERGING, as a measurement and not a diagnosis. main has not moved in 17 days. 147
+commits landed on branches since the 26th. Seven branches are 123 to 702 commits ahead of main and all
+seven are also 9 behind it. The two active branches carry 644 commits of mutual divergence. What that
+licenses is narrow: there is no single revision containing the work, so any claim of the form "the hub
+does X" has to name a branch.
+
+Not established and recorded as such: why the branches diverge, whether any branch passes its tests
+(the counts are file counts), whether the governed flag would work with a real installer, anything
+about effort, and anything about the running fuzzer beyond the fact that it is running. No running
+process was touched.
+
+Message-File: scratch/m130.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
