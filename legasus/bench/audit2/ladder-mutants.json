@@ -1,0 +1,97 @@
+{
+  "dependsOn": {
+    "2": [
+      1
+    ],
+    "3": [
+      1,
+      2
+    ],
+    "4": [
+      1,
+      2,
+      3
+    ],
+    "5": [
+      1,
+      2
+    ],
+    "6": [
+      1,
+      5
+    ],
+    "7": [
+      1
+    ],
+    "8": [
+      1,
+      2,
+      7
+    ],
+    "9": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ]
+  },
+  "mutants": [
+    {
+      "obligation": 1,
+      "name": "load shows every item (one item removed)",
+      "file": "baseline-as-delivered.html",
+      "find": "  <div class=\"entry\"><dt>daemon</dt></div>",
+      "replace": ""
+    },
+    {
+      "obligation": 2,
+      "name": "typing narrows the list",
+      "file": "baseline-as-delivered.html",
+      "find": "box.addEventListener('input', narrow);",
+      "replace": "/* no input listener */"
+    },
+    {
+      "obligation": 3,
+      "name": "clear brings every item back",
+      "file": "baseline-as-delivered.html",
+      "find": "clearBtn.addEventListener('click', function () { box.value = ''; narrow(); });",
+      "replace": "clearBtn.addEventListener('click', function () { box.value = ''; });"
+    },
+    {
+      "obligation": 4,
+      "name": "clear empties the field (list restored, text put back)",
+      "file": "baseline-as-delivered.html",
+      "find": "clearBtn.addEventListener('click', function () { box.value = ''; narrow(); });",
+      "replace": "clearBtn.addEventListener('click', function () { var keep = box.value; box.value = ''; narrow(); box.value = keep; });"
+    },
+    {
+      "obligation": 6,
+      "name": "Escape brings every item back",
+      "file": "baseline-as-delivered.html",
+      "find": "if (e.key === 'Escape') { box.value = ''; narrow(); }",
+      "replace": "if (e.key === 'Escape') { /* nothing */ }"
+    },
+    {
+      "obligation": 7,
+      "name": "counter shows 5 at load",
+      "file": "baseline-as-delivered.html",
+      "find": "counter.textContent = n + ' items visible';",
+      "replace": "counter.textContent = 'many items visible';"
+    },
+    {
+      "obligation": 8,
+      "name": "counter updates when filtered",
+      "file": "baseline-as-delivered.html",
+      "find": "box.addEventListener('input', recount);",
+      "replace": "/* counter never updates on typing */"
+    }
+  ],
+  "notIndependentlyFalsifiable": {
+    "5": "the same assertion as obligation 2 at a later position, so no mutation can break it without breaking 2",
+    "9": "noErrors is a GLOBAL sentinel: any mutation introducing an error breaks every obligation, so it cannot be specifically falsified"
+  }
+}
