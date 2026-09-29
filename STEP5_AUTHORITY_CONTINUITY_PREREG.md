@@ -167,3 +167,91 @@ different boundary or an explicitly raised limit, and that choice must be record
 - **It does not extend to queue or supervisor runs.** `spawn_subtask` is chosen because it is the
   smallest boundary already present and isolable. Queue and supervisor runs pass no scope at all and
   remain a separate, larger question.
+
+---
+
+# AMENDMENT 1 (2026-09-29) — C4 fired immediately. Appended; nothing above is edited.
+
+§5 named the depth control as a live risk and required it be checked FIRST. It was, and it failed, so
+W6 as written is vacuous at the chosen boundary. Recording that before any mechanism exists is the
+whole purpose of putting the control first.
+
+## C4: A SUB-TASK CANNOT DELEGATE AT ALL
+
+Not a depth limit — a categorical refusal, `server/agent.js:2778` in the sub-task loop:
+
+    if (tool === 'spawn_subtask') {
+      sub.history.push({ role: 'user', content: 'You are already a sub-task. Do this work yourself instead of delegating it.' });
+      continue;
+    }
+
+`SUBTASK_MAX_DEPTH` (default 2) is therefore **not the binding constraint**; the loop guard is, and it
+holds at any value of that variable. **W6 — a grandchild re-requesting what the child narrowed away —
+is unreachable through `spawn_subtask`, at any setting.**
+
+## AND THE GUARD WILL NOT BE RELAXED TO REACH IT
+
+Loosening a production guard so a world becomes reachable is weakening a control to obtain a result.
+The prohibition applies even though the motive here is to reach a world rather than to pass a repair:
+the guard is load-bearing (the comment says "this is the path that actually recurses"), and an
+experiment that changes the subject to observe it has measured a different system.
+
+## THE COMPOSING BOUNDARY IS THE QUEUE, AND IT FAILS THE OPPOSITE WAY
+
+Measured, same session:
+
+    queue_task (agent.js ~1520)   generation = (parent.generation || 0) + 1, capped by
+                                  MAX_GENERATIONS = 5. So a self-extending lineage of depth up to 5
+                                  IS reachable here - composition exists.
+    startRun call sites           /start (4569) passes writeScope. The two queue sites (4381, 4662)
+                                  pass NONE, so setRunAuthorities([]) and, under the flag, every
+                                  write in a queued run refuses.
+
+    boundary        composes?      authority crossing         property violated today
+    ───────────────────────────────────────────────────────────────────────────────────────────
+    spawn_subtask   NO             ambient, unrecorded        P3 least authority, P5 accountability
+                                   (measured, 9/9)            - too much, and untracked
+    queue_task      YES, gen <= 5  NONE - a fresh startRun    P4 non-loss - too little; autonomy
+                                   with no scope               stops at the first write
+
+**The two boundaries fail in opposite directions**, which is the same shape as the audit's finding
+about the two mechanisms: each has the property the other lacks. That is now a measured structural
+fact about this branch, not a conjecture.
+
+## SO W6 SPLITS, AND THE TWO HALVES ARE DIFFERENT KINDS OF EVIDENCE
+
+    W6a  ALGEBRAIC       attenuate(attenuate(S, A), B) must be a subset of attenuate(S, A), tested as
+                         a unit property of the attenuation function with no controller involved.
+                         CHEAP, and it is evidence about the FUNCTION only.
+    W6b  END-TO-END      composition across a real controller-created boundary. Reachable only at the
+                         QUEUE boundary, which first requires answering how a queued descendant gets
+                         any authority at all - i.e. W9 below.
+
+The gap between them is named rather than papered over: **W6a passing is not evidence that authority
+composes in the live path.** A function with the right algebra installed by a mechanism that overwrites
+shared state still loses the property, which is precisely the failure §4 anticipated.
+
+## ONE NEW FROZEN WORLD, FROM THE MEASUREMENT
+
+    #    situation                                   proposition requires                tests
+    ─────────────────────────────────────────────────────────────────────────────────────────────
+    W9   a run queues follow-up work; the queued     SOMETHING other than "refuse         P4, P1
+         descendant attempts a write the parent      everything" and other than
+         was authorized for                          "inherit silently"
+
+W9 is the honest statement of the autonomous case, and today it has no answer: the queued descendant
+gets no authority, so under the flag it refuses; and the only alternatives currently representable are
+ambient inheritance (what `spawn_subtask` does) or owner enumeration (which cannot cover discovered
+work). W9 is where representation (c) — attenuation — would have to prove itself, and where §2's
+hypothesis is actually load-bearing.
+
+## WHAT CHANGES IN THE PLAN, AND WHAT DOES NOT
+
+    unchanged   W1, W2, W3, W4, W5, W7, W8 remain at the spawn_subtask boundary as frozen
+    unchanged   the proposition P1-P6, the five candidate representations, and controls C1-C3
+    narrowed    W6 becomes W6a (unit, algebraic) and W6b (end-to-end, queue boundary, blocked on W9)
+    added       W9, the queued descendant
+    recorded    C4 FIRED. Any later claim that attenuation composes must say which of W6a or W6b it
+                rests on, and must not cite W6a as evidence about the live path
+
+Still nothing implemented, no representation chosen, and the flag stays off.

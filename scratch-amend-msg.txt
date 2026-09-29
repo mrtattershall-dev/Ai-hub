@@ -1,0 +1,42 @@
+AMENDMENT 1: C4 fired, so W6 is vacuous at the chosen boundary - appended, not rewritten
+
+The preregistration named the depth control as a live risk and required it be checked FIRST. It was,
+and it failed. Recording that before any mechanism exists is the whole point of putting the control
+first, and the frozen text above it is untouched.
+
+A SUB-TASK CANNOT DELEGATE AT ALL. Not a depth limit - a categorical refusal in the sub-task loop at
+agent.js:2778, which holds at any value of SUBTASK_MAX_DEPTH. So W6, a grandchild re-requesting what
+the child narrowed away, is unreachable through spawn_subtask at any setting. The guard will NOT be
+relaxed to reach it: loosening a load-bearing production guard so a world becomes observable is
+weakening a control to obtain a result, and its own comment says this is the path that actually
+recurses.
+
+THE COMPOSING BOUNDARY IS THE QUEUE, AND IT FAILS THE OPPOSITE WAY. queue_task carries generation
+parent plus one, capped by MAX_GENERATIONS 5, so a self-extending lineage of depth up to 5 is reachable
+there. But only /start passes writeScope; both queue call sites pass none, so a queued run installs an
+empty authority set and under the flag every write in it refuses. spawn_subtask gives a child too much,
+ambiently and unrecorded, violating least-authority and accountability. The queue gives a descendant
+nothing at all, violating non-loss - autonomy stops at the first write. Each boundary has the property
+the other lacks, which is the same shape as the audit's finding about the two mechanisms, and it is now
+measured rather than conjectured.
+
+SO W6 SPLITS INTO TWO DIFFERENT KINDS OF EVIDENCE. W6a is algebraic - attenuate of attenuate is a
+subset of attenuate - tested as a unit property of the function with no controller involved. W6b is
+end-to-end composition across a real boundary, reachable only at the queue and blocked on how a queued
+descendant gets any authority at all. The gap is named rather than papered over: W6a passing is NOT
+evidence that authority composes in the live path, because a function with the right algebra installed
+by a mechanism that overwrites shared state still loses the property.
+
+AND ONE NEW FROZEN WORLD. W9: a run queues follow-up work and the queued descendant attempts a write
+the parent was authorized for. The proposition requires something other than refuse-everything and
+other than inherit-silently, and today there is no answer - the descendant gets no authority, and the
+only alternatives currently representable are ambient inheritance or owner enumeration, which cannot
+cover discovered work. W9 is where attenuation would have to prove itself and where the hypothesis is
+actually load-bearing.
+
+Unchanged: the proposition, the five candidate representations, controls C1 to C3, and worlds W1 to W5,
+W7 and W8. Nothing implemented, no representation chosen, flag still off.
+
+Message-File: scratch-amend-msg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
