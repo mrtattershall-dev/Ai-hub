@@ -167,14 +167,25 @@ ok(outside.child === null,
 // what changed is the point.
 //
 // COMPOSITION CHANGED IT. consolidation/connect-components already carried a richer
-// `subtask_step` that keeps `result: String(result ?? '').slice(0, 400)`. Neither branch alone
-// made a sub-task governance refusal legible: the slice supplied the refusal text, the other
-// supplied the carry-up. Assembled, the refusal reaches the parent run record.
+// `subtask_step` that keeps `result: String(result ?? '').slice(0, 400)`. The slice supplied the
+// refusal text; the other line supplied the carry-up. Assembled, the refusal reaches the parent
+// run record.
 //
-// This is the only kind of evidence the assembly question accepts - a property that neither
-// component established separately. It is recorded as an IMPROVEMENT surfaced by composition,
-// not as a test that was adjusted to go green: the assertion below would fail on either branch
-// in isolation.
+// SCOPE OF THE CLAIM - CORRECTED. An earlier wording said this property exists ONLY in the
+// assembly. THAT IS NOT SHOWN. What is measured:
+//
+//     governed-slice alone, this same assertion      8/9   (it lacks the recorder)
+//     composed candidate                             9/9   (the merge preserved it)
+//
+// The converse arm was never run and cannot be run as written: consolidation alone has no
+// issueWriteScope / multi-grant route, so this suite has nothing to generate the refusal with.
+// So this is a REGRESSION-FREE COMPOSITION RESULT, not evidence of an emergent property.
+//
+// The supported claim: the composed candidate RETAINS visible governance refusal across subtask
+// reporting. Establishing emergence would need a cross-line predicate - generate the refusal via
+// the slice's authority route, assert the consolidation recorder exposes that SPECIFIC refusal,
+// and show neither the old slice recorder nor an unguided route satisfies the same end-to-end
+// predicate. Not done here, and not claimed.
 ok(/REFUSED by governance/.test(outside.allText),
   'REFUSAL NOW VISIBLE (composition): the sub-task write was refused (d.py absent) AND the parent'
   + ' run record carries the refusal - slice refusal text + consolidation result carry-up');
