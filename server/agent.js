@@ -39,7 +39,7 @@ import { lostDefs, lostExports, defCounts } from './defNames.js';
 // calculus, observation - which is what makes bringing it in a small slice rather than a merge.
 import { governedEdit, editAction, EDIT_FIXTURE } from '../legasus/runtime/epistemic-admission/governed-edit.mjs';
 import { delegate } from '../legasus/legaknow/calculus.mjs';
-import { attenuate, crossingRecord } from './authorityScope.mjs';
+import { attenuate, crossingRecord, continuationRef, resolveContinuation } from './authorityScope.mjs';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -4264,9 +4264,14 @@ function failQueueItem(loadDb, run, reason, detail) {
     return;
   }
 
+  // THE REPAIR'S AUTHORITY SOURCE IS THE FAILED WORK ITEM, and only a REFERENCE to it is stored.
+  // Copying the scope here would let a retry resurrect authority that died between the failure and
+  // the retry; the paths are derived at install time instead (see startRun / resolveContinuation).
+  // Nothing about this run, the model, the retry prompt or the scheduler contributes.
   const r = workQueue.enqueue(goal, {
     source: 'repair', generation: (item.generation || 0) + 1,
     priority: (item.priority || 0) + 1, repairOf: item.id,
+    authority: continuationRef({ sourceItemId: item.id, parentRunId: (run && run.id) || null }),
   });
   if (!r.ok) {
     pushStep(run, { type: 'note', text: `Queue: ${item.id} failed (${reason}); no retry queued — ${r.error}` });
@@ -4451,8 +4456,17 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   // installed are exactly `delegated` - a field that cannot name anything the parent did not hold,
   // because an intersection has no branch that adds a member. A missing or empty record installs
   // NOTHING, which is a refusal and not a default.
-  const grantedPaths = inheritedAuthority && Array.isArray(inheritedAuthority.delegated)
-    ? inheritedAuthority.delegated
+  // A CONTINUATION REFERENCE is resolved HERE, against the work item it names, so a repair whose
+  // source has gone gets nothing rather than a revival of a dead scope.
+  let effectiveAuthority = inheritedAuthority;
+  if (inheritedAuthority && inheritedAuthority.continuationOf) {
+    let src = null;
+    try { src = workQueue.list().find((i) => i.id === inheritedAuthority.continuationOf) || null; }
+    catch { src = null; }
+    effectiveAuthority = resolveContinuation(inheritedAuthority, src);
+  }
+  const grantedPaths = effectiveAuthority && Array.isArray(effectiveAuthority.delegated)
+    ? effectiveAuthority.delegated
     : (writeScope || null);
   setRunAuthorities(grantedPaths && grantedPaths.length ? issueWriteScope(grantedPaths) : []);
   const id = randomUUID();
@@ -4478,13 +4492,16 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   // Recorded even when NOTHING was delegated, because "this run received no authority" is the fact
   // that explains every refusal that follows.
   if (inheritedAuthority) {
+    const eff = effectiveAuthority || inheritedAuthority;
     pushStep(run, {
       type: 'authority_received',
-      text: `from run ${inheritedAuthority.parentRunId || '(unknown)'} via ${inheritedAuthority.boundary}`
-        + `; root ${JSON.stringify(inheritedAuthority.root)}`
-        + `; delegated [${(inheritedAuthority.delegated || []).join(', ') || '-'}]`
-        + `; installed [${runAuthorityTargets().join(', ') || '-'}]`,
-      authority: inheritedAuthority,
+      text: `from run ${eff.parentRunId || '(unknown)'} via ${eff.boundary}`
+        + (eff.continuationOf ? `; continuing work item ${eff.continuationOf}` : '')
+        + `; root ${JSON.stringify(eff.root)}`
+        + `; delegated [${(eff.delegated || []).join(', ') || '-'}]`
+        + `; installed [${runAuthorityTargets().join(', ') || '-'}]`
+        + (eff.unresolved ? `; UNRESOLVED ${eff.unresolved}: ${eff.why}` : ''),
+      authority: eff,
       installed: runAuthorityTargets(),
     });
   } else if (source === 'queue') {

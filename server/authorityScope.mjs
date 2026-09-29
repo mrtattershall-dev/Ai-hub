@@ -61,6 +61,63 @@ export function attenuate(available, requested) {
 }
 
 /**
+ * A REPAIR/RETRY crossing, recorded at enqueue time as a REFERENCE and nothing more.
+ *
+ * It deliberately carries NO paths. Authority is not copied here, because a repair that copied the
+ * failed work's scope at enqueue time would resurrect it later even if it had died in between. What
+ * is stored is which work item this repair continues; the paths are derived when the repair STARTS.
+ */
+export function continuationRef({ sourceItemId, parentRunId, boundary = 'repair' }) {
+  return {
+    boundary,
+    continuationOf: sourceItemId || null,
+    parentRunId: parentRunId || null,
+    // Deliberately null until resolved. A reader seeing these has a reference, not a permission.
+    root: null, availableBefore: null, requested: null, delegated: null,
+    refusedFromRequest: [], attenuated: false, leastAuthority: false, nonAmplification: true,
+  };
+}
+
+/**
+ * Resolve a continuation reference against the work item it names, at install time.
+ *
+ * THE CEILING IS THE SOURCE ITEM'S OWN DELEGATED SET. Nothing here can produce a path the source did
+ * not hold: `attenuate` is reused precisely so there is one implementation of that property rather
+ * than two that happen to agree.
+ *
+ * `sourceItem` absent, or holding no authority, yields NOTHING - a retry does not resurrect authority
+ * whose source is gone. That is the validity condition, and it uses only the existing queue as the
+ * source of truth.
+ */
+export function resolveContinuation(ref, sourceItem) {
+  const base = { ...ref };
+  const src = sourceItem && sourceItem.authority;
+  if (!sourceItem) {
+    return { ...base, delegated: [], availableBefore: [], unresolved: 'SOURCE_ITEM_GONE',
+      why: 'the work item this repair continues (' + (ref.continuationOf || '?') + ') is no longer present,'
+        + ' so there is nothing to continue and no authority is installed' };
+  }
+  if (!src || !Array.isArray(src.delegated) || !src.delegated.length) {
+    return { ...base, delegated: [], availableBefore: [], unresolved: 'SOURCE_HELD_NONE',
+      why: 'the work item this repair continues held no authority, so the continuation holds none either' };
+  }
+  const crossing = attenuate(src.delegated, null);
+  return {
+    ...base,
+    root: src.root || null,
+    availableBefore: crossing.available,
+    requested: null,
+    delegated: crossing.delegated,
+    refusedFromRequest: [],
+    attenuated: false,
+    leastAuthority: false,
+    nonAmplification: crossing.nonAmplification,
+    unresolved: null,
+    why: 'continuation of work item ' + sourceItem.id + ', under the same ceiling it held',
+  };
+}
+
+/**
  * The crossing as it goes into the record. `root` is where the chain terminates - taken from the
  * grants themselves, never asserted by the caller, so a record cannot claim an owner root it does not
  * have.
