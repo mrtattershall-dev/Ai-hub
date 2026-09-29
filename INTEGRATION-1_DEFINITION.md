@@ -25,6 +25,11 @@ assurance cases all cover parts of it. What is claimed here is only that these p
 made to compound *in this project*, and that the protocol is the precondition for finding out whether
 they can.
 
+> **Design provenance.** The schema below — the section/owner table, the four-way separation, the
+> seven laws and the five-step build order — was **supplied by tatte**, not derived here. The
+> *motivation* is this project's own handoff failures; the *design* is not mine. I implemented it and
+> wrote its validations. See [ATTRIBUTION-1.md](ATTRIBUTION-1.md).
+
 ## The one rule
 
     FACT  ≠  CLAIM  ≠  PERMISSION  ≠  EFFECT
