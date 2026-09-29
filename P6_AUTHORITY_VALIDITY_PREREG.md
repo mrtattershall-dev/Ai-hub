@@ -149,3 +149,75 @@ Each rung was forced by a hostile world rather than designed in advance. P6 atta
 newly exposes nothing beyond it that is yet known.
 
 Nothing in this document authorizes an implementation or a run.
+
+---
+
+# AMENDMENT 1 (2026-09-29) — appended, nothing above is edited
+
+Three additions from the owner's close-out. None changes the proposition or authorizes work.
+
+## A1. A SIXTH RUNG. THE LADDER WAS ONE SHORT.
+
+    authority was once granted
+      != authority crossed this boundary                  Step 5
+      != authority source still exists                    Step 6, R6
+      != the identifier resolves to the INTENDED source    exposed by Step 6, UNATTACKED
+      != the source's authority remains valid              P6
+      != AUTHORITY VALID WHEN CHECKED IS NOT AUTHORITY VALID WHEN THE EFFECT OCCURS
+
+The last rung is new here and is **not established**. §4's Q3 is what attacks it, and this reframes Q3
+from a hard edge case into the rung's own experiment: P6 may well establish validity **at resolution**
+while establishing nothing about validity **at effect**. Those are different guarantees and must be
+reported as different guarantees.
+
+**And Q3 is not to be closed by checking twice.** That produces
+
+    check -> check again -> [still a window] -> effect
+
+which moves the window rather than closing it. Closing it may eventually require validation and effect
+to be one atomic authority-consuming operation, or an explicitly bounded and stated race. Both are
+downstream speculation: the frozen experiment decides first whether the distinction is load-bearing.
+
+## A2. "INVALID" HAS SEVEN MEANINGS, NOT FIVE, AND THEY ARE NOT INTERCHANGEABLE
+
+§3 enumerated five candidate representations. The owner's enumeration is wider, and the framing matters
+more than the count: **these are different propositions about WHY permission ceases to be justified,
+not interchangeable implementations of revocation.**
+
+    1  the underlying repository changed                            (§3 candidate b)
+    2  time elapsed                                                 (§3 candidate c)
+    3  the issuing authority explicitly withdrew permission          (§3 candidate a)
+    4  an ancestor permission ceased to exist                        (§3 candidate d)
+    5  evidence supporting the permission became stale               (§3 candidate e)
+    6  the permitted operation was ALREADY CONSUMED                  NEW - this is E4 single-use, which
+                                                                     governed-edit records as not
+                                                                     implemented
+    7  the world changed such that the original scope no longer      NEW - referential drift. The grant
+       corresponds to the INTENDED OBJECT                            still names `a.py`; `a.py` is no
+                                                                     longer the thing it named
+
+(7) is the one worth flagging, because it is the same shape as the identifier dependency Step 6
+created. A grant pins a path; a continuation pins a queue id. In both cases the *name* survives while
+what it denotes may not, and nothing currently checks the correspondence. Recorded as a connection,
+not investigated — there is no observed misresolution.
+
+Reality is to force which of the seven Legasus actually needs. None is adopted here.
+
+## A3. WHAT THE FIRST FINDING ALREADY COSTS THE WORD "AUTHORITY"
+
+Stated plainly because it is the most consequential thing in this document:
+
+> Legasus currently has authority **issuance, transport, attenuation and source continuity** — and no
+> reachable lifecycle in which issued authority becomes invalid.
+
+The lifecycle today is ISSUED -> CROSSED -> ATTENUATED -> CONTINUED -> valid indefinitely, unless the
+source item itself disappears. Step 6 handles that last case, and that is **source continuity, not
+authority freshness.** Any use of the word "authority" in this project's records should be read against
+that limit until P6 changes it.
+
+## A4. UNCHANGED
+
+The proposition, the reachability finding, all six worlds, the four must-fire controls, the warning
+against revision binding, the identifier debt left alone, and the separation from the CONSOLIDATION-1
+session. The next session on this line begins by trying to make each candidate definition of invalidity
+contradict reality — not by coding.

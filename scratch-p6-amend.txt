@@ -1,0 +1,37 @@
+P6 AMENDMENT 1: a sixth rung, seven meanings of invalid, and what the finding costs the word authority
+
+Appended; the frozen proposition, the reachability finding, the six worlds and the four controls are
+untouched. No implementation and no run.
+
+A SIXTH RUNG. The ladder was one short: authority valid WHEN CHECKED is not authority valid WHEN THE
+EFFECT OCCURS. That rung is new and unestablished, and it reframes Q3 from a hard edge case into the
+rung's own experiment - P6 may establish validity at RESOLUTION while establishing nothing about
+validity at EFFECT, and those must be reported as different guarantees. Q3 is explicitly NOT to be
+closed by checking twice, which yields check, check again, still a window, effect: that moves the
+window rather than closing it. Closing it may eventually need validation and effect to be one atomic
+authority-consuming operation, or an explicitly bounded and stated race, and both are downstream
+speculation the frozen experiment decides first.
+
+SEVEN MEANINGS OF INVALID, NOT FIVE, and the framing matters more than the count: these are different
+propositions about WHY permission ceases to be justified, not interchangeable implementations of
+revocation. Two are new to the record. The permitted operation was ALREADY CONSUMED, which is E4
+single-use and unimplemented. And the world changed such that the original scope no longer corresponds
+to the INTENDED OBJECT - referential drift, where the grant still names a.py but a.py is no longer the
+thing it named. That last one is the same shape as the identifier dependency step 6 created: a grant
+pins a path, a continuation pins a queue id, the NAME survives while what it denotes may not, and
+nothing currently checks the correspondence. Recorded as a connection rather than investigated, since
+no misresolution has been observed. None of the seven is adopted.
+
+AND WHAT THE FIRST FINDING COSTS THE WORD AUTHORITY, stated plainly because it is the most consequential
+line in the document: Legasus currently has authority issuance, transport, attenuation and source
+continuity, and no reachable lifecycle in which issued authority becomes invalid. The lifecycle is
+issued, crossed, attenuated, continued, valid indefinitely - unless the source item itself disappears,
+which step 6 handles, and which is SOURCE CONTINUITY rather than authority freshness. Every use of the
+word authority in this project's records should be read against that limit until P6 changes it.
+
+The next session on this line begins by trying to make each candidate definition of invalidity
+contradict reality, not by coding.
+
+Message-File: scratch-p6-amend.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
