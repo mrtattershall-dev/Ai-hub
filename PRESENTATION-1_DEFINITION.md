@@ -1,6 +1,21 @@
 # PRESENTATION-1 — does instruction representation change what this packaged 1.5B can build?
 
-**Status: FROZEN. Nothing run.** $0, local `qwen2.5-coder:1.5b`, digest `d7372fd828518a4d`, Q4_K_M.
+**Status: FROZEN, AMENDED once before any run. Nothing run.**
+
+> **Amendment 1.** Two interpretations in the first draft were too strong and are corrected below:
+> `H ≈ N` was written as "the wrapper alone does nothing", which the design cannot support; and
+> `H vs S` was named as isolating relocation, which it does not. Nothing was run between the freeze
+> and this amendment. $0, local `qwen2.5-coder:1.5b`, digest `d7372fd828518a4d`, Q4_K_M.
+
+## The question
+
+This is **presentation research**. It does not ask whether this 1.5B "can code".
+
+> Given the same feature-construction task, how does this deployed package **distribute its
+> failures** when intent is represented in three different ways?
+
+That is answerable whichever condition wins, and it is why the three outcome categories below
+matter more than the acceptance count.
 
 ## What this is, named precisely
 
@@ -30,7 +45,7 @@ opposite of the best published arrangement than to it. Any S result is about *th
 | contrast | establishes |
 |---|---|
 | N vs H | the effect of adding this hybrid wrapper, inline comment held |
-| **H vs S** | the effect of relocating intent from inline comment to this front-loaded section — **the diagnostic one** |
+| **H vs S** | the effect of moving intent **from an inline comment near the hole to a front-loaded hybrid system section 202 tokens away** — the diagnostic contrast, and it does **not** isolate *separation* from *distance*: those move together by design |
 | N vs S | the effect of the full prompt package, not one cause |
 | **any result** | the behaviour of **this Q4 local package under these representations** — **never** IFIM training efficacy |
 
@@ -59,12 +74,18 @@ asserts the intent text is present in **all three** — *"no comment" never mean
 
 ## Pre-registered
 
-- **S < N** — consistent with the published warning; an untrained arrangement is out of distribution,
-  and/or 202 tokens of distance hurts
-- **S > N** — composing two *native* formats survives where a novel delimiter did not
-- **S = N** — instruction location is not the binding variable for this package on this task
-- **H ≈ N** — the wrapper alone does nothing, and any N-vs-S difference belongs to relocation
-- **H ≠ N** — the wrapper itself matters, and N vs S was never attributable
+| observed | what it supports |
+|---|---|
+| **H ≈ N, S > H** | this distant separated hybrid representation helped on these tasks |
+| **H > N, S ≈ H** | the wrapper/prompt regime helped; relocation added no detected benefit |
+| **H > N and S > H** | both changes matter, possibly interacting |
+| **S < H** | moving intent far away hurt, **or** this hybrid representation is simply poor |
+| **all similar** | no difference detected under this model, task and budget — **not** proof the representations are equivalent |
+
+**`H ≈ N` does not prove the wrapper does nothing.** It means no wrapper effect was detected *while
+intent remained an inline comment*. The wrapper may still interact with instruction location — the
+system section could help only when the instruction is in it. A flat N-vs-H result cannot rule that
+out, and the first draft of this file wrongly said it could.
 
 ## Scope
 
