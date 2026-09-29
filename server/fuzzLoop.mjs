@@ -124,7 +124,12 @@ async function iteration(seed) {
   const dir = mkdtempSync(join(tmpdir(), `fuzz${seed}-`));
   const ws = join(dir, 'workspace');
   writeFileSync(join(dir, 'hub.json'), JSON.stringify({ api_keys: { ollama: { base_url: `http://127.0.0.1:${mockPort}`, model: 'fuzz' } }, history: [], settings: {} }), 'utf8');
-  const hub = spawn(process.execPath, [join(HERE, 'index.js')], {
+  // CRASH-2 DIAGNOSTIC DELTA 2 — isolated worktree only. --report-on-fatalerror may capture
+  // nothing: a native fast-fail can terminate a process without a Node diagnostic report.
+  // Supplementary evidence, never a substitute for the raw process log.
+  const hub = spawn(process.execPath, [
+    ...(process.env.FUZZ_RAW ? ['--report-on-fatalerror', `--report-directory=${process.env.FUZZ_RAW}`] : []),
+    join(HERE, 'index.js')], {
     env: { ...process.env, PORT: String(hubPort), HUB_DB: join(dir, 'hub.json'), AGENT_WORKSPACE: ws,
       AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'index.jsonl'),
       AGENT_SUPERVISOR: CHAIN ? '1' : '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
@@ -134,7 +139,15 @@ async function iteration(seed) {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   live.add(hub);
-  const log = []; hub.stdout.on('data', (d) => log.push(d.toString())); hub.stderr.on('data', (d) => log.push(d.toString()));
+  // CRASH-2 DIAGNOSTIC DELTA 1 — isolated worktree only. `log` keeps its original merged
+  // contents so checkInvariants sees byte-identical input; stdout and stderr are ALSO kept
+  // apart and written raw on exit. The existing report keeps only slice(-200) of the merge,
+  // which is simultaneously why the fatal line is missing and why 52 instances of one event
+  // produced 52 distinct "kinds".
+  const log = [];
+  const rawOut = []; const rawErr = [];
+  hub.stdout.on('data', (d) => { log.push(d.toString()); rawOut.push(d); });
+  hub.stderr.on('data', (d) => { log.push(d.toString()); rawErr.push(d); });
   const API = `http://127.0.0.1:${hubPort}/api`;
   // Read the body as TEXT first. A route that throws gets Express's default error handler,
   // which answers with an HTML page holding the stack trace - and `.json()` on that throws
@@ -201,6 +214,28 @@ async function iteration(seed) {
   // each check actually fires on the damage it names.
   v.push(...checkInvariants(dir, { hubExitCode: hub.exitCode, hubLog: log.join('') }));
   if (CHAIN) v.push(...checkQueueInvariants(dir));
+
+  // CRASH-2 DIAGNOSTIC DELTA 1 (corrected). Written SYNCHRONOUSLY here, on the same code path
+  // that produced the CRASH violation above, so the raw log and the report cannot disagree.
+  //
+  // The first version registered hub.on('exit') instead. It never fired: hub.kill() is async,
+  // so the exit event is queued and the harness process ends before that event-loop turn.
+  // A crash would have captured NOTHING and the silence would have read as "no diagnostic
+  // available". Caught only because a non-crash positive control was run first.
+  if (process.env.FUZZ_RAW) {
+    try {
+      const tag = `${seed}-${Date.now()}`;
+      const so = Buffer.concat(rawOut); const se = Buffer.concat(rawErr);
+      writeFileSync(join(process.env.FUZZ_RAW, `${tag}.stdout.raw`), so);
+      writeFileSync(join(process.env.FUZZ_RAW, `${tag}.stderr.raw`), se);
+      writeFileSync(join(process.env.FUZZ_RAW, `${tag}.exit.json`), JSON.stringify({
+        seed, hubExitCode: hub.exitCode, hubKilled: hub.killed, hubPid: hub.pid,
+        hubPort, mockPort, dir, statuses, served, violations: v,
+        stdoutBytes: so.length, stderrBytes: se.length,
+        capturedAt: new Date().toISOString(),
+      }, null, 2));
+    } catch (e) { process.stdout.write(`RAWCAPTURE FAILED: ${e.message}\n`); }
+  }
 
   hub.kill(); live.delete(hub); mock.close();
   return { seed, goals: goals.length, served, statuses, violations: v, dir };
