@@ -1,0 +1,40 @@
+GOVERNED-WORKSPACE-1: frozen definition, before any implementation
+
+An asynchronous governed workspace, on the principle: do not make intelligence
+serial, serialize only conflicting effects. Observers, planners, diagnostics,
+simulations and candidate generators may run asynchronously and publish append-only
+findings; only actions affecting the same scoped target must synchronize.
+
+WHY HERE AND NOT IN PHASE1. This is where governedEdit, legaknow and the E0/E1/E3
+bindings actually exist. The phase1 worktree, where AUDIT-2 lives, has none of them -
+building a commit path there would have required writing a private executor, which is
+exactly the bypass around governedEdit the design forbids, and any green suite over it
+would have proved nothing about authority. The authority stack is deliberately NOT
+merged into phase1 to make this convenient. AUDIT-2 stage 3 and stage 4 code and
+records are untouched and their outcomes are not reinterpreted.
+
+THE AUTHORITY BOUNDARY IS UNCHANGED. Evidence establishes what may be believed; it
+does not create permission. An ACTION_PREPARED packet is a PROPOSAL, NOT A
+PERMISSION. No controller code constructs, elevates or re-scopes an authority token. A
+bare epistemic token authorizes no write. E0, E1 and E3 stay enforced where they
+already are - inside governedEdit, against the bytes on disk at commit time.
+
+WHAT IT DOES NOT GOVERN, stated so no result can be read as covering it: child-
+process and shell writes, external network effects, symlinks and Windows junctions,
+distributed clocks, real-world control of any physical asset, and any concurrency
+beyond in-process interleaving. The warehouse framing is the motivating analogy for
+scoped conflict, not a claim of coverage.
+
+Refusals from governedEdit are re-exported rather than reimplemented. Refusals added
+by this layer are named distinctly - PACKET_STALE_DEPENDENCY, PACKET_EXPIRED,
+PACKET_LOST_CONFLICT, PACKET_DEPENDENCY_INVALIDATED - so they can never be mistaken
+for an authority decision.
+
+THE CLAIM THIS DEFINITION REFUSES TO LET THE RESULT MAKE: a green unit suite does not
+prove the controller uses this path. Earlier today, in the other worktree,
+acceptanceDecision had 30 passing assertions while nothing consumed it. Until a caller
+is shown routing through this subsystem, the result is "the layer behaves correctly in
+isolation" and NOT "Legasus coordinates through it". Uncovered write routes are
+reported as uncovered.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

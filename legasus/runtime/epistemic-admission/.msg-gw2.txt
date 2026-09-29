@@ -1,0 +1,48 @@
+GOVERNED-WORKSPACE-1: the spine, and all ten required tests through the real effect path
+
+THE INVARIANT HOLDS, and is asserted directly: five prepared packets produce zero
+effects. An ACTION_PREPARED event records a proposal and grants nothing; every commit
+still passes the current revision, the contract evidence obligations and the owner-
+issued authority through governedEdit.
+
+THERE IS NO LOCK IN THE COORDINATION LAYER, deliberately. Two packets built on the
+same revision both PREPARE and both reach commit. The first writes, the target digest
+changes, and the second hits E1 revision binding INSIDE governedEdit. A coordinator
+mutex would have produced the same external behaviour while proving nothing about
+authority: the refusal has to come from the effect boundary, or "serialized conflicting
+effect" is a property of my file rather than of the system. The test asserts
+refusedBy === governedEdit.
+
+Twelve tests, all passing, each negative one asserting BOTH the refusal reason and
+byte-level non-effect:
+
+  1   valid authority at the current revision -> the exact intended bytes
+  2   authority pinned to a.js, action targets b.js -> SCOPE_MISMATCH, both files intact
+  3   target moved after the grant -> REVISION_MISMATCH, and the NEW bytes stay, since
+      refusing is not repairing
+  4   a cited finding withdrawn -> DEPENDENCY_INVALIDATED, must be revalidated not applied
+  5   unrelated b.js churns -> the a.js packet stays eligible and commits
+  6   two packets, one file, one revision -> exactly ONE effect, loser refused by E1
+  7   no authority -> refused; 7b a contract requiring evidence with none -> refused
+  8   past its freshness window -> EXPIRED, with a POSITIVE CONTROL on the same clock so
+      the layer cannot pass by refusing everything
+  9   replay reconstructs the same admissibility decisions from the record ALONE, and
+      the log by itself shows which packet rested on a withdrawn finding
+  10  four independent findings publish while a packet sits prepared, none of them
+      blocking it; only the relevant revision moving refuses the next one
+
+UNCERTAINTY STAYS UNCERTAINTY: a HYPOTHESIS is a distinct event kind carrying its
+confidence, and depending on one does not promote it. Replay confirms it is still a
+hypothesis in the record.
+
+governed-edit.mjs is UNMODIFIED - confirmed by diff - and the existing E0, E1 and E3
+suites still pass 15 of 15. No authority token is minted, elevated or re-scoped here,
+and grep confirms the subsystem contains no writeFileSync outside its tests: the only
+route to an effect is governedEdit.
+
+WHAT THIS DOES NOT ESTABLISH: that any Legasus controller routes through this layer.
+Nothing does yet. Per the frozen definition, the claim is "the layer behaves correctly
+in isolation" and NOT "Legasus coordinates through it" - the same distinction
+acceptanceDecision failed earlier today with 30 green assertions and no consumer.
+
+Message-File: legasus/runtime/epistemic-admission/.msg-gw2.txt
