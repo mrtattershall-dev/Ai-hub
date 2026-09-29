@@ -178,3 +178,20 @@ repeat
 
 The first row to read `COMPONENT ESTABLISHED / PRODUCT LIVE / COMPOSITION ESTABLISHED` will be the
 first mechanism in this project that has ever earned all three. None has today.
+
+## A fourth dimension is visible. It is deliberately NOT added.
+
+```
+composed  ≠  currently entitled
+```
+
+The ancestry and staleness work already demonstrates why: a composition that held at revision A is not
+thereby entitled at revision B. So the distinction is real and will probably be needed.
+
+**It does not get a column yet.** The three columns above exist because they were *forced* — each one
+by an actual status statement that turned out to be false, including two in my own memory. A column
+added because someone could see the gap, rather than because the gap produced a wrong answer, is
+speculative structure: it looks like rigour and costs the same as machinery nobody asked for.
+
+Let it earn its place the same way the others did. Recorded here so the insight is not lost, and so a
+future session finds a decision rather than an oversight.
