@@ -1,0 +1,43 @@
+legasus/loadSample.mjs   ok
+legasus/discover.mjs     ok
+legasus/bind.mjs         ok
+sample: {"at":"2026-09-20T18:51:43.482Z","where":"smoke","nodeProcs":10,"calibMs":761,"calibResult":262097,"source":"legasus/loadSample.mjs (stand-in)"}
+verdict now  : within every preregistered limit
+forced 5000ms: 1 calibration sample(s) over the absolute cap 4500ms (worst 5000ms); 1 calibration sample(s) over 3x the start baseline 1500ms (worst 5000ms)
+forced 4600ms vs 1500 baseline (ratio only): 1 calibration sample(s) over 3x the start baseline 1500ms (worst 4600ms)
+null sample  : not ok (correct)
+=== DISCOVER start-screen under current load (expect immediate abort, exit 3) ===
+DISCOVER C:\Users\tatte\Projects\ai-coding-hub\server\approvalPolicy.js :: segments  over 97 catalogued witness files
+load sampler: legasus/loadSample.mjs (stand-in); ceiling 40 node processes; start=10
+calibration baseline: 749ms (min of 754, 749, 800, 802, 790); abort above 3x or 4500ms
+  NOT_EXECUTED      5677ms  exit=0  fn=0  cases=0  load=9/792ms  server/apiErrors.test.mjs
+  NOT_EXECUTED       374ms  exit=0  fn=0  cases=0  load=9/778ms  server/appendFile.test.mjs
+  NOT_EXECUTED      1640ms  exit=0  fn=0  cases=0  load=13/819ms  server/appendFragment.test.mjs
+  NOT_EXECUTED     14229ms  exit=0  fn=0  cases=0  load=13/876ms  server/appendSyntax.test.mjs
+  NOT_EXECUTED     14536ms  exit=0  fn=0  cases=0  load=13/791ms  server/assertEvidence.test.mjs
+  NOT_EXECUTED       853ms  exit=0  fn=0  cases=0  load=14/931ms  server/auth.test.mjs
+  NOT_EXECUTED      2504ms  exit=0  fn=0  cases=0  load=10/810ms  server/autoStart.test.mjs
+exit=1
+node:fs:441
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\tatte\Projects\ai-coding-hub\legasus\out\segments\discover.json'
+    at Object.readFileSync (node:fs:441:20)
+    at [eval]:1:34
+    at runScriptInThisContext (node:internal/vm:219:10)
+    at node:internal/process/execution:451:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:449:60)
+    at evalFunction (node:internal/process/execution:283:30)
+    at evalTypeScript (node:internal/process/execution:295:3)
+    at node:internal/main/eval_string:71:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\segments\\discover.json'
+}
+
+Node.js v24.15.0
+
+[exited with code 1]

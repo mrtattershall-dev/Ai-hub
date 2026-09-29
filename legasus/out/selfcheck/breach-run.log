@@ -1,0 +1,28 @@
+BIND C:\Users\tatte\Projects\ai-coding-hub\legasus\selfcheck\toy.js :: clamp
+load sampler: legasus/loadSample.mjs (stand-in); ceiling 40 node processes; start=10
+witnesses: 1 (1 case-level), unobservable(budget): 0
+  baseline legasus/selfcheck/toy_witness.mjs: exit=0 cases=5 fn=0
+  M001-RETURN_EMPTY        body := return []              discriminated by 3/5
+  M002-RETURN_UNDEFINED    body := return undefined       discriminated by 3/5
+  M003-INVERT_COND         invert test @220               discriminated by 2/5
+  M004-DROP_BRANCH         drop consequent @230           discriminated by 1/5
+  M005-DROP_BRANCH         drop else @255                 discriminated by 0/5
+  M006-BOUNDARY            > := >=                        discriminated by 0/5
+  M007-BOUNDARY            10 := 11                       discriminated by 0/5
+  M008-BOUNDARY            10 := 9                        discriminated by 0/5
+  M009-DROP_EFFECT         drop AssignmentExpression @236 discriminated by 1/5
+  M010-BOUNDARY            10 := 11                       discriminated by 1/5
+  M011-BOUNDARY            10 := 9                        discriminated by 1/5
+  M012-DROP_EFFECT         drop AssignmentExpression @261 discriminated by 0/5
+  M013-BOUNDARY            0 := 1                         discriminated by 1/5
+  M014-BOUNDARY            0 := -1                        discriminated by 1/5
+  M015-EXCEPTION           swallow catch @370             discriminated by 1/5
+  M016-EXCEPTION           propagate catch @370           discriminated by 1/5
+  M017-INVERT_COND         invert test @296               discriminated by 3/5
+  M018-DROP_BRANCH         drop consequent @319           discriminated by 1/5
+  M019-BOUNDARY            1 := 2                         discriminated by 1/5
+  M020-BOUNDARY            1 := 0                         discriminated by 1/5
+load verdict: OBSERVED (worst 10, ceiling 40, 22 samples)
+records: 100  candidates: 15  dark: 5
+-> C:\Users\tatte\Projects\ai-coding-hub\legasus\out\selfcheck\REPORT.md
+exit=0

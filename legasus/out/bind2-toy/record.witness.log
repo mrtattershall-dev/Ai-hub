@@ -1,0 +1,9 @@
+  PASS  big clamps
+  PASS  small passes
+  PASS  string is -1
+  PASS  untouched
+  FAIL  deliberately wrong
+(node:27492) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/tatte/Projects/ai-coding-hub/legasus/out/bind2-toy/R000-RECORDER.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\tatte\Projects\ai-coding-hub\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
