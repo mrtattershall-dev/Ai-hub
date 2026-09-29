@@ -221,3 +221,36 @@ The proposition, the reachability finding, all six worlds, the four must-fire co
 against revision binding, the identifier debt left alone, and the separation from the CONSOLIDATION-1
 session. The next session on this line begins by trying to make each candidate definition of invalidity
 contradict reality — not by coding.
+
+---
+
+# AMENDMENT 2 (2026-09-29) — an eighth meaning of "invalid", from read prior art
+
+Appended; nothing above is edited. Source: `PRIOR_ART_2026-09-29.md`, which reads in-toto directly
+rather than recalling it.
+
+§3 enumerated five candidates; Amendment 1 widened the owner's enumeration to seven. One more exists
+and it is the one an audited field system actually chose:
+
+    (f) SUPERSESSION    the authorization was REPLACED by a newer authorization. No revocation lookup
+                        and no external state consulted at verification time - the old authorization
+                        simply is not the current one.
+
+in-toto's own verification docstring (`in_toto/verifylib.py:1512-1522`) states that it does not rely on
+"the creation time, revocation status, and usage flags" for keys, because not doing so "ensures that
+verification can be performed in isolation", and that "to revoke or otherwise affect the usage of a
+key, the supply chain owner must sign a new layout with the corresponding changes."
+
+So its validity model is **expiry (E6-shaped) plus supersession**, and it rejects revocation lookup for
+a stated architectural reason rather than for want of effort. That reason transfers directly: a
+continuation resolved at install time that had to consult external revocation state would no longer be
+decidable from the item and its source alone.
+
+**Not adopted.** Enumerated only, exactly like (a) through (e) and the owner's two additions. It is
+noted as the only one of the eight known to be load-bearing in a system audited in the field, which is
+a fact about prior art and not an argument for choosing it.
+
+One caution, recorded so it is not lost: supersession answers "which authorization is current" and says
+nothing about *why* the earlier one stopped being justified. It is therefore not a substitute for
+candidates (d) ancestor revocation or (e) evidential staleness, and adopting it would leave the
+distinction between "replaced" and "no longer warranted" unrepresented.
