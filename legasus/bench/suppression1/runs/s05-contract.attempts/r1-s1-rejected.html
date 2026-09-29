@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>s05</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s05</h2>
+<input type="text" id="term">
+<div id="grid">
+  <span class="item">violet</span>
+  <span class="item">vermilion</span>
+  <span class="item">ochre</span>
+  <span class="item">indigo</span>
+  <span class="item">umber</span>
+</div>
+<script>
+const field = document.getElementById('term');
+const rows = Array.from(document.querySelectorAll('#grid .item'));
+function paint() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+field.addEventListener('input', paint);
+        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.
+        // when #clear-filter is clicked: #term is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+        // This succeeds when that holds and everything the page already did still works.
+        // Continue here:
+        document.getElementById('clear-filter').addEventListener('click', function () {
+          field.value = '';
+          rows.forEach(function (el) {
+            el.className = 'item';
+          });
+        });
+</script>
+</body>
+</html>

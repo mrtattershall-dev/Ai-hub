@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:43:43.997Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "operator",
+  "task": "auto-s08",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s08\\baseline-as-delivered.html",
+  "baselineSha": "a0e09d663719c389a445067b1e928165c7c630553f7f7d3f56db2875f382a272",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 32196,
+      "outputTokens": 272,
+      "promptTokens": 383,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```json\n{\n  \"path\": \"index.html\",\n  \"contents\": \"<!DOCTYPE html>\\n<html>\\n<head><title>s08</title><style>.gone{display:none}</style></head>\\n<body>\\n<h2>s08</h2>\\n<input type=\\\"text\\\" id=\\\"text\\\">\\n<ul id=\\\"parts\\\">\\n  <li class=\\\"item\\\">washer</li>\\n  <li class=\\\"item\\\">wrench</li>\\n  <li class=\\\"item\\\">anvil</li>\\n  <li class=\\\"item\\\">bolt</li>\\n  <li class=\\\"item\\\">clamp</li>\\n</ul>\\n<script>\\nconst model = { query: '' };\\nconst field = document.getElementById('text');\\nconst rows = Array.from(document.querySelectorAll('#parts .item'));\\nfunction narrowList() {\\n  model.query = field.value.toLowerCase();\\n  const q = model.query;\\n  rows.forEach(function (el) {\\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\\n    el.className = hit ? 'item' : 'item gone';\\n  });\\n}\\nfield.addEventListener('input', narrowList);\\n</script>\\n</body>\\n</html>\"\n}\n```",
+        "chars": 877,
+        "lines": 6
+      },
+      "boundaries": {},
+      "timing": {},
+      "extraction": {
+        "ok": false,
+        "reason": "NO_EXTRACTABLE_CHANGE",
+        "detail": "no edit_file call could be parsed from the reply"
+      },
+      "outcome": "REFUSED_NO_EXTRACTABLE_CHANGE",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_no_extractable_change"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "9de319154114e81b104ed6b0de8bfe923287c3bbaff8787441d017da83223a14",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 1,
+    "echoed": 0,
+    "outcome": "REFUSED_NO_EXTRACTABLE_CHANGE",
+    "mismatch": {
+      "NOT_JUDGED": 1
+    },
+    "outputTokens": 272,
+    "generationSeconds": 32.2,
+    "wallClockSeconds": 32.3,
+    "corpus": "legasus/bench/suppression1/runs/s08-operator.attempts"
+  }
+}

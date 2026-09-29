@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:37:14.573Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "operator",
+  "task": "auto-s06",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s06\\baseline-as-delivered.html",
+  "baselineSha": "20f7ef59365737df2fe9e58106f515767d3220f8dee06b1ee4e8aa8c13593cfe",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 25786,
+      "outputTokens": 217,
+      "promptTokens": 369,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```javascript\nedit_file(\"index.html\", `<!DOCTYPE html>\n<html>\n<head><title>s06</title></head>\n<body>\n<h2>s06</h2>\n<input type=\"text\" id=\"find\">\n<ul id=\"log\">\n  <li class=\"item\">delta</li>\n  <li class=\"item\">denim</li>\n  <li class=\"item\">fennel</li>\n  <li class=\"item\">garnet</li>\n  <li class=\"item\">hazel</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('find');\nconst rows = Array.from(document.querySelectorAll('#log .item'));\nfunction show() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.hidden = !hit;\n  });\n}\nfield.addEventListener('input', show);\n</script>\n</body>\n</html>`);\n```",
+        "chars": 749,
+        "lines": 31
+      },
+      "boundaries": {},
+      "timing": {},
+      "extraction": {
+        "ok": false,
+        "reason": "ECHOED_THE_INPUT",
+        "detail": "the page came back unchanged"
+      },
+      "outcome": "REFUSED_ECHOED_THE_INPUT",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_echoed_the_input"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "d8d84e20f069f9732bae0b83aad63e5deb1cfe8657b739e772fc8b71cba37f92",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 0,
+    "echoed": 1,
+    "outcome": "REFUSED_ECHOED_THE_INPUT",
+    "mismatch": {
+      "NOT_JUDGED": 1
+    },
+    "outputTokens": 217,
+    "generationSeconds": 25.8,
+    "wallClockSeconds": 25.9,
+    "corpus": "legasus/bench/suppression1/runs/s06-operator.attempts"
+  }
+}

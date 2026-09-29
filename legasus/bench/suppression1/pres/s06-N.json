@@ -1,0 +1,78 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T07:12:00.282Z",
+  "experiment": "PRESENTATION-1",
+  "condition": "N",
+  "conditionName": "native-FIM / inline-comment intent",
+  "page": "legasus/bench/suppression1/s06",
+  "task": "auto-s06",
+  "model": "qwen2.5-coder:1.5b",
+  "seed": 1,
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 400,
+    "seed": 1
+  },
+  "wireSha": "e08e1012280d16af",
+  "wireBytes": 928,
+  "codePrefixSha": "1ef6f7c4fca8dc1a",
+  "suffixSha": "ae086d9e42383e98",
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 10996,
+      "outputTokens": 7,
+      "promptTokens": 250,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</body>\n</html>",
+        "chars": 15,
+        "lines": 2
+      },
+      "boundaries": {},
+      "timing": {},
+      "outcomes": {
+        "localLogic": false,
+        "localNamesUsed": [],
+        "featureBuilt": false,
+        "createsControl": false,
+        "wiresHandler": false,
+        "accepted": false
+      },
+      "containment": {
+        "ok": false,
+        "reason": "WRONG_SLOT_LANGUAGE",
+        "detail": "the completion contains markup; the slot is JavaScript inside a <script> element (Unexpected token '<')",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_wrong_slot_language"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "totals": {
+    "accepted": 0,
+    "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+    "outcomes": {
+      "localLogic": false,
+      "localNamesUsed": [],
+      "featureBuilt": false,
+      "createsControl": false,
+      "wiresHandler": false,
+      "accepted": false
+    },
+    "outputTokens": 7,
+    "generationSeconds": 11,
+    "wallClockSeconds": 11.1,
+    "corpus": "legasus/bench/suppression1/pres/s06-N.attempts"
+  }
+}

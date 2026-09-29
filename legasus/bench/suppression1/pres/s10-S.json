@@ -1,0 +1,84 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T07:15:21.615Z",
+  "experiment": "PRESENTATION-1",
+  "condition": "S",
+  "conditionName": "front-loaded hybrid wrapper / separated intent",
+  "page": "legasus/bench/suppression1/s10",
+  "task": "auto-s10",
+  "model": "qwen2.5-coder:1.5b",
+  "seed": 1,
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 400,
+    "seed": 1
+  },
+  "wireSha": "79a2ab5db8d7f2f3",
+  "wireBytes": 948,
+  "codePrefixSha": "f3e6b40419017c52",
+  "suffixSha": "ae086d9e42383e98",
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 9549,
+      "outputTokens": 62,
+      "promptTokens": 256,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "field.addEventListener('keypress', function (e) {\n  if (e.key === 'Enter') {\n    sift();\n  }\n});\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  sift();\n});\n</script>\n</body>\n</html>\n\n\n",
+        "chars": 239,
+        "lines": 15
+      },
+      "boundaries": {},
+      "timing": {},
+      "outcomes": {
+        "localLogic": true,
+        "localNamesUsed": [
+          "sift",
+          "field"
+        ],
+        "featureBuilt": false,
+        "createsControl": false,
+        "wiresHandler": true,
+        "accepted": false
+      },
+      "containment": {
+        "ok": false,
+        "reason": "WRONG_SLOT_LANGUAGE",
+        "detail": "the completion contains markup; the slot is JavaScript inside a <script> element (Unexpected token '<')",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_wrong_slot_language"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "totals": {
+    "accepted": 0,
+    "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+    "outcomes": {
+      "localLogic": true,
+      "localNamesUsed": [
+        "sift",
+        "field"
+      ],
+      "featureBuilt": false,
+      "createsControl": false,
+      "wiresHandler": true,
+      "accepted": false
+    },
+    "outputTokens": 62,
+    "generationSeconds": 9.5,
+    "wallClockSeconds": 9.8,
+    "corpus": "legasus/bench/suppression1/pres/s10-S.attempts"
+  }
+}

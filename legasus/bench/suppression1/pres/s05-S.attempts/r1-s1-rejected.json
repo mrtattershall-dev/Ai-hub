@@ -1,0 +1,102 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "NOTHING_WORKED",
+    "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "<|im_start|>system\nAdd a control #clear-filter. Clicking it: #term is empty; every item in the list is visible again. typing in the filter still narrows the list.<|im_end|>\n<|fim_prefix|><!DOCTYPE html>\n<html>\n<head><title>s05</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s05</h2>\n<input type=\"text\" id=\"term\">\n<div id=\"grid\">\n  <span class=\"item\">violet</span>\n  <span class=\"item\">vermilion</span>\n  <span class=\"item\">ochre</span>\n  <span class=\"item\">indigo</span>\n  <span class=\"item\">umber</span>\n</div>\n<script>\nconst field = document.getElementById('term');\nconst rows = Array.from(document.querySelectorAll('#grid .item'));\nfunction paint() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', paint);\n<|fim_suffix|>\n</script>\n</body>\n</html>\n<|fim_middle|>",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "paint();",
+    "chars": 8,
+    "lines": 1,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "paint();",
+    "chars": 8,
+    "lines": 1
+  },
+  "containment": {
+    "ok": true,
+    "text": "paint();",
+    "codeLines": 1,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      5,
+      7
+    ],
+    "failing": [
+      3,
+      4,
+      6
+    ],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "9f986074854e1439ca171129101a75039ab64ff1"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-rejected.html"
+}

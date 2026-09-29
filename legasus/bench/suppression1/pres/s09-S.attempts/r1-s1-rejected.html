@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>s09</title></head>
+<body>
+<h2>s09</h2>
+<input type="text" id="query">
+<main id="items">
+  <div class="item">saffron</div>
+  <div class="item">sage</div>
+  <div class="item">thyme</div>
+  <div class="item">oregano</div>
+  <div class="item">cumin</div>
+</main>
+<script>
+const field = document.getElementById('query');
+const rows = Array.from(document.querySelectorAll('#items .item'));
+function render() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.hidden = !hit;
+  });
+}
+field.addEventListener('input', render);
+render();
+</script>
+</body>
+</html>

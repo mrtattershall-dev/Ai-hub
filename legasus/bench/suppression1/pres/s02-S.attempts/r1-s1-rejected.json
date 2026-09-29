@@ -1,0 +1,102 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "NOTHING_WORKED",
+    "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "<|im_start|>system\nAdd a control #clear-filter. Clicking it: #search is empty; every item in the list is visible again. typing in the filter still narrows the list.<|im_end|>\n<|fim_prefix|><!DOCTYPE html>\n<html>\n<head><title>s02</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s02</h2>\n<input type=\"text\" id=\"search\">\n<div id=\"cards\">\n  <div class=\"item\">maple</div>\n  <div class=\"item\">mahogany</div>\n  <div class=\"item\">birch</div>\n  <div class=\"item\">cedar</div>\n  <div class=\"item\">walnut</div>\n</div>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#cards .item'));\nfunction refine() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', refine);\n<|fim_suffix|>\n</script>\n</body>\n</html>\n<|fim_middle|>",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "field.addEventListener('clear-filter', function () {\n  field.value = '';\n  refine();\n});",
+    "chars": 88,
+    "lines": 4,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "field.addEventListener('clear-filter', function () {\n  field.value = '';\n  refine();\n});",
+    "chars": 88,
+    "lines": 4
+  },
+  "containment": {
+    "ok": true,
+    "text": "field.addEventListener('clear-filter', function () {\n  field.value = '';\n  refine();\n});",
+    "codeLines": 4,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      5,
+      7
+    ],
+    "failing": [
+      3,
+      4,
+      6
+    ],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "3433ec2b682b9974e5674799d0351ec034ad9ec4"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-rejected.html"
+}

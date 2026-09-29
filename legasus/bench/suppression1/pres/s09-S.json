@@ -1,0 +1,224 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T07:14:29.472Z",
+  "experiment": "PRESENTATION-1",
+  "condition": "S",
+  "conditionName": "front-loaded hybrid wrapper / separated intent",
+  "page": "legasus/bench/suppression1/s09",
+  "task": "auto-s09",
+  "model": "qwen2.5-coder:1.5b",
+  "seed": 1,
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 400,
+    "seed": 1
+  },
+  "wireSha": "14aafd7e6bf7299d",
+  "wireBytes": 888,
+  "codePrefixSha": "2dc39bda2db0f645",
+  "suffixSha": "ae086d9e42383e98",
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 4109,
+      "outputTokens": 3,
+      "promptTokens": 234,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "render();",
+        "chars": 9,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 13890,
+        "acceptanceMs": 33334
+      },
+      "outcomes": {
+        "localLogic": true,
+        "localNamesUsed": [
+          "render"
+        ],
+        "featureBuilt": false,
+        "createsControl": false,
+        "wiresHandler": false,
+        "accepted": false
+      },
+      "containment": {
+        "ok": true,
+        "text": "render();",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "render();",
+        "chars": 9,
+        "lines": 1
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"saff\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #query empty -> expected dom.inputValues[\"#query\"] === ''; state null; visible [\"s09\",\"saffron\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "query",
+            "items"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "query",
+            "items"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "a9ec4795ee2ab4d3ed3abdd195162916e53e9c2d"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "5bea37dd7ecb2a814add10b817cd47e383f15fdc9c65fdc87993a0a2190d522d",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s1-rejected"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "totals": {
+    "accepted": 0,
+    "outcome": "REJECTED",
+    "outcomes": {
+      "localLogic": true,
+      "localNamesUsed": [
+        "render"
+      ],
+      "featureBuilt": false,
+      "createsControl": false,
+      "wiresHandler": false,
+      "accepted": false
+    },
+    "outputTokens": 3,
+    "generationSeconds": 4.1,
+    "wallClockSeconds": 34.7,
+    "corpus": "legasus/bench/suppression1/pres/s09-S.attempts"
+  }
+}

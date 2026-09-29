@@ -1,0 +1,65 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:31:01.676Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "contract",
+  "task": "auto-s04",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s04\\baseline-as-delivered.html",
+  "baselineSha": "09bcddaeef53200e82ba0a17cf03530f7c07a8e258dae1e581326cc615c55385",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 400
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 43661,
+      "outputTokens": 400,
+      "promptTokens": 291,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #needle is empty; every",
+        "chars": 1948,
+        "lines": 22
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_empty"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "a28aeb325a0cbc62ba64e4039ff98a27d7cf0525adb1ceaab5bb6db5d761e358",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 0,
+    "echoed": 0,
+    "outcome": "REFUSED_EMPTY",
+    "mismatch": {
+      "NOT_JUDGED": 1
+    },
+    "outputTokens": 400,
+    "generationSeconds": 43.7,
+    "wallClockSeconds": 43.8,
+    "corpus": "legasus/bench/suppression1/runs/s04-contract.attempts"
+  }
+}

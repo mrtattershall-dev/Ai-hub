@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:53:28.464Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "operator",
+  "task": "auto-s11",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s11\\baseline-as-delivered.html",
+  "baselineSha": "8394b16e6607058d7c5f78f06e27f91428c565c056a800a5f3c7592c02d2fa6a",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 26891,
+      "outputTokens": 219,
+      "promptTokens": 373,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```\nedit_file(\"index.html\", `<!DOCTYPE html>\n<html>\n<head><title>s11</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s11</h2>\n<input type=\"text\" id=\"input-term\">\n<article id=\"listing\">\n  <p class=\"item\">cobalt</p>\n  <p class=\"item\">copper</p>\n  <p class=\"item\">nickel</p>\n  <p class=\"item\">osmium</p>\n  <p class=\"item\">pewter</p>\n</article>\n<script>\nconst field = document.getElementById('input-term');\nconst rows = Array.from(document.querySelectorAll('#listing .item'));\nfunction display() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('keyup', display);\n</script>\n</body>\n</html>`)\n```",
+        "chars": 768,
+        "lines": 29
+      },
+      "boundaries": {},
+      "timing": {},
+      "extraction": {
+        "ok": false,
+        "reason": "ECHOED_THE_INPUT",
+        "detail": "the page came back unchanged"
+      },
+      "outcome": "REFUSED_ECHOED_THE_INPUT",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_echoed_the_input"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "984013edc5d00e0034439cec9f41c84d4fe74f70cb139d6d2a6d13e1edc6489e",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 0,
+    "echoed": 1,
+    "outcome": "REFUSED_ECHOED_THE_INPUT",
+    "mismatch": {
+      "NOT_JUDGED": 1
+    },
+    "outputTokens": 219,
+    "generationSeconds": 26.9,
+    "wallClockSeconds": 27,
+    "corpus": "legasus/bench/suppression1/runs/s11-operator.attempts"
+  }
+}

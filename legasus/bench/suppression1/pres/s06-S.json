@@ -1,0 +1,84 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T07:12:18.496Z",
+  "experiment": "PRESENTATION-1",
+  "condition": "S",
+  "conditionName": "front-loaded hybrid wrapper / separated intent",
+  "page": "legasus/bench/suppression1/s06",
+  "task": "auto-s06",
+  "model": "qwen2.5-coder:1.5b",
+  "seed": 1,
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 400,
+    "seed": 1
+  },
+  "wireSha": "291f226865e2c09e",
+  "wireBytes": 920,
+  "codePrefixSha": "1ef6f7c4fca8dc1a",
+  "suffixSha": "ae086d9e42383e98",
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 7195,
+      "outputTokens": 36,
+      "promptTokens": 248,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  show();\n});\n</script>\n</body>\n</html>\n\n\n",
+        "chars": 142,
+        "lines": 10
+      },
+      "boundaries": {},
+      "timing": {},
+      "outcomes": {
+        "localLogic": true,
+        "localNamesUsed": [
+          "show",
+          "field"
+        ],
+        "featureBuilt": false,
+        "createsControl": false,
+        "wiresHandler": true,
+        "accepted": false
+      },
+      "containment": {
+        "ok": false,
+        "reason": "WRONG_SLOT_LANGUAGE",
+        "detail": "the completion contains markup; the slot is JavaScript inside a <script> element (Unexpected token '<')",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_wrong_slot_language"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "totals": {
+    "accepted": 0,
+    "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+    "outcomes": {
+      "localLogic": true,
+      "localNamesUsed": [
+        "show",
+        "field"
+      ],
+      "featureBuilt": false,
+      "createsControl": false,
+      "wiresHandler": true,
+      "accepted": false
+    },
+    "outputTokens": 36,
+    "generationSeconds": 7.2,
+    "wallClockSeconds": 7.3,
+    "corpus": "legasus/bench/suppression1/pres/s06-S.attempts"
+  }
+}

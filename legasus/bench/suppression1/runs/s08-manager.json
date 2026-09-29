@@ -1,0 +1,339 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:45:02.048Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-s08",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s08\\baseline-as-delivered.html",
+  "baselineSha": "a0e09d663719c389a445067b1e928165c7c630553f7f7d3f56db2875f382a272",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 1,
+    "seedsPerRound": [
+      1
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 25,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through narrowList, which existing code calls after changing state\n// FACT: this file defines narrowList()\n// FACT: a input on input#text handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 25,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "narrowList"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function narrowList() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>s08</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s08</h2>\n<input type=\"text\" id=\"text\">\n<ul id=\"parts\">\n  <li class=\"item\">washer</li>\n  <li class=\"item\">wrench</li>\n  <li class=\"item\">anvil</li>\n  <li class=\"item\">bolt</li>\n  <li class=\"item\">clamp</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('text');\nconst rows = Array.from(document.querySelectorAll('#parts .item'));\nfunction narrowList() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', narrowList);\n// create #clear-filter and attach the handler that does the work\n// the page updates through narrowList, which existing code calls after changing state\n// FACT: this file defines narrowList()\n// FACT: a input on input#text handler is registered\n// when #clear-filter is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "cd39b07f7eaa291c96d622471a13186f6764f34574b8011257f2812cfcb0b17d",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 13678,
+      "outputTokens": 107,
+      "promptTokens": 367,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "const clearFilterButton = document.createElement('button');\nclearFilterButton.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilterButton);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  narrowList();\n});\n// FACT: a button with text 'Clear Filter' is created\n// FACT: a click event handler is attached to the button\n// when the button is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+        "chars": 502,
+        "lines": 10
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 24841,
+        "acceptanceMs": 44113
+      },
+      "containment": {
+        "ok": true,
+        "text": "const clearFilterButton = document.createElement('button');\nclearFilterButton.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilterButton);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  narrowList();\n});\n// FACT: a button with text 'Clear Filter' is created\n// FACT: a click event handler is attached to the button\n// when the button is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "const clearFilterButton = document.createElement('button');\nclearFilterButton.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilterButton);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  narrowList();\n});\n// FACT: a button with text 'Clear Filter' is created\n// FACT: a click event handler is attached to the button\n// when the button is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+        "chars": 502,
+        "lines": 10
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"wash\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #text empty -> expected dom.inputValues[\"#text\"] === ''; state null; visible [\"s08\",\"washer\",\"Clear Filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "text",
+            "parts"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "text",
+            "parts"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "4898cd9c87735529f92694884b3052dc7c641dae"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "06243b2e8adb64635477222bad73e64ee952cce3d1587b14139a9b1443b99cae",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s1-rejected"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 6,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "rounds exhausted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "NOTHING_WORKED": 1
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/suppression1/runs/s08-manager.attempts",
+    "generationSeconds": 13.7,
+    "wallClockSeconds": 45.3,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

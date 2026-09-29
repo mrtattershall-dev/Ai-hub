@@ -1,0 +1,78 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T07:13:36.627Z",
+  "experiment": "PRESENTATION-1",
+  "condition": "N",
+  "conditionName": "native-FIM / inline-comment intent",
+  "page": "legasus/bench/suppression1/s08",
+  "task": "auto-s08",
+  "model": "qwen2.5-coder:1.5b",
+  "seed": 1,
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 400,
+    "seed": 1
+  },
+  "wireSha": "bfec53d425233b66",
+  "wireBytes": 1002,
+  "codePrefixSha": "49b41d56d1d7c67d",
+  "suffixSha": "ae086d9e42383e98",
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 13981,
+      "outputTokens": 1,
+      "promptTokens": 264,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "outcomes": {
+        "localLogic": false,
+        "localNamesUsed": [],
+        "featureBuilt": false,
+        "createsControl": false,
+        "wiresHandler": false,
+        "accepted": false
+      },
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_empty"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "totals": {
+    "accepted": 0,
+    "outcome": "REFUSED_EMPTY",
+    "outcomes": {
+      "localLogic": false,
+      "localNamesUsed": [],
+      "featureBuilt": false,
+      "createsControl": false,
+      "wiresHandler": false,
+      "accepted": false
+    },
+    "outputTokens": 1,
+    "generationSeconds": 14,
+    "wallClockSeconds": 15.1,
+    "corpus": "legasus/bench/suppression1/pres/s08-N.attempts"
+  }
+}

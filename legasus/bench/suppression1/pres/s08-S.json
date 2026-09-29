@@ -1,0 +1,84 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T07:14:09.063Z",
+  "experiment": "PRESENTATION-1",
+  "condition": "S",
+  "conditionName": "front-loaded hybrid wrapper / separated intent",
+  "page": "legasus/bench/suppression1/s08",
+  "task": "auto-s08",
+  "model": "qwen2.5-coder:1.5b",
+  "seed": 1,
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 400,
+    "seed": 1
+  },
+  "wireSha": "9deb80edd23fd693",
+  "wireBytes": 994,
+  "codePrefixSha": "49b41d56d1d7c67d",
+  "suffixSha": "ae086d9e42383e98",
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 6630,
+      "outputTokens": 37,
+      "promptTokens": 262,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  narrowList();\n});\n</script>\n</body>\n</html>\n\n\n",
+        "chars": 148,
+        "lines": 10
+      },
+      "boundaries": {},
+      "timing": {},
+      "outcomes": {
+        "localLogic": true,
+        "localNamesUsed": [
+          "narrowList",
+          "field"
+        ],
+        "featureBuilt": false,
+        "createsControl": false,
+        "wiresHandler": true,
+        "accepted": false
+      },
+      "containment": {
+        "ok": false,
+        "reason": "WRONG_SLOT_LANGUAGE",
+        "detail": "the completion contains markup; the slot is JavaScript inside a <script> element (Unexpected token '<')",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_wrong_slot_language"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "totals": {
+    "accepted": 0,
+    "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+    "outcomes": {
+      "localLogic": true,
+      "localNamesUsed": [
+        "narrowList",
+        "field"
+      ],
+      "featureBuilt": false,
+      "createsControl": false,
+      "wiresHandler": true,
+      "accepted": false
+    },
+    "outputTokens": 37,
+    "generationSeconds": 6.6,
+    "wallClockSeconds": 6.7,
+    "corpus": "legasus/bench/suppression1/pres/s08-S.attempts"
+  }
+}

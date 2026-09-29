@@ -1,0 +1,60 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REFUSED_NOT_PARSEABLE_JAVASCRIPT",
+  "classification": {
+    "mismatch": "NOT_JUDGED",
+    "why": "the completion never reached the gate",
+    "addition": null,
+    "carriedForward": null
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 23,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "refine"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function refine() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>s02</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s02</h2>\n<input type=\"text\" id=\"search\">\n<div id=\"cards\">\n  <div class=\"item\">maple</div>\n  <div class=\"item\">mahogany</div>\n  <div class=\"item\">birch</div>\n  <div class=\"item\">cedar</div>\n  <div class=\"item\">walnut</div>\n</div>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#cards .item'));\nfunction refine() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', refine);\n// create #clear-filter and attach the handler that does the work\n// the page updates through refine, which existing code calls after changing state\n// FACT: this file defines refine()\n// FACT: a input on input#search handler is registered\n// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "document.createElement('button').textContent = 'Clear Filter'; document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear Filter'); document.getElementById('cards').appendChild(document.createElement('button').textContent = 'Clear",
+    "chars": 2559,
+    "lines": 1,
+    "truncatedInRunRecord": false
+  },
+  "contained": null,
+  "containment": {
+    "ok": false,
+    "reason": "NOT_PARSEABLE_JAVASCRIPT",
+    "detail": "the completion does not parse as JavaScript: Invalid or unexpected token",
+    "truncatedAtLine": null,
+    "droppedLines": 0
+  },
+  "play": null,
+  "acceptance": null,
+  "decision": null,
+  "candidateFile": null
+}

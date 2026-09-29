@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>s02</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s02</h2>
+<input type="text" id="search">
+<div id="cards">
+  <div class="item">maple</div>
+  <div class="item">mahogany</div>
+  <div class="item">birch</div>
+  <div class="item">cedar</div>
+  <div class="item">walnut</div>
+</div>
+<script>
+const field = document.getElementById('search');
+const rows = Array.from(document.querySelectorAll('#cards .item'));
+function refine() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+field.addEventListener('input', refine);
+</script>
+</body>
+</html>

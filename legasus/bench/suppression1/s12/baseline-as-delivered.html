@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>s12</title></head>
+<body>
+<h2>s12</h2>
+<input type="text" id="seek">
+<ol id="results">
+  <li class="item">tundra</li>
+  <li class="item">tulip</li>
+  <li class="item">meadow</li>
+  <li class="item">canyon</li>
+  <li class="item">delta</li>
+</ol>
+<script>
+const model = { query: '' };
+const field = document.getElementById('seek');
+const rows = Array.from(document.querySelectorAll('#results .item'));
+function recompute() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.hidden = !hit;
+  });
+}
+field.addEventListener('input', recompute);
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": [
+        1,
+        7
+      ]
+    },
+    "mismatch": "BROKE_WHAT_WORKED",
+    "why": "2 carried-forward check(s) stopped passing: 1, 7"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>s10</title></head>\n<body>\n<h2>s10</h2>\n<input type=\"text\" id=\"box\">\n<ul id=\"catalogue\">\n  <li class=\"item\">ferry</li>\n  <li class=\"item\">fennec</li>\n  <li class=\"item\">gannet</li>\n  <li class=\"item\">heron</li>\n  <li class=\"item\">ibis</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('box');\nconst rows = Array.from(document.querySelectorAll('#catalogue .item'));\nfunction sift() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\nfield.addEventListener('input', sift);\n        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n        // when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n",
+    "chars": 169,
+    "lines": 8,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n",
+    "chars": 169,
+    "lines": 8
+  },
+  "containment": {
+    "ok": true,
+    "text": "\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n",
+    "codeLines": 6,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      2,
+      5
+    ],
+    "failing": [
+      1,
+      3,
+      4,
+      6,
+      7
+    ],
+    "errors": [
+      "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+    ]
+  },
+  "acceptance": {
+    "disposition": "RESTORED",
+    "protected": "PASS",
+    "survivingBytes": "IDENTICAL_TO_START",
+    "candidateTree": "1dca1219a4537e6d7d2d28521868591d6427d039"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-rejected.html"
+}

@@ -1,0 +1,230 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:50:42.710Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "contract",
+  "task": "auto-s10",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s10\\baseline-as-delivered.html",
+  "baselineSha": "6511fa3e5939ac016379dea4281598d99848fcc5b2bf1423f0f1e2427f00ea66",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 400
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 9539,
+      "outputTokens": 37,
+      "promptTokens": 294,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n",
+        "chars": 169,
+        "lines": 8
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 16231,
+        "acceptanceMs": 27124
+      },
+      "containment": {
+        "ok": true,
+        "text": "\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n",
+        "codeLines": 6,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n",
+        "chars": 169,
+        "lines": 8
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"ferry\",\"fennec\",\"gannet\",\"heron\",\"ibis\"].includes(t))) === \"[\\\"ferry\\\",\\\"fennec\\\",\\\"gannet\\\",\\\"heron\\\",\\\"ibis\\\"]\"; state null; visible [\"s10\",\"ferry\",\"fennec\",\"gannet\",\"heron\",\"ibis\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"ferr\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #box empty -> expected dom.inputValues[\"#box\"] === ''; state null; visible [\"s10\",\"ferry\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"s10\",\"ferry\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:53386/index.html:32:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "box",
+            "catalogue"
+          ],
+          "idsAfterReady": [
+            "box",
+            "catalogue"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:53386/index.html:32:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "box",
+            "catalogue"
+          ],
+          "idsAfterReady": [
+            "box",
+            "catalogue"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "1dca1219a4537e6d7d2d28521868591d6427d039"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "550be317b2d9a7f87108d2e4272b01ff6563f61b45c2926bed514ed0c3bc023c",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r1-s1-rejected"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "8906d61d2e1abf7e45cd93a9913fa63021e29964847ea6855903511aa36bcd0d",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 0,
+    "echoed": 0,
+    "outcome": "REJECTED",
+    "mismatch": {
+      "BROKE_WHAT_WORKED": 1
+    },
+    "outputTokens": 37,
+    "generationSeconds": 9.5,
+    "wallClockSeconds": 28.2,
+    "corpus": "legasus/bench/suppression1/runs/s10-contract.attempts"
+  }
+}

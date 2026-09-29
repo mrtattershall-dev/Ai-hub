@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>s06</title></head>
+<body>
+<h2>s06</h2>
+<input type="text" id="find">
+<ul id="log">
+  <li class="item">delta</li>
+  <li class="item">denim</li>
+  <li class="item">fennel</li>
+  <li class="item">garnet</li>
+  <li class="item">hazel</li>
+</ul>
+<script>
+const model = { query: '' };
+const field = document.getElementById('find');
+const rows = Array.from(document.querySelectorAll('#log .item'));
+function show() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.hidden = !hit;
+  });
+}
+field.addEventListener('input', show);
+        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.
+        // when #clear-filter is clicked: #find is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+        // This succeeds when that holds and everything the page already did still works.
+        // Continue here:
+document.getElementById('clear-filter').addEventListener('click', function () {
+  field.value = '';
+  show();
+});
+
+</script>
+</body>
+</html>

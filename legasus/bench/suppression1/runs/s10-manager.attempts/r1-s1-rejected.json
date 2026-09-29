@@ -1,0 +1,128 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "NOTHING_WORKED",
+    "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 25,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "sift"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function sift() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>s10</title></head>\n<body>\n<h2>s10</h2>\n<input type=\"text\" id=\"box\">\n<ul id=\"catalogue\">\n  <li class=\"item\">ferry</li>\n  <li class=\"item\">fennec</li>\n  <li class=\"item\">gannet</li>\n  <li class=\"item\">heron</li>\n  <li class=\"item\">ibis</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('box');\nconst rows = Array.from(document.querySelectorAll('#catalogue .item'));\nfunction sift() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\nfield.addEventListener('input', sift);\n// create #clear-filter and attach the handler that does the work\n// the page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on input#box handler is registered\n// when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "const clearFilterButton = document.createElement('button');\nclearFilterButton.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilterButton);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  sift();\n});\n// The page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on input#box handler is registered\n// when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+    "chars": 554,
+    "lines": 11,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "const clearFilterButton = document.createElement('button');\nclearFilterButton.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilterButton);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  sift();\n});\n// The page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on input#box handler is registered\n// when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+    "chars": 554,
+    "lines": 11
+  },
+  "containment": {
+    "ok": true,
+    "text": "const clearFilterButton = document.createElement('button');\nclearFilterButton.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilterButton);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  sift();\n});\n// The page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on input#box handler is registered\n// when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+    "codeLines": 7,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      5,
+      7
+    ],
+    "failing": [
+      3,
+      4,
+      6
+    ],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "02aaa0d8e59533ec100ca4fcf26722cbbe166929"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-rejected.html"
+}

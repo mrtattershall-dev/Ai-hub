@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>s11</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s11</h2>
+<input type="text" id="input-term">
+<button id="clear-filter">Clear Filter</button>
+<article id="listing">
+  <p class="item">cobalt</p>
+  <p class="item">copper</p>
+  <p class="item">nickel</p>
+  <p class="item">osmium</p>
+  <p class="item">pewter</p>
+</article>
+<script>
+const field = document.getElementById('input-term');
+const rows = Array.from(document.querySelectorAll('#listing .item'));
+const clearFilterButton = document.getElementById('clear-filter');
+
+function display() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+
+field.addEventListener('keyup', display);
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  rows.forEach(function (el) {
+    el.className = 'item';
+  });
+});
+</script>
+</body>
+</html>

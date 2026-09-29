@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a web page.\n\n<!DOCTYPE html>\n<html>\n<head><title>s10</title></head>\n<body>\n<h2>s10</h2>\n<input type=\"text\" id=\"box\">\n<ul id=\"catalogue\">\n  <li class=\"item\">ferry</li>\n  <li class=\"item\">fennec</li>\n  <li class=\"item\">gannet</li>\n  <li class=\"item\">heron</li>\n  <li class=\"item\">ibis</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('box');\nconst rows = Array.from(document.querySelectorAll('#catalogue .item'));\nfunction sift() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\nfield.addEventListener('input', sift);\n</script>\n</body>\n</html>\n\n\nA user wants this change: when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nExplain how to do it, or give the updated page.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "To achieve the desired functionality, we need to add a button with the ID `clear-filter` to the HTML and modify the JavaScript code to handle the click event on this button. When the button is clicked, we will clear the value of the input field and set the display style of all list items to `''`, effectively making them visible again. Here's the updated HTML and JavaScript code:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><title>s10</title></head>\n<body>\n<h2>s10</h2>\n<input type=\"text\" id=\"box\">\n<button id=\"clear-filter\">Clear Filter</button>\n<ul id=\"catalogue\">\n  <li class=\"item\">ferry</li>\n  <li class=\"item\">fennec</li>\n  <li class=\"item\">gannet</li>\n  <li class=\"item\">heron</li>\n  <li class=\"item\">ibis</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('box');\nconst rows = Array.from(document.querySelectorAll('#catalogue .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction sift() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\n\nfield.addEventListener('input', sift);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n</script>\n</body>\n</html>\n```\n\n### Explanation:\n1. **HTML Structure**:\n   - Added a button with the ID `clear-filter`.\n   - The input field remains unchanged.\n\n2. **JavaScript**:\n   - The `sift` function remains the same, which filters the list items based on the input value.\n   - The `clearFilterButton` is added to the HTML.\n   - The `clearFilterButton` has an event listener that triggers the `sift` function when clicked. This function clears the input field (`field.value = ''`) and sets the display style of all list items to `''`, making them visible again.\n\nThis way, when the user clicks the \"Clear Filter\" button, the input field is cleared, and all items in the list are displayed again, while typing in the filter still narrows the list.",
+    "chars": 2111,
+    "lines": 55,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head><title>s10</title></head>\n<body>\n<h2>s10</h2>\n<input type=\"text\" id=\"box\">\n<button id=\"clear-filter\">Clear Filter</button>\n<ul id=\"catalogue\">\n  <li class=\"item\">ferry</li>\n  <li class=\"item\">fennec</li>\n  <li class=\"item\">gannet</li>\n  <li class=\"item\">heron</li>\n  <li class=\"item\">ibis</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('box');\nconst rows = Array.from(document.querySelectorAll('#catalogue .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction sift() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\n\nfield.addEventListener('input', sift);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n</script>\n</body>\n</html>",
+    "chars": 995,
+    "lines": 39
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "c1509110c09427a70c21af2d76014e894291c2eb"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

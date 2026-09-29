@@ -1,0 +1,71 @@
+{
+  "entry": "index.html",
+  "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+  "contract": "The visible result is the evidence; a state accessor is used only when the page exposes one.",
+  "steps": [
+    {
+      "n": 1,
+      "name": "loads with no page or console error, showing every item",
+      "do": [],
+      "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"cobalt\",\"copper\",\"nickel\",\"osmium\",\"pewter\"].includes(t))) === \"[\\\"cobalt\\\",\\\"copper\\\",\\\"nickel\\\",\\\"osmium\\\",\\\"pewter\\\"]\""
+    },
+    {
+      "n": 2,
+      "name": "typing \"coba\" narrows the list as it already does",
+      "do": [
+        {
+          "kind": "type",
+          "selector": "#input-term",
+          "text": "coba"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"cobalt\",\"copper\",\"nickel\",\"osmium\",\"pewter\"].includes(t))) === \"[\\\"cobalt\\\"]\""
+    },
+    {
+      "n": 3,
+      "name": "clicking #clear-filter brings every item back",
+      "do": [
+        {
+          "kind": "click",
+          "selector": "#clear-filter"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"cobalt\",\"copper\",\"nickel\",\"osmium\",\"pewter\"].includes(t))) === \"[\\\"cobalt\\\",\\\"copper\\\",\\\"nickel\\\",\\\"osmium\\\",\\\"pewter\\\"]\""
+    },
+    {
+      "n": 4,
+      "name": "and leaves #input-term empty",
+      "do": [],
+      "expect": "dom.inputValues[\"#input-term\"] === ''"
+    },
+    {
+      "n": 5,
+      "name": "filtering still narrows the list afterwards",
+      "do": [
+        {
+          "kind": "type",
+          "selector": "#input-term",
+          "text": "coba"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"cobalt\",\"copper\",\"nickel\",\"osmium\",\"pewter\"].includes(t))) === \"[\\\"cobalt\\\"]\""
+    },
+    {
+      "n": 6,
+      "name": "clicking #clear-filter a second time brings every item back again",
+      "do": [
+        {
+          "kind": "click",
+          "selector": "#clear-filter"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"cobalt\",\"copper\",\"nickel\",\"osmium\",\"pewter\"].includes(t))) === \"[\\\"cobalt\\\",\\\"copper\\\",\\\"nickel\\\",\\\"osmium\\\",\\\"pewter\\\"]\""
+    },
+    {
+      "n": 7,
+      "name": "no page or console error was raised at any point",
+      "do": [],
+      "expect": "noErrors"
+    }
+  ]
+}

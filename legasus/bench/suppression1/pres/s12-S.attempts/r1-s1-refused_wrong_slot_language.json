@@ -1,0 +1,34 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REFUSED_WRONG_SLOT_LANGUAGE",
+  "classification": {
+    "mismatch": "NOT_JUDGED",
+    "why": "the completion never reached the gate",
+    "addition": null,
+    "carriedForward": null
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "<|im_start|>system\nAdd a control #clear-filter. Clicking it: #seek is empty; every item in the list is visible again. typing in the filter still narrows the list.<|im_end|>\n<|fim_prefix|><!DOCTYPE html>\n<html>\n<head><title>s12</title></head>\n<body>\n<h2>s12</h2>\n<input type=\"text\" id=\"seek\">\n<ol id=\"results\">\n  <li class=\"item\">tundra</li>\n  <li class=\"item\">tulip</li>\n  <li class=\"item\">meadow</li>\n  <li class=\"item\">canyon</li>\n  <li class=\"item\">delta</li>\n</ol>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('seek');\nconst rows = Array.from(document.querySelectorAll('#results .item'));\nfunction recompute() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.hidden = !hit;\n  });\n}\nfield.addEventListener('input', recompute);\n<|fim_suffix|>\n</script>\n</body>\n</html>\n<|fim_middle|>",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "document.getElementById('clear-filter').addEventListener('click', function () {\n  field.value = '';\n  recompute();\n});\n</script>",
+    "chars": 128,
+    "lines": 5,
+    "truncatedInRunRecord": false
+  },
+  "contained": null,
+  "containment": {
+    "ok": false,
+    "reason": "WRONG_SLOT_LANGUAGE",
+    "detail": "the completion contains markup; the slot is JavaScript inside a <script> element (Unexpected token '<')",
+    "truncatedAtLine": null,
+    "droppedLines": 0
+  },
+  "play": null,
+  "acceptance": null,
+  "decision": null,
+  "candidateFile": null
+}

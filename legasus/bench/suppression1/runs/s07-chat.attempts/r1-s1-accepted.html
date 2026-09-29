@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>s07</title></head>
+<body>
+<h2>s07</h2>
+<input type="text" id="filterbox">
+<button id="clear-filter">Clear Filter</button>
+<div id="people">
+  <p class="item">nadia</p>
+  <p class="item">nasser</p>
+  <p class="item">oleg</p>
+  <p class="item">priya</p>
+  <p class="item">ravi</p>
+</div>
+<script>
+const field = document.getElementById('filterbox');
+const rows = Array.from(document.querySelectorAll('#people .item'));
+const clearFilterButton = document.getElementById('clear-filter');
+
+function apply() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+
+field.addEventListener('keyup', apply);
+
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  rows.forEach(function (el) {
+    el.style.display = '';
+  });
+});
+</script>
+</body>
+</html>

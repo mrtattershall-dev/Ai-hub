@@ -1,0 +1,133 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": [
+        1,
+        7
+      ]
+    },
+    "mismatch": "BROKE_WHAT_WORKED",
+    "why": "2 carried-forward check(s) stopped passing: 1, 7"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 23,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "filterRows"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function filterRows() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>s01</title></head>\n<body>\n<h2>s01</h2>\n<input type=\"text\" id=\"q\">\n<ul id=\"rows\">\n  <li class=\"item\">almond</li>\n  <li class=\"item\">apricot</li>\n  <li class=\"item\">brazil</li>\n  <li class=\"item\">cashew</li>\n  <li class=\"item\">pecan</li>\n</ul>\n<script>\nconst field = document.getElementById('q');\nconst rows = Array.from(document.querySelectorAll('#rows .item'));\nfunction filterRows() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\nfield.addEventListener('input', filterRows);\n// create #clear-filter and attach the handler that does the work\n// the page updates through filterRows, which existing code calls after changing state\n// FACT: this file defines filterRows()\n// FACT: a input on input#q handler is registered\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "document.createElement('div').id = 'clear-filter'; document.body.appendChild(document.getElementById('clear-filter')); document.getElementById('clear-filter').addEventListener('click', function () { field.value = ''; filterRows(); });",
+    "chars": 234,
+    "lines": 1,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "document.createElement('div').id = 'clear-filter'; document.body.appendChild(document.getElementById('clear-filter')); document.getElementById('clear-filter').addEventListener('click', function () { field.value = ''; filterRows(); });",
+    "chars": 234,
+    "lines": 1
+  },
+  "containment": {
+    "ok": true,
+    "text": "document.createElement('div').id = 'clear-filter'; document.body.appendChild(document.getElementById('clear-filter')); document.getElementById('clear-filter').addEventListener('click', function () { field.value = ''; filterRows(); });",
+    "codeLines": 1,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      2,
+      5
+    ],
+    "failing": [
+      1,
+      3,
+      4,
+      6,
+      7
+    ],
+    "errors": [
+      "[JS ERROR] Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'."
+    ]
+  },
+  "acceptance": {
+    "disposition": "RESTORED",
+    "protected": "PASS",
+    "survivingBytes": "IDENTICAL_TO_START",
+    "candidateTree": "a433690d82f6b1a9517169d6e6e6ca528b4e2079"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-rejected.html"
+}

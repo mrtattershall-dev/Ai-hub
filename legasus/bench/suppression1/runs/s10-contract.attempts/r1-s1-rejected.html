@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><title>s10</title></head>
+<body>
+<h2>s10</h2>
+<input type="text" id="box">
+<ul id="catalogue">
+  <li class="item">ferry</li>
+  <li class="item">fennec</li>
+  <li class="item">gannet</li>
+  <li class="item">heron</li>
+  <li class="item">ibis</li>
+</ul>
+<script>
+const model = { query: '' };
+const field = document.getElementById('box');
+const rows = Array.from(document.querySelectorAll('#catalogue .item'));
+function sift() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+field.addEventListener('input', sift);
+        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.
+        // when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+        // This succeeds when that holds and everything the page already did still works.
+        // Continue here:
+
+document.getElementById('clear-filter').addEventListener('click', function () {
+  field.value = '';
+  rows.forEach(function (el) {
+    el.style.display = '';
+  });
+});
+
+</script>
+</body>
+</html>

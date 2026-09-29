@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a web page.\n\n<!DOCTYPE html>\n<html>\n<head><title>s08</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s08</h2>\n<input type=\"text\" id=\"text\">\n<ul id=\"parts\">\n  <li class=\"item\">washer</li>\n  <li class=\"item\">wrench</li>\n  <li class=\"item\">anvil</li>\n  <li class=\"item\">bolt</li>\n  <li class=\"item\">clamp</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('text');\nconst rows = Array.from(document.querySelectorAll('#parts .item'));\nfunction narrowList() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', narrowList);\n</script>\n</body>\n</html>\n\n\nA user wants this change: when #clear-filter is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nExplain how to do it, or give the updated page.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "To achieve the desired functionality, we need to add a button with the ID `clear-filter` to the HTML and modify the JavaScript code to handle the click event on this button. When the button is clicked, we will clear the value of the input field and remove the `gone` class from all list items, making them visible again.\n\nHere's the updated HTML:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><title>s08</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s08</h2>\n<input type=\"text\" id=\"text\">\n<ul id=\"parts\">\n  <li class=\"item\">washer</li>\n  <li class=\"item\">wrench</li>\n  <li class=\"item\">anvil</li>\n  <li class=\"item\">bolt</li>\n  <li class=\"item\">clamp</li>\n</ul>\n<button id=\"clear-filter\">Clear Filter</button>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('text');\nconst rows = Array.from(document.querySelectorAll('#parts .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrowList() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\n\nfield.addEventListener('input', narrowList);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.classList.remove('gone');\n  });\n});\n</script>\n</body>\n</html>\n```\n\n### Explanation:\n\n1. **HTML Structure**:\n   - Added a new button with the ID `clear-filter`.\n   - The button is placed after the input field and the list.\n\n2. **JavaScript**:\n   - The `clearFilterButton` is selected using `document.getElementById('clear-filter')`.\n   - The `click` event listener is added to the button, which triggers the function `function clearFilter()`.\n   - Inside the `clearFilter` function:\n     - The value of the input field (`field.value`) is set to an empty string.\n     - The `forEach` loop iterates over all list items (`rows`).\n     - For each list item, the `classList.remove('gone')` method is called to remove the `gone` class, making the item visible again.\n\n3. **NarrowList Function**:\n   - The `narrowList` function remains unchanged and filters the list items based on the input value.\n\nWith these changes, when the user clicks the \"Clear Filter\" button, the input field is cleared, and all list items become visible again, while typing in the filter still narrows the list.",
+    "chars": 2420,
+    "lines": 64,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head><title>s08</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s08</h2>\n<input type=\"text\" id=\"text\">\n<ul id=\"parts\">\n  <li class=\"item\">washer</li>\n  <li class=\"item\">wrench</li>\n  <li class=\"item\">anvil</li>\n  <li class=\"item\">bolt</li>\n  <li class=\"item\">clamp</li>\n</ul>\n<button id=\"clear-filter\">Clear Filter</button>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('text');\nconst rows = Array.from(document.querySelectorAll('#parts .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrowList() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\n\nfield.addEventListener('input', narrowList);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.classList.remove('gone');\n  });\n});\n</script>\n</body>\n</html>",
+    "chars": 1046,
+    "lines": 39
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "83a12573efba434b35175d00ee6df5c088fc2e81"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

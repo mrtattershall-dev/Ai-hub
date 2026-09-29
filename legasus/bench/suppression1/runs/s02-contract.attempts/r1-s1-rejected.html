@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>s02</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s02</h2>
+<input type="text" id="search">
+<div id="cards">
+  <div class="item">maple</div>
+  <div class="item">mahogany</div>
+  <div class="item">birch</div>
+  <div class="item">cedar</div>
+  <div class="item">walnut</div>
+</div>
+<script>
+const field = document.getElementById('search');
+const rows = Array.from(document.querySelectorAll('#cards .item'));
+function refine() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+field.addEventListener('input', refine);
+        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.
+        // when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+        // This succeeds when that holds and everything the page already did still works.
+        // Continue here:
+        document.getElementById('clear-filter').addEventListener('click', function () {
+          field.value = '';
+          rows.forEach(function (el) {
+            el.className = 'item';
+          });
+        });
+</script>
+</body>
+</html>

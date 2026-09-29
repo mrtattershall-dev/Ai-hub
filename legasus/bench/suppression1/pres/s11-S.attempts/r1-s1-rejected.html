@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>s11</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s11</h2>
+<input type="text" id="input-term">
+<article id="listing">
+  <p class="item">cobalt</p>
+  <p class="item">copper</p>
+  <p class="item">nickel</p>
+  <p class="item">osmium</p>
+  <p class="item">pewter</p>
+</article>
+<script>
+const field = document.getElementById('input-term');
+const rows = Array.from(document.querySelectorAll('#listing .item'));
+function display() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+field.addEventListener('keyup', display);
+field.addEventListener('change', display);
+</script>
+</body>
+</html>

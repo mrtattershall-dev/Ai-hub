@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>s04</title></head>
+<body>
+<h2>s04</h2>
+<input type="text" id="needle">
+<button id="clear-filter">Clear Filter</button>
+<ol id="stack">
+  <li class="item">lisbon</li>
+  <li class="item">lima</li>
+  <li class="item">cairo</li>
+  <li class="item">oslo</li>
+  <li class="item">dakar</li>
+</ol>
+<script>
+const model = { query: '' };
+const field = document.getElementById('needle');
+const rows = Array.from(document.querySelectorAll('#stack .item'));
+const clearFilterButton = document.getElementById('clear-filter');
+
+function redraw() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+
+field.addEventListener('input', redraw);
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  redraw();
+});
+</script>
+</body>
+</html>

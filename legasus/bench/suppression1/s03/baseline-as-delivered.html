@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>s03</title></head>
+<body>
+<h2>s03</h2>
+<input type="text" id="lookup">
+<section id="entries">
+  <p class="item">quartz</p>
+  <p class="item">quarry</p>
+  <p class="item">basalt</p>
+  <p class="item">gneiss</p>
+  <p class="item">shale</p>
+</section>
+<script>
+const model = { query: '' };
+const field = document.getElementById('lookup');
+const rows = Array.from(document.querySelectorAll('#entries .item'));
+function update() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.hidden = !hit;
+  });
+}
+field.addEventListener('keyup', update);
+</script>
+</body>
+</html>

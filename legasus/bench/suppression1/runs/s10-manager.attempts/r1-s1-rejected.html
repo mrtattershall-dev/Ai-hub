@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head><title>s10</title></head>
+<body>
+<h2>s10</h2>
+<input type="text" id="box">
+<ul id="catalogue">
+  <li class="item">ferry</li>
+  <li class="item">fennec</li>
+  <li class="item">gannet</li>
+  <li class="item">heron</li>
+  <li class="item">ibis</li>
+</ul>
+<script>
+const model = { query: '' };
+const field = document.getElementById('box');
+const rows = Array.from(document.querySelectorAll('#catalogue .item'));
+function sift() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+field.addEventListener('input', sift);
+// create #clear-filter and attach the handler that does the work
+// the page updates through sift, which existing code calls after changing state
+// FACT: this file defines sift()
+// FACT: a input on input#box handler is registered
+// when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+const clearFilterButton = document.createElement('button');
+clearFilterButton.textContent = 'Clear Filter';
+document.body.appendChild(clearFilterButton);
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  sift();
+});
+// The page updates through sift, which existing code calls after changing state
+// FACT: this file defines sift()
+// FACT: a input on input#box handler is registered
+// when #clear-filter is clicked: #box is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+</script>
+</body>
+</html>

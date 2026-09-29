@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>s01</title></head>
+<body>
+<h2>s01</h2>
+<input type="text" id="q">
+<button id="clear-filter">Clear Filter</button>
+<ul id="rows">
+  <li class="item">almond</li>
+  <li class="item">apricot</li>
+  <li class="item">brazil</li>
+  <li class="item">cashew</li>
+  <li class="item">pecan</li>
+</ul>
+<script>
+const field = document.getElementById('q');
+const rows = Array.from(document.querySelectorAll('#rows .item'));
+const clearFilterButton = document.getElementById('clear-filter');
+
+function filterRows() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+
+field.addEventListener('input', filterRows);
+
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  rows.forEach(function (el) {
+    el.style.display = '';
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a web page.\n\n<!DOCTYPE html>\n<html>\n<head><title>s02</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s02</h2>\n<input type=\"text\" id=\"search\">\n<div id=\"cards\">\n  <div class=\"item\">maple</div>\n  <div class=\"item\">mahogany</div>\n  <div class=\"item\">birch</div>\n  <div class=\"item\">cedar</div>\n  <div class=\"item\">walnut</div>\n</div>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#cards .item'));\nfunction refine() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', refine);\n</script>\n</body>\n</html>\n\n\nA user wants this change: when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nExplain how to do it, or give the updated page.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "To achieve the desired functionality, we need to add a button with the ID `clear-filter` to the HTML and modify the JavaScript code to handle the click event on this button. When the button is clicked, we will clear the value of the input field and remove the `gone` class from all items in the list, making them visible again. Here's the updated HTML and JavaScript code:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><title>s02</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s02</h2>\n<input type=\"text\" id=\"search\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"cards\">\n  <div class=\"item\">maple</div>\n  <div class=\"item\">mahogany</div>\n  <div class=\"item\">birch</div>\n  <div class=\"item\">cedar</div>\n  <div class=\"item\">walnut</div>\n</div>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#cards .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction refine() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\n\nfield.addEventListener('input', refine);\n\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.classList.remove('gone');\n  });\n});\n</script>\n</body>\n</html>\n```\n\n### Explanation:\n\n1. **HTML Changes:**\n   - Added a `<button>` element with the ID `clear-filter` to the HTML.\n   - The `clear-filter` button is positioned below the search input field.\n\n2. **JavaScript Changes:**\n   - Added an event listener to the `clear-filter` button that listens for the `click` event.\n   - When the button is clicked, it sets the value of the search input field to an empty string using `field.value = ''`.\n   - It then iterates over all items in the list using `rows.forEach(function (el) { ... })`.\n   - For each item, it removes the `gone` class using `el.classList.remove('gone')`, making the item visible again.\n\nThis way, when the user clicks the \"Clear Filter\" button, the search input field is cleared, and all items in the list are made visible again. The `refine` function remains unchanged, ensuring that typing in the filter still narrows the list.",
+    "chars": 2271,
+    "lines": 56,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head><title>s02</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s02</h2>\n<input type=\"text\" id=\"search\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"cards\">\n  <div class=\"item\">maple</div>\n  <div class=\"item\">mahogany</div>\n  <div class=\"item\">birch</div>\n  <div class=\"item\">cedar</div>\n  <div class=\"item\">walnut</div>\n</div>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#cards .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction refine() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\n\nfield.addEventListener('input', refine);\n\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.classList.remove('gone');\n  });\n});\n</script>\n</body>\n</html>",
+    "chars": 1000,
+    "lines": 38
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "fddb10a0bacb0217bb6cfe99a05b86f39ab7a4f2"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

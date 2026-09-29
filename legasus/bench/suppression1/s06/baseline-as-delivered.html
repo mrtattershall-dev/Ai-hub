@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>s06</title></head>
+<body>
+<h2>s06</h2>
+<input type="text" id="find">
+<ul id="log">
+  <li class="item">delta</li>
+  <li class="item">denim</li>
+  <li class="item">fennel</li>
+  <li class="item">garnet</li>
+  <li class="item">hazel</li>
+</ul>
+<script>
+const model = { query: '' };
+const field = document.getElementById('find');
+const rows = Array.from(document.querySelectorAll('#log .item'));
+function show() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.hidden = !hit;
+  });
+}
+field.addEventListener('input', show);
+</script>
+</body>
+</html>

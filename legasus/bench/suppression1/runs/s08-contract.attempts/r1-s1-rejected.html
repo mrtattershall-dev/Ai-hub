@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head><title>s08</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s08</h2>
+<input type="text" id="text">
+<ul id="parts">
+  <li class="item">washer</li>
+  <li class="item">wrench</li>
+  <li class="item">anvil</li>
+  <li class="item">bolt</li>
+  <li class="item">clamp</li>
+</ul>
+<script>
+const model = { query: '' };
+const field = document.getElementById('text');
+const rows = Array.from(document.querySelectorAll('#parts .item'));
+function narrowList() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+field.addEventListener('input', narrowList);
+        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.
+        // when #clear-filter is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+        // This succeeds when that holds and everything the page already did still works.
+        // Continue here:
+const clearFilterBtn = document.getElementById('clear-filter');
+clearFilterBtn.addEventListener('click', function () {
+  field.value = '';
+  rows.forEach(function (el) {
+    el.className = 'item';
+  });
+});
+        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.
+        // when #clear-filter is clicked: #text is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+        // This succeeds when that holds and everything the page already did still works. Continue here:
+
+</script>
+</body>
+</html>

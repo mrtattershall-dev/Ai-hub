@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>s01</title></head>
+<body>
+<h2>s01</h2>
+<input type="text" id="q">
+<ul id="rows">
+  <li class="item">almond</li>
+  <li class="item">apricot</li>
+  <li class="item">brazil</li>
+  <li class="item">cashew</li>
+  <li class="item">pecan</li>
+</ul>
+<script>
+const field = document.getElementById('q');
+const rows = Array.from(document.querySelectorAll('#rows .item'));
+function filterRows() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+field.addEventListener('input', filterRows);
+</script>
+</body>
+</html>

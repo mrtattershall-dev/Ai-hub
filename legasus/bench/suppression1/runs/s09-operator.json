@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:47:13.857Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "operator",
+  "task": "auto-s09",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s09\\baseline-as-delivered.html",
+  "baselineSha": "c31780b3a2ca9df4ca0cd24753d780c427568eaf86336e2a7ca786f11d9ea509",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 31095,
+      "outputTokens": 240,
+      "promptTokens": 355,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```json\n{\n  \"path\": \"index.html\",\n  \"contents\": \"<!DOCTYPE html>\\n<html>\\n<head><title>s09</title></head>\\n<body>\\n<h2>s09</h2>\\n<input type=\\\"text\\\" id=\\\"query\\\">\\n<main id=\\\"items\\\">\\n  <div class=\\\"item\\\">saffron</div>\\n  <div class=\\\"item\\\">sage</div>\\n  <div class=\\\"item\\\">thyme</div>\\n  <div class=\\\"item\\\">oregano</div>\\n  <div class=\\\"item\\\">cumin</div>\\n</main>\\n<script>\\nconst field = document.getElementById('query');\\nconst rows = Array.from(document.querySelectorAll('#items .item'));\\nfunction render() {\\n  const q = field.value.toLowerCase();\\n  rows.forEach(function (el) {\\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\\n    el.hidden = !hit;\\n  });\\n}\\nfield.addEventListener('input', render);\\n</script>\\n</body>\\n</html>\"\n}\n```",
+        "chars": 768,
+        "lines": 6
+      },
+      "boundaries": {},
+      "timing": {},
+      "extraction": {
+        "ok": false,
+        "reason": "NO_EXTRACTABLE_CHANGE",
+        "detail": "no edit_file call could be parsed from the reply"
+      },
+      "outcome": "REFUSED_NO_EXTRACTABLE_CHANGE",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_no_extractable_change"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "709308e65247d12121bfc9ce2a059b466241323779c5094a5e914dc30ddcd278",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 1,
+    "echoed": 0,
+    "outcome": "REFUSED_NO_EXTRACTABLE_CHANGE",
+    "mismatch": {
+      "NOT_JUDGED": 1
+    },
+    "outputTokens": 240,
+    "generationSeconds": 31.1,
+    "wallClockSeconds": 31.2,
+    "corpus": "legasus/bench/suppression1/runs/s09-operator.attempts"
+  }
+}

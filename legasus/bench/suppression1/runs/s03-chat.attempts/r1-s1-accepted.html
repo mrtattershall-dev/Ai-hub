@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>s03</title></head>
+<body>
+<h2>s03</h2>
+<input type="text" id="lookup">
+<button id="clear-filter">Clear Filter</button>
+<section id="entries">
+  <p class="item">quartz</p>
+  <p class="item">quarry</p>
+  <p class="item">basalt</p>
+  <p class="item">gneiss</p>
+  <p class="item">shale</p>
+</section>
+<script>
+const model = { query: '' };
+const field = document.getElementById('lookup');
+const rows = Array.from(document.querySelectorAll('#entries .item'));
+const clearFilterButton = document.getElementById('clear-filter');
+
+function update() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.hidden = !hit;
+  });
+}
+
+field.addEventListener('keyup', update);
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  update();
+});
+</script>
+</body>
+</html>

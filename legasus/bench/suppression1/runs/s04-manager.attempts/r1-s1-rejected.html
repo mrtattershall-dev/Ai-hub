@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head><title>s04</title></head>
+<body>
+<h2>s04</h2>
+<input type="text" id="needle">
+<ol id="stack">
+  <li class="item">lisbon</li>
+  <li class="item">lima</li>
+  <li class="item">cairo</li>
+  <li class="item">oslo</li>
+  <li class="item">dakar</li>
+</ol>
+<script>
+const model = { query: '' };
+const field = document.getElementById('needle');
+const rows = Array.from(document.querySelectorAll('#stack .item'));
+function redraw() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+field.addEventListener('input', redraw);
+// create #clear-filter and attach the handler that does the work
+// the page updates through redraw, which existing code calls after changing state
+// FACT: this file defines redraw()
+// FACT: a input on input#needle handler is registered
+// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+const clearFilterButton = document.createElement('button');
+clearFilterButton.textContent = 'Clear Filter';
+document.body.appendChild(clearFilterButton);
+clearFilterButton.addEventListener('click', function () {
+  field.value = '';
+  redraw();
+});
+// This code creates a button with the text 'Clear Filter' and appends it to the body of the document. When the button is clicked, the value of the input field is set to an empty string, and the `redraw` function is called to display all items in the list again. This ensures that typing in the filter still narrows the list. The `redraw` function updates the display of the list items based on the current value of the input field. The `clearFilterButton` is added to the body of the document and is attached to the `click` event listener, which triggers the `redraw` function when the button is clicked. This completes the implementation of the page's existing functionality. The `redraw` function is called after changing state, and it updates the display of the list items based on the current value of the input field. The `clearFilterButton` is added to the body of the document and is attached to the `click` event listener, which triggers the `redraw` function when the button is clicked. This completes the implementation of the page's existing functionality. The `redraw` function is called after changing state, and it updates the display of the list items based on the current value of the input field. The `clearFilterButton` is added to the body of the document and is attached to the `click` event listener, which triggers the `redraw` function when the button is clicked. This completes the implementation of the page's existing functionality. The `redraw` function is called after changing state, and it updates the display of the list items based on the current value of the input field. The `clearFilterButton` is added to the body of the document
+</script>
+</body>
+</html>

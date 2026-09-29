@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>s10</title></head>
+<body>
+<h2>s10</h2>
+<input type="text" id="box">
+<ul id="catalogue">
+  <li class="item">ferry</li>
+  <li class="item">fennec</li>
+  <li class="item">gannet</li>
+  <li class="item">heron</li>
+  <li class="item">ibis</li>
+</ul>
+<script>
+const model = { query: '' };
+const field = document.getElementById('box');
+const rows = Array.from(document.querySelectorAll('#catalogue .item'));
+function sift() {
+  model.query = field.value.toLowerCase();
+  const q = model.query;
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.style.display = hit ? '' : 'none';
+  });
+}
+field.addEventListener('input', sift);
+</script>
+</body>
+</html>

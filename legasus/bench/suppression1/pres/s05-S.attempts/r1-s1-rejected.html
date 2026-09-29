@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>s05</title><style>.gone{display:none}</style></head>
+<body>
+<h2>s05</h2>
+<input type="text" id="term">
+<div id="grid">
+  <span class="item">violet</span>
+  <span class="item">vermilion</span>
+  <span class="item">ochre</span>
+  <span class="item">indigo</span>
+  <span class="item">umber</span>
+</div>
+<script>
+const field = document.getElementById('term');
+const rows = Array.from(document.querySelectorAll('#grid .item'));
+function paint() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (el) {
+    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;
+    el.className = hit ? 'item' : 'item gone';
+  });
+}
+field.addEventListener('input', paint);
+paint();
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a web page.\n\n<!DOCTYPE html>\n<html>\n<head><title>s05</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s05</h2>\n<input type=\"text\" id=\"term\">\n<div id=\"grid\">\n  <span class=\"item\">violet</span>\n  <span class=\"item\">vermilion</span>\n  <span class=\"item\">ochre</span>\n  <span class=\"item\">indigo</span>\n  <span class=\"item\">umber</span>\n</div>\n<script>\nconst field = document.getElementById('term');\nconst rows = Array.from(document.querySelectorAll('#grid .item'));\nfunction paint() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\nfield.addEventListener('input', paint);\n</script>\n</body>\n</html>\n\n\nA user wants this change: when #clear-filter is clicked: #term is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nExplain how to do it, or give the updated page.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "To achieve the desired functionality, we need to add a button with the ID `clear-filter` to the HTML and modify the JavaScript to handle the click event on this button. When the button is clicked, we will clear the input field and set the class of each item to `item` to make them visible again. Here's the updated HTML and JavaScript:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><title>s05</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s05</h2>\n<input type=\"text\" id=\"term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"grid\">\n  <span class=\"item\">violet</span>\n  <span class=\"item\">vermilion</span>\n  <span class=\"item\">ochre</span>\n  <span class=\"item\">indigo</span>\n  <span class=\"item\">umber</span>\n</div>\n<script>\nconst field = document.getElementById('term');\nconst rows = Array.from(document.querySelectorAll('#grid .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction paint() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\n\nfield.addEventListener('input', paint);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.className = 'item';\n  });\n});\n</script>\n</body>\n</html>\n```\n\n### Explanation:\n1. **HTML Structure**:\n   - Added a button with the ID `clear-filter`.\n   - The `input` field remains unchanged.\n\n2. **JavaScript**:\n   - **Paint Function**: This function is called whenever the user types in the `input` field. It checks if the input matches any of the items in the list and updates their class accordingly.\n   - **Clear Filter Button**:\n     - Added an event listener to the button that listens for the `click` event.\n     - When the button is clicked, it clears the value of the `input` field using `field.value = ''`.\n     - It then sets the class of each item in the list to `item` to make them visible again.\n\nThis way, when the user clicks the \"Clear Filter\" button, the `input` field is cleared, and all items in the list are made visible again. The typing functionality remains intact.",
+    "chars": 2175,
+    "lines": 55,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head><title>s05</title><style>.gone{display:none}</style></head>\n<body>\n<h2>s05</h2>\n<input type=\"text\" id=\"term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"grid\">\n  <span class=\"item\">violet</span>\n  <span class=\"item\">vermilion</span>\n  <span class=\"item\">ochre</span>\n  <span class=\"item\">indigo</span>\n  <span class=\"item\">umber</span>\n</div>\n<script>\nconst field = document.getElementById('term');\nconst rows = Array.from(document.querySelectorAll('#grid .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction paint() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.className = hit ? 'item' : 'item gone';\n  });\n}\n\nfield.addEventListener('input', paint);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.className = 'item';\n  });\n});\n</script>\n</body>\n</html>",
+    "chars": 997,
+    "lines": 37
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "9170f6b56a9d0921cebcb74e48898e1115b7436f"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

@@ -1,0 +1,65 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-29T05:47:45.793Z",
+  "experiment": "SUPPRESSION-1",
+  "arm": "contract",
+  "task": "auto-s09",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\suppression1\\s09\\baseline-as-delivered.html",
+  "baselineSha": "c31780b3a2ca9df4ca0cd24753d780c427568eaf86336e2a7ca786f11d9ea509",
+  "budget": {
+    "callsPerPage": 1,
+    "seed": 1,
+    "maxTokens": 400
+  },
+  "interventionsByAPerson": 0,
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 39616,
+      "outputTokens": 400,
+      "promptTokens": 272,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n        // when #clear-filter is clicked: #query is empty; every",
+        "chars": 1940,
+        "lines": 22
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_empty"
+    }
+  ],
+  "accepted": false,
+  "calls": 1,
+  "promptSha": "c870da3ea736bb33974716d1a77de75bdd98d0a1812ca525c37c6e1ea0e94982",
+  "totals": {
+    "accepted": 0,
+    "declinedToAct": 0,
+    "noExtractableChange": 0,
+    "echoed": 0,
+    "outcome": "REFUSED_EMPTY",
+    "mismatch": {
+      "NOT_JUDGED": 1
+    },
+    "outputTokens": 400,
+    "generationSeconds": 39.6,
+    "wallClockSeconds": 39.8,
+    "corpus": "legasus/bench/suppression1/runs/s09-contract.attempts"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a web page.\n\n<!DOCTYPE html>\n<html>\n<head><title>s06</title></head>\n<body>\n<h2>s06</h2>\n<input type=\"text\" id=\"find\">\n<ul id=\"log\">\n  <li class=\"item\">delta</li>\n  <li class=\"item\">denim</li>\n  <li class=\"item\">fennel</li>\n  <li class=\"item\">garnet</li>\n  <li class=\"item\">hazel</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('find');\nconst rows = Array.from(document.querySelectorAll('#log .item'));\nfunction show() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.hidden = !hit;\n  });\n}\nfield.addEventListener('input', show);\n</script>\n</body>\n</html>\n\n\nA user wants this change: when #clear-filter is clicked: #find is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nExplain how to do it, or give the updated page.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "To achieve the desired functionality, we need to add a button with the ID `clear-filter` to the HTML and modify the JavaScript to handle the click event on this button. When the button is clicked, we will clear the value of the input field and set all items in the list to be visible again. Here's the updated HTML and JavaScript:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><title>s06</title></head>\n<body>\n<h2>s06</h2>\n<input type=\"text\" id=\"find\">\n<button id=\"clear-filter\">Clear Filter</button>\n<ul id=\"log\">\n  <li class=\"item\">delta</li>\n  <li class=\"item\">denim</li>\n  <li class=\"item\">fennel</li>\n  <li class=\"item\">garnet</li>\n  <li class=\"item\">hazel</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('find');\nconst rows = Array.from(document.querySelectorAll('#log .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction show() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.hidden = !hit;\n  });\n}\n\nfield.addEventListener('input', show);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  show();\n});\n</script>\n</body>\n</html>\n```\n\n### Explanation:\n1. **HTML Structure**:\n   - Added a button with the ID `clear-filter`.\n   - The button is positioned below the input field.\n\n2. **JavaScript**:\n   - The `show` function is already defined to handle the input event and update the visibility of the list items based on the query.\n   - The `clearFilterButton` is assigned to the `clearFilter` variable.\n   - The `clearFilterButton` has an event listener that listens for the `click` event. When clicked, it sets the value of the input field to an empty string and calls the `show` function to re-display all items in the list.\n\nThis way, when the user clicks the \"Clear Filter\" button, the input field is cleared, and all items in the list are displayed again, ensuring that typing in the filter still narrows the list.",
+    "chars": 2041,
+    "lines": 53,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head><title>s06</title></head>\n<body>\n<h2>s06</h2>\n<input type=\"text\" id=\"find\">\n<button id=\"clear-filter\">Clear Filter</button>\n<ul id=\"log\">\n  <li class=\"item\">delta</li>\n  <li class=\"item\">denim</li>\n  <li class=\"item\">fennel</li>\n  <li class=\"item\">garnet</li>\n  <li class=\"item\">hazel</li>\n</ul>\n<script>\nconst model = { query: '' };\nconst field = document.getElementById('find');\nconst rows = Array.from(document.querySelectorAll('#log .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction show() {\n  model.query = field.value.toLowerCase();\n  const q = model.query;\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.hidden = !hit;\n  });\n}\n\nfield.addEventListener('input', show);\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  show();\n});\n</script>\n</body>\n</html>",
+    "chars": 912,
+    "lines": 37
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "74a0b4f35472c810c91f5e322f09ca8551e75fb3"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

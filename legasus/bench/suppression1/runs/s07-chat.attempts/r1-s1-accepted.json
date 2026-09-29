@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a web page.\n\n<!DOCTYPE html>\n<html>\n<head><title>s07</title></head>\n<body>\n<h2>s07</h2>\n<input type=\"text\" id=\"filterbox\">\n<div id=\"people\">\n  <p class=\"item\">nadia</p>\n  <p class=\"item\">nasser</p>\n  <p class=\"item\">oleg</p>\n  <p class=\"item\">priya</p>\n  <p class=\"item\">ravi</p>\n</div>\n<script>\nconst field = document.getElementById('filterbox');\nconst rows = Array.from(document.querySelectorAll('#people .item'));\nfunction apply() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\nfield.addEventListener('keyup', apply);\n</script>\n</body>\n</html>\n\n\nA user wants this change: when #clear-filter is clicked: #filterbox is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nExplain how to do it, or give the updated page.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "To achieve the desired functionality, we need to add a button with the id `clear-filter` to the HTML and modify the JavaScript code to handle the click event on this button. When the button is clicked, we will clear the value of the `#filterbox` input field and set the `display` style of all items in the list to `''`, effectively making them visible again.\n\nHere's the updated HTML and JavaScript code:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><title>s07</title></head>\n<body>\n<h2>s07</h2>\n<input type=\"text\" id=\"filterbox\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"item\">nadia</p>\n  <p class=\"item\">nasser</p>\n  <p class=\"item\">oleg</p>\n  <p class=\"item\">priya</p>\n  <p class=\"item\">ravi</p>\n</div>\n<script>\nconst field = document.getElementById('filterbox');\nconst rows = Array.from(document.querySelectorAll('#people .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction apply() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\n\nfield.addEventListener('keyup', apply);\n\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n</script>\n</body>\n</html>\n```\n\n### Explanation:\n\n1. **HTML Structure:**\n   - Added a `<button>` element with the id `clear-filter` to the HTML.\n   - The `#filterbox` input field remains unchanged.\n\n2. **JavaScript Code:**\n   - The `apply` function remains the same, which filters the items based on the value in the `#filterbox`.\n   - The `clearFilterButton` is added to the HTML.\n   - The `clearFilterButton` has an event listener that clears the value of the `#filterbox` and sets the `display` style of all items in the list to `''`, making them visible again.\n\nThis way, when the user clicks the \"Clear Filter\" button, the `#filterbox` is cleared, and all items in the list are displayed again, while typing in the filter still narrows the list.",
+    "chars": 2074,
+    "lines": 57,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head><title>s07</title></head>\n<body>\n<h2>s07</h2>\n<input type=\"text\" id=\"filterbox\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"item\">nadia</p>\n  <p class=\"item\">nasser</p>\n  <p class=\"item\">oleg</p>\n  <p class=\"item\">priya</p>\n  <p class=\"item\">ravi</p>\n</div>\n<script>\nconst field = document.getElementById('filterbox');\nconst rows = Array.from(document.querySelectorAll('#people .item'));\nconst clearFilterButton = document.getElementById('clear-filter');\n\nfunction apply() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (el) {\n    const hit = el.textContent.toLowerCase().indexOf(q) !== -1;\n    el.style.display = hit ? '' : 'none';\n  });\n}\n\nfield.addEventListener('keyup', apply);\n\nclearFilterButton.addEventListener('click', function () {\n  field.value = '';\n  rows.forEach(function (el) {\n    el.style.display = '';\n  });\n});\n</script>\n</body>\n</html>",
+    "chars": 936,
+    "lines": 38
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "1f8034f96dade885c6042cc99a63c4e2a0a083d0"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}
