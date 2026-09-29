@@ -1,0 +1,42 @@
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:1.5b   goals [64,74]   seeds [31,32,33,34,35,36,37,38]   conditions [R,B]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/b3-run
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+--- B  goal 64 ---
+  [B g64 s31] sites 5/7          loads=null  old=null  delta=null  site 5 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g64 s32] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s33] sites 7/7          loads=true  old=true  delta=false DELTA: ordered lists not rendered: A False
+B False
+C False
+H False
+  [B g64 s34] sites 6/7          loads=null  old=null  delta=null  site 6 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g64 s35] sites 2/7          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL '# Title' threw %d format: a real 
+  [B g64 s36] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s37] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s38] sites 7/7          loads=true  old=true  delta=false DELTA: ordered lists not rendered: A False
+B False
+C False
+H False
+
+--- B  goal 74 ---
+  [B g74 s31] sites 3/3          loads=null  old=null  delta=null  site 3 broke old behaviour: REGFAIL 'a\nb' threw cannot access local v
+  [B g74 s32] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+  [B g74 s33] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g74 s34] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' threw name 'codes' is not d
+  [B g74 s35] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+  [B g74 s36] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+  [B g74 s37] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+  [B g74 s38] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  B_oracle_localized_insertion   loads 2/8   OLD KEPT 2/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  B_oracle_localized_insertion   loads 4/8   OLD KEPT 4/8   NEW DELTA 0/8   VERIFIED 0/8
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 16/16
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/b3-run

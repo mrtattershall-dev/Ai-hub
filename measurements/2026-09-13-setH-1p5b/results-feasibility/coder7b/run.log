@@ -1,0 +1,71 @@
+########## CONDITION A on qwen2.5-coder:7b (seeds 1-8) ##########
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:7b   goals [64,74]   seeds [1,2,3,4,5,6,7,8]   conditions [A]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/coder7b/A
+
+--- A  goal 64 ---
+  [A g64 s1 ] 248tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g64 s2 ] 257tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g64 s3 ] 192tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g64 s4 ] 208tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> <generator object to_html at 0x000001CC32
+  [A g64 s5 ] 314tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p></p><p>b</p></p>' wanted '<p>a b
+  [A g64 s6 ] 236tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g64 s7 ] 217tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g64 s8 ] 208tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+
+--- A  goal 74 ---
+  [A g74 s1 ] 321tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a\nb</p>' wanted '<p>a b</p>' | 'a\n\
+  [A g74 s2 ] 228tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g74 s3 ] 730tok/stop        loads=false old=false delta=false LOAD: load_error ["UnboundLocalError: cannot access local variable 'cu
+  [A g74 s4 ] 90tok/stop         loads=false old=false delta=false LOAD: load_error ["SyntaxError: cannot use assignment expressions with
+  [A g74 s5 ] 1766tok/stop       loads=false old=false delta=false LOAD: load_error ["SyntaxError: invalid syntax (s4_markdown.py, line 2
+  [A g74 s6 ] 235tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a\n<p>b' wanted '<p>a b</p>' | 'a\n\n
+  [A g74 s7 ] 186tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb' wanted '<p>a b</p>' | 'a\n\nb' -> 
+  [A g74 s8 ] 217tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>'
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  A_instruction_only             loads 8/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  A_instruction_only             loads 5/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+
+  reference control: 0/0  <-- READ NOTHING ELSE UNTIL FIXED
+  rollbacks byte-exact: 16/16
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/coder7b/A
+
+########## CONDITION B3 on qwen2.5-coder:7b (seeds 31-38) ##########
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:7b   goals [64,74]   seeds [31,32,33,34,35,36,37,38]   conditions [R,B]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/coder7b/B3
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+--- B  goal 64 ---
+  [B g64 s31] sites 5/7          loads=null  old=null  delta=null  site 5 broke old behaviour: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wan
+  [B g64 s32] sites 6/7          loads=null  old=null  delta=null  site 6 broke old behaviour: REGFAIL '# Title' -> '<h1>Title</h1>\n<h1>
+  [B g64 s33] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s34] sites 6/7          loads=null  old=null  delta=null  site 6 broke old behaviour: REGFAIL 'a\nb' threw unsupported operand t
+  [B g64 s35] sites 3/7          loads=null  old=null  delta=null  site 3 broke old behaviour: REGFAIL 'a\n\nb' -> '<p>a</p>\n<p></p>\n<p
+  [B g64 s36] sites 3/7          loads=null  old=null  delta=null  site 3 broke old behaviour: REGFAIL 'a\n\nb' -> '<p>a</p>\n<p>\n<p>b</
+  [B g64 s37] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s38] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+
+--- B  goal 74 ---
+  [B g74 s31] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g74 s32] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: 'continue' not properl
+  [B g74 s33] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wan
+  [B g74 s34] sites 3/3          loads=true  old=true  delta=true  VERIFIED
+  [B g74 s35] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g74 s36] sites 1/3          loads=null  old=null  delta=null  site 1 broke old behaviour: REGFAIL 'a\nb' threw cannot access local v
+  [B g74 s37] sites 1/3          loads=null  old=null  delta=null  site 1 broke old behaviour: REGFAIL 'a\nb' threw cannot access local v
+  [B g74 s38] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  B_oracle_localized_insertion   loads 0/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  B_oracle_localized_insertion   loads 1/8   OLD KEPT 1/8   NEW DELTA 1/8   VERIFIED 1/8
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 15/15
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/coder7b/B3

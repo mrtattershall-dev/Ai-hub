@@ -1,0 +1,35 @@
+  SUBSTRATE QUALIFICATION stage 1 - local 1.5B, 8 unseeded draws per lane
+  MINIMUM FIXED BEFORE ANY RESULT: >=2/8 verified AND >=2/8 failed
+
+  [67 1/8] fail  delegated_to_v2             
+  [67 2/8] fail  delegated_to_v2             
+  [67 3/8] fail  delegated_to_v2             
+  [67 4/8] PASS  delegated_to_v2             
+  [67 5/8] PASS  delegated_to_v2             
+  [67 6/8] PASS  delegated_to_v2             
+  [67 7/8] fail  delegated_to_v2             
+  [67 8/8] PASS  delegated_to_v2             
+    -> 4/8 verified   routes delegated_to_v2   multi-site=false   QUALIFIES=false
+
+  [71 1/8] fail  multi_member_insertion       members 0/2
+  [71 2/8] fail  multi_member_insertion       members 1/2
+  [71 3/8] fail  multi_member_insertion       members 1/2
+  [71 4/8] fail  multi_member_insertion       members 1/2
+  [71 5/8] fail  multi_member_insertion       members 1/2
+  [71 6/8] fail  multi_member_insertion       members 0/2
+  [71 7/8] fail  multi_member_insertion       members 1/2
+  [71 8/8] fail  multi_member_insertion       members 1/2
+    -> 0/8 verified   routes multi_member_insertion   multi-site=true   QUALIFIES=false
+
+  goal 80  UNRUNNABLE_FROM_THIS_SEED - the goal references toJSON (owned by goal 71), fromJSON (owned by goal 71), which this predecessor does not define.
+    Excluded from qualification. A 0/N here would be a dependency artifact, not model
+    difficulty. Qualify it only on a predecessor that contains its dependency.
+
+===== QUALIFICATION =====
+  goal 67  4/8 verified   multi-site false   does not qualify (single-site)
+  goal 71  0/8 verified   multi-site true    does not qualify (too few successes)
+  goal 80  EXCLUDED - unrunnable_from_this_seed (toJSON (owned by goal 71),fromJSON (owned by goal 71))
+
+  STAGE 2 IS NOT AUTHORISED. No lane has both a chain to govern and outcome variance to
+  measure, so the policy question stays unanswerable on this goal set and the honest move
+  is to build a substrate rather than spend another window on one that cannot answer it.

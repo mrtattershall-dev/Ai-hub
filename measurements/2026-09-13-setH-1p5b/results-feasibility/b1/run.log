@@ -1,0 +1,36 @@
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:1.5b   goals [64,74]   seeds [11,12,13,14,15,16,17,18]   conditions [R,B]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/b1-run
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+--- B  goal 64 ---
+  [B g64 s11] sites 1/7          loads=null  old=null  delta=null  site 2 does not load: load_error ["SyntaxError: 'return' outside funct
+  [B g64 s12] sites 1/7          loads=null  old=null  delta=null  site 2: anchor_ambiguous (2 occurrences)
+  [B g64 s13] sites 2/7          loads=null  old=null  delta=null  site 3 does not load: load_error ["IndentationError: unindent does not
+  [B g64 s14] sites 1/7          loads=null  old=null  delta=null  site 2 does not load: load_error ["SyntaxError: 'return' outside funct
+  [B g64 s15] sites 1/7          loads=null  old=null  delta=null  site 2 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g64 s16] sites 2/7          loads=null  old=null  delta=null  site 3 does not load: load_error ["IndentationError: expected an inden
+  [B g64 s17] sites 1/7          loads=null  old=null  delta=null  site 2 does not load: load_error ["SyntaxError: unterminated string li
+  [B g64 s18] sites 2/7          loads=null  old=null  delta=null  site 3 does not load: load_error ["SyntaxError: unterminated string li
+
+--- B  goal 74 ---
+  [B g74 s11] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+  [B g74 s12] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g74 s13] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: expected an inden
+  [B g74 s14] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: '(' was never closed (
+  [B g74 s15] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g74 s16] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g74 s17] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g74 s18] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: 'return' outside funct
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  B_oracle_localized_insertion   loads 0/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  B_oracle_localized_insertion   loads 1/8   OLD KEPT 1/8   NEW DELTA 0/8   VERIFIED 0/8
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 16/16
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/b1-run
