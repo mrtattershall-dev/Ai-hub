@@ -79,6 +79,26 @@ say(!prose.ok && prose.reason === 'NO_FILE_MARKERS', `a reply in no recognisable
 const fenced = parseApp('Here you go:' + NL + '```' + NL + changed + NL + '```', paths, before);
 say(fenced.ok, 'but a correct reply wrapped in a markdown fence is still accepted - shape is not the test');
 
+// == 3b. running out of room is a CAPACITY outcome, not a coding failure ========================
+console.log('\n3b. the output cap - a cost outcome of the whole-app method, not a mistake');
+const truncated = changed.split(`${FILE_MARK}style.css ===`)[0];  // stops mid-manifest, no END marker
+const cap1 = parseApp(truncated, paths, before, { doneReason: 'length' });
+say(!cap1.ok && cap1.reason === 'OUTPUT_CAP_EXHAUSTED', `a reply cut off by the backend is ${cap1.reason}, not MISSING_PATHS`);
+say(cap1.capped === true && cap1.signals.length === 2, `with BOTH signals recorded (${cap1.signals && cap1.signals.join(' + ')})`);
+say(cap1.reproduced === 3 && cap1.ofManifest === 4, `and how far it got, which is the number the benchmark needs (${cap1.reproduced}/${cap1.ofManifest})`);
+
+const cap2 = parseApp(truncated, paths, before, {});
+say(!cap2.ok && cap2.reason === 'OUTPUT_CAP_EXHAUSTED', 'the structural signal alone is enough - a manifest begun and never closed');
+say(cap2.signals.length === 1 && /END marker/.test(cap2.signals[0]), `naming only the signal it actually has (${cap2.signals[0]})`);
+
+const deliberate = omitted;  // ends with END_MARK, so it CHOSE to stop
+const notCapped = parseApp(deliberate, paths, before, { doneReason: 'stop' });
+say(!notCapped.ok && notCapped.reason === 'MISSING_PATHS', 'a reply that closed its manifest and still omitted a file is MISSING_PATHS, not a cap');
+say(!notCapped.capped, 'the two are never conflated: one is capacity, the other is a mistake');
+
+const capNoMarkers = parseApp('I will start with the first file', paths, before, { doneReason: 'length' });
+say(capNoMarkers.reason === 'OUTPUT_CAP_EXHAUSTED', 'running out before even one marker is still a cap, not an unrecognisable shape');
+
 // ══ 4. round trip ═══════════════════════════════════════════════════════════════════════════════
 console.log('\n4. a parsed application can be written back and re-read');
 const ws = mkdtempSync(join(tmpdir(), 'wsf-out-'));

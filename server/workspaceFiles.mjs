@@ -74,20 +74,32 @@ export function manifestText(dir, paths) {
  * Returns { ok: true, files } only when the reply carries exactly the governed paths - no more, no
  * fewer, none twice. Every other case is a named refusal, because each is a different failure:
  *
+ *   OUTPUT_CAP_EXHAUSTED the reply stopped mid-reproduction because it ran out of tokens. This is a
+ *                       COST AND CAPACITY OUTCOME OF THE WHOLE-APP METHOD, not a coding failure:
+ *                       the model was not wrong, it was not given room to say the answer. Counting
+ *                       it as a generic failure would hide the exact effect this benchmark exists
+ *                       to measure - that reproduction cost grows with the application.
  *   NO_FILE_MARKERS     the reply is not in the required shape at all
  *   MISSING_PATHS       it dropped part of the application
  *   EXTRA_PATHS         it invented files the application does not have
  *   DUPLICATE_PATHS     it emitted the same path twice, so which one is the app is undefined
  *   ECHOED_THE_INPUT    every file came back byte-identical to what was sent
  */
-export function parseApp(reply, manifest, before) {
+export function parseApp(reply, manifest, before, meta = {}) {
   let text = String(reply || '');
   const fence = text.match(/```(?:[a-z]*)\s*([\s\S]*?)```/i);
   if (fence && fence[1].includes(FILE_MARK)) text = fence[1];
+  // TWO INDEPENDENT SIGNALS for a cap, because either alone can be wrong: the backend's own
+  // done_reason, and the structural fact that the reply began the manifest and never finished it.
+  const cappedByBackend = meta.doneReason === 'length';
   const idx = text.indexOf(FILE_MARK);
-  if (idx === -1) return { ok: false, reason: 'NO_FILE_MARKERS', detail: `the reply carries no "${FILE_MARK}" marker, so no file can be identified` };
+  if (idx === -1) {
+    if (cappedByBackend) return { ok: false, reason: 'OUTPUT_CAP_EXHAUSTED', detail: 'the reply hit the output cap before emitting a single file marker', capped: true, signals: ['done_reason=length'] };
+    return { ok: false, reason: 'NO_FILE_MARKERS', detail: `the reply carries no "${FILE_MARK}" marker, so no file can be identified` };
+  }
   text = text.slice(idx);
 
+  const finished = text.includes(END_MARK);
   const files = new Map();
   const dupes = [];
   const re = new RegExp(`^${FILE_MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(.+?) ===\\s*$`, 'gm');
@@ -105,7 +117,22 @@ export function parseApp(reply, manifest, before) {
   const want = [...manifest].sort();
   const missing = want.filter((p) => !files.has(p));
   const extra = got.filter((p) => !want.includes(p));
-  if (missing.length) return { ok: false, reason: 'MISSING_PATHS', detail: `the reply omits ${missing.join(', ')}; an omitted file is NOT inherited from the old workspace` };
+  if (missing.length) {
+    // A CAP IS NOT A MISTAKE. If the reply ran out of room, the missing files are a capacity
+    // outcome of reproducing the whole application and are reported as one - with the signals that
+    // establish it, so the classification can be checked rather than trusted.
+    const signals = [];
+    if (cappedByBackend) signals.push('done_reason=length');
+    if (!finished) signals.push('no END marker: the reply began the manifest and never closed it');
+    if (signals.length) {
+      return {
+        ok: false, reason: 'OUTPUT_CAP_EXHAUSTED', capped: true, signals,
+        reproduced: got.length, ofManifest: want.length, missing,
+        detail: `the reply reproduced ${got.length} of ${want.length} governed files and stopped: ${signals.join('; ')}`,
+      };
+    }
+    return { ok: false, reason: 'MISSING_PATHS', detail: `the reply omits ${missing.join(', ')}; an omitted file is NOT inherited from the old workspace` };
+  }
   if (extra.length) return { ok: false, reason: 'EXTRA_PATHS', detail: `the reply adds ${extra.join(', ')}, which is not part of the governed application` };
 
   if (before && want.every((p) => (files.get(p) || '').trim() === String(before[p] || '').trim())) {
