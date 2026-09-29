@@ -1,0 +1,2 @@
+GATE EVAL-1 stage1 2026-09-26T03:25:58Z: accrued $0.00; maximum ~$5.4 conservative (9900s watchdog + retries + scaledown) = the authorized cap -> OK
+GATE EVAL-1 stage2 2026-09-26T03:28:19Z: accrued ~$0.05; campaign max ~$5.4 conservative = cap -> OK; seed probe identical=true

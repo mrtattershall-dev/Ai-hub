@@ -1,0 +1,57 @@
+M1-LIVE-1 START 2026-09-26T07:50:54.126Z hub f9ab212
+model: http://127.0.0.1:11434
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+arms (identical seed + guidance in every arm): RECOVERY_ARM = full diagnostic (opening + after every edit) PLUS the recovery controller: verified checkpoint, exact rollback of rejected edits, repeat refusal, attempt/provisional bounds
+seeds: 1   order: arm order for task index ti in replicate r starts at (ti + r - 1) mod 1
+queue: 1 tasks x 1 arms x 1 replicate(s) = 1 units
+limits: 900s/task, 1500s total, no retries
+
+measuring seed baselines (no model involved):
+  baseline farm-v1: 0/8 graded cases pass on the seed
+fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+fatal: ambiguous argument 'HEAD^{tree}': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+  1. [RECOVERY_ARM] farm-v1 ENDED req=- prot=- cases 0->0/8 edits=0 HELD delivered=false msgs=0 caseLines=0 ctl=ACTIVE - restores=0/0
+report written 2026-09-26T08:06:19.421Z: C:\Users\tatte\AppData\Local\Temp\autodiag1-ORpkzL\M1-LIVE-1_REPORT.json
+
+=== M1-LIVE-1 RESULT ===
+elapsed 15m 25s of 25m
+stopped cleanly: YES
+integrity false  reconciliation true
+status {"COMPLETED":1,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":0,"OTHER":0,"UNACCOUNTED":0,"total":1,"planned":1}
+
+LABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.
+
+RECOVERY_ARM  {
+ "runs": 1,
+ "verifiedRepairs": 0,
+ "dispositions": {
+  "HELD": 1
+ },
+ "regressionsProduced": 0,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 0,
+ "runsWithNewlyFailing": 0,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 0,
+ "caseMeasurementErrors": 0,
+ "editsOnTarget": 0,
+ "runsThatEdited": 0,
+ "sawFailingTest": 0,
+ "editAfterFailure": 0,
+ "runsWithDiagnosticDelivered": 0,
+ "diagnosticsDelivered": 1,
+ "diagnosticsSkippedForBudget": 0,
+ "diagnosticsUnavailable": 0
+}
+
+isolation: held in every recorded unit
+
+summary: C:\Users\tatte\AppData\Local\Temp\autodiag1-ORpkzL\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\autodiag1-ORpkzL\M1-LIVE-1_REPORT.json
+M1-LIVE-1 COMPLETE 2026-09-26T08:06:19.426Z
+M1-LIVE-1 EXIT 2026-09-26T08:06:19.431Z code 0
+exit 0

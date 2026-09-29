@@ -1,0 +1,41 @@
+--- seed 1 2026-09-26T09:25:47Z
+farm-i1 qwen2.5-coder:1.5b seed=1  termination=stop natural=yes
+  B1 artifact produced   YES   B2 complete YES   B3 contract clean YES
+  B4 reached execution   YES   B5 diagnostic no    B6 protected YES   B7 accepted no 
+  chars=3830 outTok=876 promptTok=366 firstToken=1190ms gen=62423ms
+  play: OK passing [] failing [1,2,3]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/narrow1/seed1.json
+--- seed 2 2026-09-26T09:26:57Z
+farm-i1 qwen2.5-coder:1.5b seed=2  termination=stop natural=yes
+  B1 artifact produced   YES   B2 complete YES   B3 contract clean YES
+  B4 reached execution   YES   B5 diagnostic no    B6 protected YES   B7 accepted no 
+  chars=3541 outTok=810 promptTok=366 firstToken=156ms gen=55947ms
+  play: OK passing [] failing [1,2,3]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/narrow1/seed2.json
+--- seed 3 2026-09-26T09:27:59Z
+farm-i1 qwen2.5-coder:1.5b seed=3  termination=stop natural=yes
+  B1 artifact produced   YES   B2 complete YES   B3 contract clean YES
+  B4 reached execution   YES   B5 diagnostic no    B6 protected YES   B7 accepted no 
+  chars=3413 outTok=725 promptTok=366 firstToken=134ms gen=49595ms
+  play: OK passing [] failing [1,2,3]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/narrow1/seed3.json
+--- seed 4 2026-09-26T09:28:56Z
+farm-i1 qwen2.5-coder:1.5b seed=4  termination=stop natural=yes
+  B1 artifact produced   YES   B2 complete YES   B3 contract clean YES
+  B4 reached execution   YES   B5 diagnostic no    B6 protected YES   B7 accepted no 
+  chars=3499 outTok=811 promptTok=366 firstToken=220ms gen=58661ms
+  play: OK passing [] failing [1,2,3]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/narrow1/seed4.json
+--- seed 5 2026-09-26T09:30:01Z
+farm-i1 qwen2.5-coder:1.5b seed=5  termination=stop natural=yes
+  B1 artifact produced   YES   B2 complete YES   B3 contract clean YES
+  B4 reached execution   YES   B5 diagnostic no    B6 protected YES   B7 accepted no 
+  chars=3457 outTok=750 promptTok=366 firstToken=179ms gen=51859ms
+  play: OK passing [] failing [1,2,3]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/narrow1/seed5.json
+cell exit 0

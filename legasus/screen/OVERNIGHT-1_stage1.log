@@ -1,0 +1,30 @@
+[2026-09-25T20:01:23Z] STAGE1 start; HEAD 3abcef2
+[2026-09-25T20:01:24Z] deploy
+✓ App deployed in 2.018s! 🎉
+
+View Deployment: https://modal.com/apps/mr-tattershall/main/deployed/legasus-7b
+[2026-09-25T20:01:33Z] deployed; starting the watchdog (deadline 8400s, sentinel C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/overnight1/DONE)
+gpuWatchdog detached pid 23324 app legasus-7b deadline 8400s log C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/overnight1/watchdog.log
+[2026-09-25T20:01:33Z] waiting for https://mr-tattershall--legasus-7b-server-web.modal.run/api/tags
+[2026-09-25T20:03:22Z] model up; seed probe
+{
+  "base": "https://mr-tattershall--legasus-7b-server-web.modal.run",
+  "seed": 101,
+  "allOk": true,
+  "statuses": [
+    200,
+    200,
+    200
+  ],
+  "ms": [
+    3593,
+    3242,
+    3535
+  ],
+  "seededPairIdentical": true,
+  "seededDiffersFromUnseeded": true,
+  "sampleA": "```python\ndef second_largest(lst):\n    if len(lst) < 2:\n        raise ValueError(\"List must contain at least two element",
+  "sampleB": "```python\ndef second_largest(lst):\n    if len(lst) < 2:\n        raise ValueError(\"List must contain at least two element"
+}
+[2026-09-25T20:03:33Z] STAGE1 done. Check the gate, then run stage2 WITHOUT idling 15 min (scaledown).
+stage1 exit 0

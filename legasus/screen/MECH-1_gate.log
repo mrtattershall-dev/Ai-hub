@@ -1,0 +1,2 @@
+GATE stage1 2026-09-25T13:51:42Z: accrued $0.00; unit max ~$7.3 (conservative, 4.7h x $1.55/h); cap $10 -> OK
+GATE stage2 2026-09-25T13:54:05Z: accrued ~$0.05 (GPU live since 13:51:48Z); campaign max ~$7.3 (conservative); total ~$7.4 <= $10 cap -> OK; seed probe identical=true
