@@ -43,6 +43,9 @@ export const EVENT = Object.freeze({
   ACTION_PREPARED: 'ACTION_PREPARED',
   ACTION_COMMITTED: 'ACTION_COMMITTED',
   ACTION_REFUSED: 'ACTION_REFUSED',
+  // The write HAPPENED and the bytes on disk are not the bytes intended. Distinct from COMMITTED,
+  // because it is not verified progress, and distinct from REFUSED, because something did change.
+  ACTION_EFFECTED_UNVERIFIED: 'ACTION_EFFECTED_UNVERIFIED',
   INVALIDATED: 'INVALIDATED',
 });
 
@@ -56,6 +59,11 @@ export const PACKET = Object.freeze({
   EXPIRED: 'PACKET_EXPIRED',
   DEPENDENCY_INVALIDATED: 'PACKET_DEPENDENCY_INVALIDATED',
   NOT_PREPARED: 'PACKET_NOT_PREPARED',
+  // An effect landed unverified on this scope. It is NOT unauthorised - the authority was valid and
+  // the write occurred - it is UNUSABLE AS VERIFIED PROGRESS, so it may not become the base revision
+  // for later work. The scope stays quarantined until a person reconciles or restores it.
+  EFFECT_UNVERIFIED: 'PACKET_EFFECT_UNVERIFIED',
+  SCOPE_UNVERIFIED: 'PACKET_SCOPE_UNVERIFIED',
 });
 
 const hash = (t) => createHash('sha256').update(String(t)).digest('hex');
@@ -65,7 +73,11 @@ export function fileScope(path) { return { kind: 'file', path }; }
 export function workspaceScope() { return { kind: 'workspace', path: '.' }; }
 export const sameScope = (a, b) => a && b && a.kind === b.kind && a.path === b.path;
 
-export function createWorkspace({ root, clock = () => Date.now() }) {
+// `deps` is forwarded verbatim to the executor. It exists ONLY so the read-back check can be
+// exercised from this layer - a quarantine nobody can trigger is a quarantine nobody has tested.
+export function createWorkspace({ root, clock = () => Date.now(), deps = undefined }) {
+  // Scopes whose current bytes are known NOT to be the bytes any authorised write intended.
+  const unverified = new Set();
   const events = [];
   const packets = new Map();
   let seq = 0;
@@ -150,6 +162,17 @@ export function createWorkspace({ root, clock = () => Date.now() }) {
       return { committed: false, reason: PACKET.NOT_PREPARED, event: ev, effected: false };
     }
 
+    // QUARANTINE. Enforced at the effect boundary rather than at prepare(), because proposing
+    // against a damaged scope is harmless - only causing a further effect on it is not.
+    if (unverified.has(p.scope.path)) {
+      const ev = append(EVENT.ACTION_REFUSED, {
+        packetId, scope: p.scope, reason: PACKET.SCOPE_UNVERIFIED,
+        why: `an earlier effect on ${p.scope.path} landed unverified; its current bytes may not be used as`
+          + ' a base revision for further work until that is reconciled or restored',
+      });
+      return { committed: false, reason: PACKET.SCOPE_UNVERIFIED, event: ev, effected: false };
+    }
+
     if (p.expiresAt !== null && clock() > p.expiresAt) {
       const ev = append(EVENT.ACTION_REFUSED, {
         packetId, scope: p.scope, reason: PACKET.EXPIRED,
@@ -174,6 +197,7 @@ export function createWorkspace({ root, clock = () => Date.now() }) {
       action: editAction({ target: p.scope.path, contents: p.contents, evidence: p.evidence || [] }),
       root,
       contract: p.contract,
+      ...(deps ? { deps } : {}),
     });
 
     if (!r.permitted) {
@@ -182,6 +206,22 @@ export function createWorkspace({ root, clock = () => Date.now() }) {
         refusedBy: 'governedEdit', pinnedRevision: r.pinnedRevision, currentRevision: r.currentRevision,
       });
       return { committed: false, reason: r.outcome, why: r.why, event: ev, effected: false, effect: r };
+    }
+
+    // ── THE EFFECT LANDED. Did it land as intended? `governedEdit` now reads the file back, so this
+    // layer can tell a VERIFIED effect from a transformed one instead of assuming the write was
+    // faithful. A mismatch is not unauthorised and cannot be undone by refusing it - the bytes are
+    // already there. What it must never do is COUNT: it may not be published as progress and may not
+    // become the base revision for later work, so the scope is quarantined.
+    if (r.effectVerified === false) {
+      unverified.add(p.scope.path);
+      const ev = append(EVENT.ACTION_EFFECTED_UNVERIFIED, {
+        packetId, scope: p.scope, baseRevision: p.baseRevision, resolvedTarget: r.resolvedTarget,
+        intendedRevision: r.intendedRevision, revisionAfter: r.revisionAfter, why: r.effectMismatch,
+        note: 'the write was authorised and it occurred; the bytes on disk are not the bytes intended,'
+          + ' so this is not verified progress and this scope is quarantined until reconciled or restored',
+      });
+      return { committed: false, reason: PACKET.EFFECT_UNVERIFIED, why: r.effectMismatch, event: ev, effected: true, effect: r };
     }
 
     const ev = append(EVENT.ACTION_COMMITTED, {
