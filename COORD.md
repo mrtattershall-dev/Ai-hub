@@ -11378,3 +11378,24 @@ Claimed by: Claude (ancestry slice). Files:
   legasus/runtime/governedWorkspace/ANCESTRY-1_PREREG.md (new)
 Do not edit these until this claim is removed.
 Claim released 2026-09-29 (ancestry slice landed).
+
+---
+## CLAIM 2026-09-29 — consolidation/connect-components — NOT TAKEN, BLOCKED
+Requested by: Claude (phase1 session, governed-runner work). File I need:
+  server/agent.js   (to call setRunAuthority on the PRODUCTION run path)
+
+NOT CLAIMING IT, because it currently holds ~70 lines of UNCOMMITTED work from another session
+adding runWorkspace / runAncestry / runValidator beside runAuthority - the same region. I can edit
+the working tree without losing that, but I cannot COMMIT: staging server/agent.js would sweep
+their unfinished work into my commit.
+
+WHAT I NEED, and it is one line at the point a run begins:
+    setRunAuthority(<owner-issued grant scoped to the goal's target and its observed revision>)
+plus AGENT_GOVERNED_WRITES=1 for that run.
+
+Until then the eight governed write sites in agent.js are unreachable on the ordinary path: the flag
+is set nowhere in the repository and setRunAuthority is called only by classA-governed-child.mjs and
+chain-child.mjs, both harnesses.
+
+Meanwhile I am running a READ-ONLY probe against the real exports to establish what actually happens
+when governance is switched on - new file under legasus/probe/, nothing in server/ touched.
