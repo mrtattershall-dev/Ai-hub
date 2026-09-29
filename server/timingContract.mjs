@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════════════════════════════════════
-// timingContract.mjs — TIMING-1 v1.0.0. FROZEN BEFORE ANY NUMBER IS COLLECTED.
+// timingContract.mjs — TIMING-1. FROZEN BEFORE ANY NUMBER IS COLLECTED. Current version: 1.1.0.
 //
 // The order matters and is the whole reason this file exists separately: the schema is fixed FIRST, a
 // baseline is collected SECOND, and treatment behaviour is added THIRD. A contract written after the
@@ -31,7 +31,21 @@
 // ══════════════════════════════════════════════════════════════════════════════════════════════════
 
 export const TIMING_CONTRACT = 'TIMING-1';
-export const TIMING_VERSION = '1.0.0';
+
+// ══ VERSIONING, AND WHY A RECORD IS VALIDATED AGAINST THE VERSION IT DECLARES ════════════════════
+// The contract is FROZEN, not immutable. v1.1.0 adds `authority` because the governed arm must record
+// WHICH authority stack it bound to - an experiment that silently binds to whichever mutable checkout
+// happens to sit beside it is the provenance problem this project exists to prevent.
+//
+// A v1.0.0 record MUST STILL VALIDATE, unchanged, forever. Bumping the current version and then
+// rejecting everything written before it is not versioning - it is quietly invalidating history to
+// make the present look consistent. So each version names its own required keys and a record is
+// checked against the version IT declares.
+//
+// `authority` is required in BOTH arms at v1.1.0. The direct arm records `null`, which is a stated
+// fact about that arm rather than a missing column - a field present in one arm and absent in the
+// other is exactly what the unknown-key refusal exists to catch.
+export const TIMING_VERSION = '1.1.0';
 
 /** Arms. `direct` is the control. `governed` adds only the prepare/lease/effect/receipt path. */
 export const ARMS = Object.freeze(['direct', 'governed']);
@@ -53,12 +67,17 @@ const NUMERIC_COUNTS = Object.freeze([
 ]);
 
 /** Every key a TIMING-1 record must carry. Missing or unknown keys are both refused. */
-export const REQUIRED = Object.freeze([
+const REQUIRED_1_0_0 = Object.freeze([
   'contract', 'version', 'arm', 'runId', 'at',
   'task', 'page', 'baselineSha', 'model',
   'decodingProfile', 'decoding', 'decodingOverridesRefused',
   'clocks', 'counts', 'terminal', 'outcome', 'candidateSha', 'notes',
 ]);
+const REQUIRED_1_1_0 = Object.freeze([...REQUIRED_1_0_0, 'authority']);
+
+export const REQUIRED_BY_VERSION = Object.freeze({ '1.0.0': REQUIRED_1_0_0, '1.1.0': REQUIRED_1_1_0 });
+/** The current version's keys, for callers building a new record. */
+export const REQUIRED = REQUIRED_1_1_0;
 
 /**
  * Validate a record against the frozen contract. Refusing UNKNOWN keys matters as much as refusing
@@ -69,12 +88,16 @@ export function validateTimingRecord(rec) {
   const problems = [];
   if (!rec || typeof rec !== 'object') return { ok: false, problems: ['not an object'] };
   if (rec.contract !== TIMING_CONTRACT) problems.push(`contract is ${rec.contract}, not ${TIMING_CONTRACT}`);
-  if (rec.version !== TIMING_VERSION) problems.push(`version is ${rec.version}, not ${TIMING_VERSION}`);
+  const required = REQUIRED_BY_VERSION[rec.version];
+  if (!required) {
+    return { ok: false, problems: [`version ${JSON.stringify(rec.version)} is not a declared TIMING-1 version`
+      + ` (declared: ${Object.keys(REQUIRED_BY_VERSION).join(', ')})`] };
+  }
   if (!ARMS.includes(rec.arm)) problems.push(`arm ${JSON.stringify(rec.arm)} is not one of ${ARMS.join('/')}`);
   if (!TERMINAL.includes(rec.terminal)) problems.push(`terminal ${JSON.stringify(rec.terminal)} is not declared`);
 
-  for (const k of REQUIRED) if (!(k in rec)) problems.push(`missing required key ${k}`);
-  for (const k of Object.keys(rec)) if (!REQUIRED.includes(k)) problems.push(`UNKNOWN key ${k} - a column present in one arm and not the other makes the comparison incomparable`);
+  for (const k of required) if (!(k in rec)) problems.push(`missing required key ${k} (v${rec.version})`);
+  for (const k of Object.keys(rec)) if (!required.includes(k)) problems.push(`UNKNOWN key ${k} at v${rec.version} - a column present in one arm and not the other makes the comparison incomparable`);
 
   const clocks = rec.clocks || {};
   for (const k of NUMERIC_CLOCKS) {
@@ -99,10 +122,12 @@ export function validateTimingRecord(rec) {
 }
 
 /** The empty shape, so a runner cannot invent columns by forgetting them. */
-export function blankRecord({ arm, runId, at, task, page, baselineSha, model, decodingProfile, decoding, decodingOverridesRefused }) {
+export function blankRecord({ arm, runId, at, task, page, baselineSha, model, decodingProfile, decoding, decodingOverridesRefused, authority = null }) {
   return {
     contract: TIMING_CONTRACT, version: TIMING_VERSION, arm, runId, at,
     task, page, baselineSha, model, decodingProfile, decoding, decodingOverridesRefused,
+    // null in the direct arm: a STATED fact about that arm, not an absent column.
+    authority,
     clocks: Object.fromEntries(NUMERIC_CLOCKS.map((k) => [k, null])),
     counts: Object.fromEntries(NUMERIC_COUNTS.map((k) => [k, null])),
     terminal: 'NOT_EVALUATED', outcome: null, candidateSha: null, notes: [],

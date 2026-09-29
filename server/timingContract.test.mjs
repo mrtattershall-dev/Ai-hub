@@ -7,7 +7,7 @@
  * failure it guards against is not a missing field - that is loud - but an EXTRA one that appears in
  * only one arm, which is silent and is how a scorer once printed COMPARABLE over runs that were not.
  */
-import { validateTimingRecord, blankRecord, TIMING_CONTRACT, TIMING_VERSION, ARMS, TERMINAL } from './timingContract.mjs';
+import { validateTimingRecord, blankRecord, TIMING_CONTRACT, TIMING_VERSION, REQUIRED_BY_VERSION, ARMS, TERMINAL } from './timingContract.mjs';
 
 let passed = 0, failed = 0;
 const say = (ok, m) => { console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${m}`); ok ? passed++ : failed++; };
@@ -18,17 +18,22 @@ const good = () => {
     baselineSha: 'abc', model: 'qwen2.5-coder:1.5b', decodingProfile: 'localized-v1',
     decoding: { temperature: 0.2, num_predict: 400, seed: 1 }, decodingOverridesRefused: [],
   });
+  r.authority = null;
   r.clocks = { generationMs: 100, verificationMs: 900, endToEndMs: 1200, derivationMs: 300, containmentMs: 2, effectMs: 1, restorationMs: null };
   r.counts = { calls: 1, promptTokens: 300, outputTokens: 120, acceptedChanges: 1, nodesCovered: 7, nodesMissing: 0 };
   r.terminal = 'RETAINED'; r.outcome = 'ACCEPTED'; r.candidateSha = 'def';
   return r;
 };
 
+/** A record as it was written before `authority` existed. It must validate forever, unchanged. */
+const asV1_0_0 = () => { const r = good(); r.version = '1.0.0'; delete r.authority; return r; };
+
 console.log('\npositive control - a well-formed record validates');
 {
   const v = validateTimingRecord(good());
   say(v.ok, `a complete record passes${v.ok ? '' : ': ' + v.problems.join('; ')}`);
-  say(TIMING_CONTRACT === 'TIMING-1' && TIMING_VERSION === '1.0.0', `the contract names itself (${TIMING_CONTRACT} v${TIMING_VERSION})`);
+  say(TIMING_CONTRACT === 'TIMING-1' && !!REQUIRED_BY_VERSION[TIMING_VERSION],
+    `the contract names itself and its current version is declared (${TIMING_CONTRACT} v${TIMING_VERSION})`);
 }
 
 console.log('\nmissing things are refused');
@@ -81,7 +86,27 @@ console.log('\nthe blank shape carries every column, so none can be invented by 
   say(Object.values(b.clocks).every((x) => x === null), 'and every clock starts null rather than 0 - unmeasured is not instant');
 }
 
+console.log('\nversioning - history must still replay, or it is not versioning');
+{
+  say(validateTimingRecord(good()).ok, `the current version validates (v${TIMING_VERSION})`);
+
+  const r = validateTimingRecord(asV1_0_0());
+  say(r.ok, `a v1.0.0 record still validates after the bump to v${TIMING_VERSION}`
+    + `${r.ok ? '' : ' -> ' + r.problems.join('; ')}`);
+
+  // Declaring an old version does not license carrying a new version's keys.
+  const mixed = good(); mixed.version = '1.0.0';
+  say(!validateTimingRecord(mixed).ok,
+    'but a v1.0.0 record carrying `authority` is refused - a version is not a suggestion');
+
+  const future = good(); future.version = '9.9.9';
+  say(!validateTimingRecord(future).ok, 'and an undeclared version is refused rather than guessed at');
+
+  say(good().authority === null,
+    'the direct arm records authority: null - a STATED fact about that arm, not an absent column');
+}
+
 console.log(`\n  timing contract: ${passed} passed, ${failed} failed -> ${failed
   ? 'THE CONTRACT DOES NOT CONSTRAIN WHAT IT IS MEANT TO'
-  : 'frozen at v1.0.0, and an incomparable record cannot be published by accident'}`);
+  : `frozen at v${TIMING_VERSION}, history still replays, and an incomparable record cannot be published by accident`}`);
 process.exit(failed ? 1 : 0);
