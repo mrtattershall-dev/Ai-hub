@@ -11368,3 +11368,13 @@ Two deviations from the claim, stated rather than smoothed:
 
 Trunk and this worktree's `server/` untouched; the runner was a patched copy in a session scratchpad,
 `--hub` read-only against trunk. Claim released.
+
+---
+## CLAIM 2026-09-29 05:53 CDT — consolidation/connect-components
+Claimed by: Claude (ancestry slice). Files:
+  legasus/runtime/governedWorkspace/workspace.mjs
+  legasus/runtime/governedWorkspace/ancestry.test.mjs (new)
+  legasus/runtime/governedWorkspace/verifier.test.mjs (new)
+  legasus/runtime/governedWorkspace/ANCESTRY-1_PREREG.md (new)
+Do not edit these until this claim is removed.
+Claim released 2026-09-29 (ancestry slice landed).
