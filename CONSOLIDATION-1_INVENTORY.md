@@ -235,3 +235,74 @@ descendants and attenuation.
 
 For TEST-0, find the **smallest owner-originated scope representation already justified by existing
 work**. No generalized scope-discovery architecture unless TEST-0 actually requires one.
+
+---
+
+# Pass 2b — the mechanism map, and the rule that decides everything
+
+Reachability root: `server/index.js:9` → `:472` `app.use('/api/agent', agentRouter(...))`. Ordinary
+launch is `start-hub.bat` → `npm start`. **No env var is set anywhere on that path.**
+
+## Finding 13 — five mechanisms are live product. Five are not, and three more are flag-dead.
+
+**LIVE PRODUCT** — non-test caller, reachable from `index.js`, no flag:
+
+| mechanism | canonical | production consumer |
+|---|---|---|
+| controller / run loop | `agent.js:3949 drive()` | `index.js:472` → `agent.js:6054` `/api/agent/start`; client `AgentPage.jsx:348` |
+| executable verification | `verifyProject.js:200 verify()` | `agent.js:4535` finish gate inside `drive()` |
+| preservation / restore | `agent.js:4821` destructive-write refusal + `:5275` syntax rollback | `drive()`, **unconditional** |
+| receipts | `agent.js:3053 persist()`, `:3070` transcript, `:3546` run-index, `:3651` traces | `drive()` finally, from `/start` |
+| persistence / restart | `agent.js:3079 loadRuns()`, `queue.js` `withLock` | runs at router construction |
+
+**TEST-ONLY — green suites, no product at all:** governed writes; the authority calculus
+(`delegate` has no caller outside two `*-child*` files and a `*probe*`; `observe`/`derive` have **no
+server caller whatsoever**); ancestry/staleness (entirely inside `if (runWorkspace)`, set only by
+`chain-child.mjs`); promotion receipts; **LegaScreen — zero importers under `server/` or `client/`.**
+
+**FLAG-DEAD on a user-started hub**, verified by hand:
+- a **governed run returns 409 BLOCKED**: `governance.js:84` refuses without `qualifiedPath`, i.e.
+  `AGENT_WORKER_EXEC=1 && AGENT_BOUND_ROUTES=1`, set only in `bench1.mjs`, `autodiag1.mjs`,
+  `endurance.mjs`, `qualify.mjs` and tests — never `start-hub.bat`. So `evaluator.js`,
+  `acceptance.js:85 applyAcceptance` and its git restore **never execute** for a real user.
+- `ProtocolController` needs `AGENT_PROTOCOL`; the whole `d2.js` preservation/quarantine apparatus
+  needs `AGENT_D2_TARGETS`. Same verdict, same reason.
+
+## Finding 14 — the flags are DECISIONS, not oversights
+
+This must not be read as sloppiness. `STEP5_AUTHORITY_CONTINUITY_PREREG.md:160` records it outright:
+*"It does not authorize enabling the flag anywhere."* Activation was withheld until the
+authority-continuity work licensed it. **That is good discipline.** The error is only in how the
+resulting state got described afterwards — including by me, in my own memory, which called the Phase-1
+host-event integration DONE when `emitHostEvent` returns on line 1 with zero sinks and discards its
+argument on every ordinary launch. `agent.js:45` says so in a comment I had not read.
+
+## Finding 15 — composition status is UNESTABLISHED, and component evidence does not transfer
+
+Recorded as a standing rule for the candidate, at tatte's instruction:
+
+> **Do not inherit component evidence as evidence of system composition.**
+
+Preserve every component result. The assembled candidate nonetheless begins at
+**composition: UNESTABLISHED**. Many `Cᵢ` have evidence; the conjunction `C₁ ∧ C₂ ∧ … ∧ Cₙ` has none,
+and composition is precisely where this project has repeatedly found new failure classes — information
+lost between layers, two mechanisms disagreeing about identity, a refusal invisible upstream, a test
+establishing the wrong proposition.
+
+**And the honest correction to the optimistic reading:** it is not "components proven individually,
+conjunction unproven." For five of the ten mechanisms it is *"proven in a harness and never connected
+to the product at all."* Assembling PRODUCT-0 is therefore **not** merely a merge — it requires
+connecting mechanisms to the ordinary path for the first time, which is new integration work with no
+prior evidence, not the recovery of work already done.
+
+## Finding 16 — what TEST-0 actually faces
+
+The path the architecture claims —
+`OBSERVE → ADMIT → DECIDE → AUTHORITY → PLAN → PROPOSE → GOVERN → EFFECT → VERIFY → PRESERVE → RECEIPT
+→ PERSIST → RESTART → CONTINUE` — today has **live implementations only at** OBSERVE(partial), PLAN,
+PROPOSE, EFFECT(ungoverned), VERIFY, PRESERVE, RECEIPT, PERSIST, RESTART. **ADMIT, AUTHORITY and GOVERN
+have no production consumer on any branch.**
+
+The first frozen composition candidate should therefore preregister, per transition: what it claims,
+what evidence must appear if it really occurred, and what counts as a composition failure. A first
+assembly that fails somewhere stupid is the expected and useful outcome.
