@@ -13,16 +13,32 @@
 //   SENSITIVITY   a hand-written CORRECT artifact passes every obligation
 //   SPECIFICITY   for each obligation, one TARGETED mutant fails THAT obligation
 //
-// The second is the one that does the work, and it has a trap worth naming: a mutant that breaks its
-// own check AND several others has not demonstrated specificity - it has demonstrated that the suite
-// notices damage. What is required is that the mutant's own obligation fails. Collateral failures are
-// recorded per mutant so over-broad mutants are visible rather than counted as successes.
+// SPECIFICITY IS NOT "ONLY ONE CHECK FAILED". On a real dependency ladder some obligations support
+// later ones, so breaking an early obligation legitimately breaks what rests on it. An earlier version
+// of this file demanded a single failure and would have rejected perfectly good mutants for doing
+// exactly what the ladder's structure requires. The rule is three-part:
+//
+//   1  the mutant MUST fail its named OWNER check
+//   2  it MUST preserve the declared unrelated SENTINEL checks
+//   3  failures among the owner's DECLARED DEPENDENTS are EXPECTED, and recorded as such
+//
+// A sentinel breach is the real over-broad signal: a mutant that takes out obligations with no
+// declared relationship to its own has shown that the suite notices damage, not that the obligation is
+// independently falsifiable. A mutant that breaks nearly everything trips this by construction.
+//
+// THE DEPENDENCY GRAPH IS DECLARED, NOT INFERRED. Inferring it from which checks happen to fail would
+// make the gate unfalsifiable: every collateral failure could be relabelled a dependency after the
+// fact. Declaring it up front also documents the ladder's structure, which is worth having on its own.
 //
 // A mutant whose obligation still PASSES is an ESCAPE, and the right reading is not "the mutant was too
 // weak" - it is that the check, the mutant, or the expectation is wrong, and which one must be
 // established rather than assumed.
 //
-// MUTANTS FILE: [{ obligation: <step n>, name, file, find, replace }]
+// MUTANTS FILE:
+//   { dependsOn: { "<step>": [steps it rests on] },
+//     mutants: [{ obligation, name, file, find, replace }] }
+// or a bare array, in which case no dependencies are declared and the gate reports every non-owner
+// failure as an UNDECLARED sentinel breach - deliberately strict, so an undeclared ladder cannot pass.
 // `find` must appear exactly once in `file`, so a mutant is a precise edit and never a broad rewrite.
 // ══════════════════════════════════════════════════════════════════════════════════════════════════
 import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
@@ -41,7 +57,28 @@ const { playCheck } = await import('./playCheck.js');
 const { governedFiles, copyApp } = await import('./workspaceFiles.mjs');
 
 const spec = JSON.parse(readFileSync(join(DIR, SPEC), 'utf8'));
-const mutants = JSON.parse(readFileSync(MUTANTS, 'utf8'));
+const mutantFile = JSON.parse(readFileSync(MUTANTS, 'utf8'));
+const mutants = Array.isArray(mutantFile) ? mutantFile : (mutantFile.mutants || []);
+const dependsOn = Array.isArray(mutantFile) ? null : (mutantFile.dependsOn || {});
+
+/**
+ * Everything that rests on `owner`, transitively. `dependsOn` maps a step to the steps it needs, so
+ * the dependents are found by inversion: if 8 depends on 7, breaking 7 is expected to break 8.
+ */
+function dependentsOf(owner) {
+  if (!dependsOn) return null;
+  const out = new Set();
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const [stepText, needs] of Object.entries(dependsOn)) {
+      const step = Number(stepText);
+      if (out.has(step)) continue;
+      if ((needs || []).some((n) => n === owner || out.has(n))) { out.add(step); grew = true; }
+    }
+  }
+  return out;
+}
 const paths = governedFiles(DIR);
 
 /** Run the whole spec against a workspace built from the app, with one optional mutation applied. */
@@ -85,32 +122,43 @@ for (const m of mutants) {
   const r = await run(m);
   if (r.error) { rows.push({ ...m, verdict: 'MUTANT_INVALID', detail: r.error }); continue; }
   const ownFailed = r.failing.includes(m.obligation);
-  const collateral = r.failing.filter((n) => n !== m.obligation);
+  const deps = dependentsOf(m.obligation);
+  const expected = deps ? [...deps] : [];
+  const sentinels = all.filter((n) => n !== m.obligation && !expected.includes(n));
+  const brokenSentinels = r.failing.filter((n) => sentinels.includes(n));
+  const brokenDependents = r.failing.filter((n) => expected.includes(n));
   rows.push({
     obligation: m.obligation, name: m.name,
-    verdict: ownFailed ? 'CAUGHT' : 'ESCAPED',
-    collateral,
+    verdict: !ownFailed ? 'ESCAPED' : (brokenSentinels.length ? 'OVER_BROAD' : 'CAUGHT'),
+    brokenSentinels, brokenDependents, sentinelCount: sentinels.length, declared: !!deps,
   });
 }
 for (const r of rows) {
-  const tag = r.verdict === 'CAUGHT' ? 'CAUGHT ' : r.verdict === 'ESCAPED' ? 'ESCAPED' : 'INVALID';
-  const extra = r.verdict === 'MUTANT_INVALID' ? `  ${r.detail}`
-    : r.collateral.length ? `  (also failed ${r.collateral.join(',')} - over-broad, recorded not credited)` : '  (only its own check)';
-  console.log(`  ${tag}  obligation ${String(r.obligation).padStart(3)}  ${String(r.name).slice(0, 44).padEnd(46)}${extra}`);
+  const tag = { CAUGHT: 'CAUGHT ', ESCAPED: 'ESCAPED', OVER_BROAD: 'BROAD  ', MUTANT_INVALID: 'INVALID' }[r.verdict];
+  let extra;
+  if (r.verdict === 'MUTANT_INVALID') extra = `  ${r.detail}`;
+  else if (r.brokenSentinels.length) extra = `  SENTINELS BROKEN: ${r.brokenSentinels.join(',')} - no declared relationship to this obligation`;
+  else if (r.brokenDependents.length) extra = `  + dependents ${r.brokenDependents.join(',')} (expected: they rest on it)`;
+  else extra = `  (owner only; ${r.sentinelCount} sentinels intact)`;
+  console.log(`  ${tag}  obligation ${String(r.obligation).padStart(3)}  ${String(r.name).slice(0, 40).padEnd(42)}${extra}`);
 }
 
 const caught = rows.filter((r) => r.verdict === 'CAUGHT').length;
 const escaped = rows.filter((r) => r.verdict === 'ESCAPED');
+const broad = rows.filter((r) => r.verdict === 'OVER_BROAD');
 const invalid = rows.filter((r) => r.verdict === 'MUTANT_INVALID');
-const precise = rows.filter((r) => r.verdict === 'CAUGHT' && r.collateral.length === 0).length;
+const ownerOnly = rows.filter((r) => r.verdict === 'CAUGHT' && r.brokenDependents.length === 0).length;
+const undeclared = rows.some((r) => r.declared === false);
 const covered = new Set(rows.filter((r) => r.verdict === 'CAUGHT').map((r) => r.obligation));
 const uncovered = all.filter((n) => !covered.has(n));
 
-console.log(`${NL}  caught ${caught} of ${mutants.length}, of which ${precise} failed ONLY their own check`);
+console.log(`${NL}  caught ${caught} of ${mutants.length} with every sentinel intact; ${ownerOnly} touched nothing but their owner`);
+if (broad.length) console.log(`  OVER-BROAD: obligations ${broad.map((r) => r.obligation).join(', ')} - broke checks with NO declared relationship to them`);
+if (undeclared) console.log('  NO DEPENDENCY GRAPH DECLARED: every non-owner failure is treated as a sentinel breach, so an undeclared ladder cannot pass');
 if (invalid.length) console.log(`  ${invalid.length} mutant(s) were INVALID and prove nothing about the obligations they targeted`);
 if (escaped.length) console.log(`  ESCAPED: obligations ${escaped.map((r) => r.obligation).join(', ')} - the check, the mutant, or the expectation is wrong, and which must be established`);
 if (uncovered.length) console.log(`  NO MUTANT EXERCISES: obligations ${uncovered.join(', ')} - unfalsified, and not to be counted as validated`);
 
-const validated = escaped.length === 0 && invalid.length === 0 && uncovered.length === 0;
+const validated = escaped.length === 0 && broad.length === 0 && invalid.length === 0 && uncovered.length === 0;
 console.log(`${NL}${validated ? 'VALIDATED: every obligation is independently falsifiable' : 'NOT VALIDATED: see above'}`);
 process.exit(validated ? 0 : 1);
