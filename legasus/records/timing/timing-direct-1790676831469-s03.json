@@ -1,0 +1,39 @@
+{
+  "contract": "TIMING-1",
+  "version": "1.0.0",
+  "arm": "direct",
+  "runId": "timing-direct-1790676831469",
+  "at": "2026-09-29T10:13:51.473Z",
+  "task": "auto-s03",
+  "page": "s03",
+  "baselineSha": "28c5786d28ae0d55bd1b7f658fb8b02f22f80dbc1a5229c8cc2d22b51ba1f614",
+  "model": "qwen2.5-coder:1.5b",
+  "decodingProfile": "whole-file-v1",
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 3000,
+    "seed": 1
+  },
+  "decodingOverridesRefused": [],
+  "clocks": {
+    "generationMs": 45435,
+    "verificationMs": 12712,
+    "endToEndMs": 64095,
+    "derivationMs": 5918,
+    "containmentMs": 10,
+    "effectMs": 6,
+    "restorationMs": null
+  },
+  "counts": {
+    "calls": 1,
+    "promptTokens": 294,
+    "outputTokens": 448,
+    "acceptedChanges": 1,
+    "nodesCovered": 7,
+    "nodesMissing": 0
+  },
+  "terminal": "RETAINED",
+  "outcome": "ACCEPTED",
+  "candidateSha": "8954e27e87b9815161241540d99474164b17c7bbfdf066c70f251d57ac6afcc4",
+  "notes": []
+}
