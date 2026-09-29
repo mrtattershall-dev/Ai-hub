@@ -1,0 +1,11 @@
+DISCOVER C:\Users\tatte\Projects\ai-coding-hub\server\approvalPolicy.js :: segments  over 97 catalogued witness files
+  NOT_EXECUTED     40171ms  exit=0  fn=0  cases=0  server/apiErrors.test.mjs
+  NOT_EXECUTED     11043ms  exit=0  fn=0  cases=0  server/appendFile.test.mjs
+  NOT_EXECUTED     58116ms  exit=0  fn=0  cases=0  server/appendFragment.test.mjs
+  UNOBSERVABLE    187076ms  exit=null  fn=0  cases=0  server/appendSyntax.test.mjs
+  UNOBSERVABLE    180499ms  exit=null  fn=0  cases=0  server/assertEvidence.test.mjs
+  NOT_EXECUTED     62298ms  exit=0  fn=0  cases=0  server/auth.test.mjs
+  NOT_EXECUTED     10487ms  exit=0  fn=0  cases=0  server/autoStart.test.mjs
+  UNOBSERVABLE    181150ms  exit=null  fn=0  cases=0  server/batchActions.test.mjs
+  UNOBSERVABLE    182118ms  exit=null  fn=0  cases=0  server/budgetAccounting.test.mjs
+  UNOBSERVABLE     27780ms  exit=3221226505  fn=0  cases=0  server/chatTimeout.test.mjs

@@ -1,0 +1,129 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-CJdysfzAUNUzu8aiKtJ8Vu
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\034_homestea
+│   d_game\modal_followup.py
+├── 🔨 Created mount C:\Users\tatte\OneDrive\Documents\ai-native-engine\core
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\034_homestea
+│   d_game
+├── 🔨 Created function dense_jobs.
+└── 🔨 Created function moe_jobs.
+
+[1ALoading checkpoint shards:   0%|          | 0/14 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   7%|▋         | 1/14 [00:03<00:44,  3.39s/it]
+[1ALoading checkpoint shards:  14%|█▍        | 2/14 [00:06<00:42,  3.51s/it]
+[1ALoading checkpoint shards:   0%|          | 0/16 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   6%|▋         | 1/16 [00:03<00:57,  3.81s/it]
+[1ALoading checkpoint shards:  21%|██▏       | 3/14 [00:11<00:44,  4.05s/it]
+[1ALoading checkpoint shards:  12%|█▎        | 2/16 [00:07<00:53,  3.81s/it]
+[1ALoading checkpoint shards:  29%|██▊       | 4/14 [00:17<00:46,  4.61s/it]
+[1ALoading checkpoint shards:  19%|█▉        | 3/16 [00:11<00:50,  3.87s/it]
+[1ALoading checkpoint shards:  36%|███▌      | 5/14 [00:20<00:37,  4.20s/it]
+[1ALoading checkpoint shards:  25%|██▌       | 4/16 [00:15<00:45,  3.81s/it]
+[1ALoading checkpoint shards:  43%|████▎     | 6/14 [00:24<00:31,  3.98s/it]
+[1ALoading checkpoint shards:  31%|███▏      | 5/16 [00:18<00:40,  3.71s/it]
+[1ALoading checkpoint shards:  50%|█████     | 7/14 [00:28<00:28,  4.03s/it]
+[1ALoading checkpoint shards:  38%|███▊      | 6/16 [00:22<00:37,  3.77s/it]
+[1ALoading checkpoint shards:  57%|█████▋    | 8/14 [00:32<00:23,  3.97s/it]
+[1ALoading checkpoint shards:  44%|████▍     | 7/16 [00:26<00:33,  3.77s/it]
+[1ALoading checkpoint shards:  64%|██████▍   | 9/14 [00:35<00:18,  3.79s/it]
+[1ALoading checkpoint shards:  50%|█████     | 8/16 [00:30<00:30,  3.80s/it]
+[1ALoading checkpoint shards:  71%|███████▏  | 10/14 [00:38<00:14,  3.67s/it]
+[1ALoading checkpoint shards:  56%|█████▋    | 9/16 [00:34<00:26,  3.82s/it]
+[1ALoading checkpoint shards:  79%|███████▊  | 11/14 [00:42<00:10,  3.63s/it]
+[1ALoading checkpoint shards:  62%|██████▎   | 10/16 [00:37<00:22,  3.75s/it]
+[1ALoading checkpoint shards:  86%|████████▌ | 12/14 [00:48<00:08,  4.33s/it]
+[1ALoading checkpoint shards:  69%|██████▉   | 11/16 [00:42<00:19,  3.98s/it]
+[1ALoading checkpoint shards:  93%|█████████▎| 13/14 [00:53<00:04,  4.64s/it]
+[1ALoading checkpoint shards:  75%|███████▌  | 12/16 [00:46<00:16,  4.10s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [00:55<00:00,  3.81s/it]Loading checkpoint shards: 100%|██████████| 14/14 [00:55<00:00,  3.97s/it]
+
+[1ALoading checkpoint shards:  81%|████████▏ | 13/16 [00:51<00:13,  4.37s/it]
+[1ALoading checkpoint shards:  88%|████████▊ | 14/16 [00:56<00:08,  4.45s/it]
+[1ALoading checkpoint shards:  94%|█████████▍| 15/16 [01:01<00:04,  4.64s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [01:02<00:00,  3.60s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [01:02<00:00,  3.91s/it]
+
+===== DENSE =====
+
+--- rescue_control (rc=0) ---
+=== TRACK 3 rescue: Qwen/Qwen2.5-Coder-32B-Instruct arm=control fb_mode=full sessions=3 rounds=2 (hard scoped-sum score) ===
+
+  session 1/3 [control]
+      round 1: installed 5/5, WIN (tally 800, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":true})
+  session 2/3 [control]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+  session 3/3 [control]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+
+=== SUMMARY (arm=control) ===
+  wins: 1/3  (rescued-by-retry: 0)  unsafe: 0  sessions-with-collapse: 3
+RESULT_JSON {"model":"Qwen/Qwen2.5-Coder-32B-Instruct","arm":"control","fbMode":"full","sessions":3,"rounds":2,"wins":1,"rescued":0,"unsafe":0,"collapse":3,"perSession":[{"win":true,"rounds":1,"unsafe":0,"collapseSeen":true},{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}},{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}}]}
+
+
+--- rescue_full (rc=0) ---
+=== TRACK 3 rescue: Qwen/Qwen2.5-Coder-32B-Instruct arm=feedback fb_mode=full sessions=3 rounds=2 (hard scoped-sum score) ===
+
+  session 1/3 [feedback]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 5/5, WIN (tally 800, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":true})
+  session 2/3 [feedback]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+  session 3/3 [feedback]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+
+=== SUMMARY (arm=feedback) ===
+  wins: 1/3  (rescued-by-retry: 1)  unsafe: 0  sessions-with-collapse: 3
+RESULT_JSON {"model":"Qwen/Qwen2.5-Coder-32B-Instruct","arm":"feedback","fbMode":"full","sessions":3,"rounds":2,"wins":1,"rescued":1,"unsafe":0,"collapse":3,"perSession":[{"win":true,"rounds":2,"unsafe":0,"collapseSeen":true},{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}},{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}}]}
+
+
+--- rescue_names (rc=0) ---
+=== TRACK 3 rescue: Qwen/Qwen2.5-Coder-32B-Instruct arm=feedback fb_mode=names sessions=3 rounds=2 (hard scoped-sum score) ===
+
+  session 1/3 [feedback]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+  session 2/3 [feedback]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+  session 3/3 [feedback]
+      round 1: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+      round 2: installed 4/5, lose (tally 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+
+=== SUMMARY (arm=feedback) ===
+  wins: 0/3  (rescued-by-retry: 0)  unsafe: 0  sessions-with-collapse: 3
+RESULT_JSON {"model":"Qwen/Qwen2.5-Coder-32B-Instruct","arm":"feedback","fbMode":"names","sessions":3,"rounds":2,"wins":0,"rescued":0,"unsafe":0,"collapse":3,"perSession":[{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}},{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}},{"win":false,"rounds":2,"unsafe":0,"collapseSeen":true,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false}}]}
+
+
+--- ab_dense (rc=0) ---
+=== RD-B8 A/B: Qwen/Qwen2.5-Coder-32B-Instruct authors the scoped-sum score rule, 8 trials/mode ===
+
+  control  installs 6/8 (rate 0.75)  meanAtt 2.3  collapse-seen 0
+  echo     installs 8/8 (rate 1.00)  meanAtt 1.9  collapse-seen 0
+  auto     installs 8/8 (rate 1.00)  meanAtt 1.8  collapse-seen 0
+
+  A/B: auto 1.00 vs echo 1.00 vs control 0.75 -> switch ties vs fixed feedback
+RESULT_JSON {"model":"Qwen/Qwen2.5-Coder-32B-Instruct","trials":8,"modes":{"control":{"ok":6,"rate":"0.75","meanAtt":"2.3","collapse":0},"echo":{"ok":8,"rate":"1.00","meanAtt":"1.9","collapse":0},"auto":{"ok":8,"rate":"1.00","meanAtt":"1.8","collapse":0}}}
+
+
+===== MOE =====
+
+--- ab_moe (rc=0) ---
+=== RD-B8 A/B: Qwen/Qwen3-Coder-30B-A3B-Instruct authors the scoped-sum score rule, 8 trials/mode ===
+
+  control  installs 0/8 (rate 0.00)  meanAtt -  collapse-seen 0
+  echo     installs 2/8 (rate 0.25)  meanAtt 2.0  collapse-seen 0
+  auto     installs 1/8 (rate 0.13)  meanAtt 2.0  collapse-seen 7
+
+  A/B: auto 0.13 vs echo 0.25 vs control 0.00 -> switch hurts vs fixed feedback
+RESULT_JSON {"model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","trials":8,"modes":{"control":{"ok":0,"rate":"0.00","meanAtt":"-","collapse":0},"echo":{"ok":2,"rate":"0.25","meanAtt":"2.0","collapse":0},"auto":{"ok":1,"rate":"0.13","meanAtt":"2.0","collapse":7}}}
+
+✓ App completed. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-CJdysfzAUNUzu8aiKtJ8Vu

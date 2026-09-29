@@ -1,0 +1,136 @@
+[
+  {
+    "name": "S1 homestead",
+    "inputShape": "write-only",
+    "nRules": 5,
+    "nActors": 8,
+    "ticks": 2000,
+    "liveEntities": 8,
+    "popMin": 7,
+    "popMax": 7,
+    "rowsUsed": 704,
+    "capacity": 4096,
+    "tickMs": {
+      "p50": 0.0608,
+      "p90": 0.1674,
+      "p99": 0.508,
+      "max": 1.2452,
+      "mean": 0.08764704999999998
+    },
+    "soloSubmitMs": {
+      "p50": 0.0064,
+      "p90": 0.0106,
+      "p99": 0.0283,
+      "max": 0.4992,
+      "mean": 0.009368599999999996
+    },
+    "committedTx": 15275,
+    "rejectedPlayerTx": 725,
+    "ruleTxRejected": 1332,
+    "ruleTxTotal": 31332,
+    "rejectWhy": {
+      "validate": 1332
+    },
+    "unsafe": 0
+  },
+  {
+    "name": "S2 ref (write-only)",
+    "inputShape": "write-only",
+    "nRules": 10,
+    "nActors": 8,
+    "ticks": 2000,
+    "liveEntities": 1001,
+    "popMin": 1000,
+    "popMax": 1000,
+    "rowsUsed": 1001,
+    "capacity": 16384,
+    "tickMs": {
+      "p50": 9.4635,
+      "p90": 14.1434,
+      "p99": 27.2591,
+      "max": 64.595,
+      "mean": 10.066178749999986
+    },
+    "soloSubmitMs": {
+      "p50": 0.002,
+      "p90": 0.0029,
+      "p99": 0.0075,
+      "max": 0.047,
+      "mean": 0.002422799999999994
+    },
+    "committedTx": 16000,
+    "rejectedPlayerTx": 0,
+    "ruleTxRejected": 0,
+    "ruleTxTotal": 6741233,
+    "rejectWhy": {},
+    "unsafe": 0
+  },
+  {
+    "name": "S2 ref (claim+write)",
+    "inputShape": "claim+write",
+    "nRules": 10,
+    "nActors": 8,
+    "ticks": 2000,
+    "liveEntities": 1001,
+    "popMin": 1000,
+    "popMax": 1000,
+    "rowsUsed": 1001,
+    "capacity": 16384,
+    "tickMs": {
+      "p50": 9.8024,
+      "p90": 14.5846,
+      "p99": 20.3975,
+      "max": 98.0565,
+      "mean": 10.138439449999993
+    },
+    "soloSubmitMs": {
+      "p50": 0.0034,
+      "p90": 0.0039,
+      "p99": 0.0078,
+      "max": 0.0505,
+      "mean": 0.003681800000000005
+    },
+    "committedTx": 15891,
+    "rejectedPlayerTx": 109,
+    "ruleTxRejected": 60626,
+    "ruleTxTotal": 6748736,
+    "rejectWhy": {
+      "claim": 60626
+    },
+    "unsafe": 0
+  },
+  {
+    "name": "S3 stress",
+    "inputShape": "claim+write",
+    "nRules": 20,
+    "nActors": 32,
+    "ticks": 500,
+    "liveEntities": 5001,
+    "popMin": 5000,
+    "popMax": 5000,
+    "rowsUsed": 5001,
+    "capacity": 32768,
+    "tickMs": {
+      "p50": 141.0294,
+      "p90": 203.3079,
+      "p99": 283.3431,
+      "max": 292.6321,
+      "mean": 147.35830579999995
+    },
+    "soloSubmitMs": {
+      "p50": 0.0034,
+      "p90": 0.0039,
+      "p99": 0.0067,
+      "max": 0.0388,
+      "mean": 0.0036138000000000003
+    },
+    "committedTx": 15915,
+    "rejectedPlayerTx": 85,
+    "ruleTxRejected": 61922,
+    "ruleTxTotal": 15432034,
+    "rejectWhy": {
+      "claim": 61922
+    },
+    "unsafe": 0
+  }
+]

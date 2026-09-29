@@ -1,0 +1,14 @@
+deploy start 22:35:55
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\Projects\ai-coding-hub\training-data\factory\modal_serve_vll
+│   m.py
+├── 🔨 Created function Server.*.
+└── 🔨 Created Web Function URL for Server.web => 
+    https://mr-tattershall--coder14b-setg-server-web.modal.run
+✓ App deployed in 3.773s! 🎉
+
+View Deployment: 
+https://modal.com/apps/mr-tattershall/main/deployed/coder14b-setg
+health try 1 22:38:31: 
+health try 2 22:39:23: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}

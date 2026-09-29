@@ -1,0 +1,127 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-OuqKOGhJyg1SV5rPIEdqUN
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\028_behavior
+│   _model_curve\modal_behavior_curve.py
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior
+│   _live
+├── 🔨 Created mount C:\Users\tatte\OneDrive\Documents\ai-native-engine\core
+└── 🔨 Created function run_curve.
+
+[1ALoading checkpoint shards:   0%|          | 0/16 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   6%|▋         | 1/16 [00:02<00:31,  2.07s/it]
+[1ALoading checkpoint shards:  12%|█▎        | 2/16 [00:04<00:29,  2.13s/it]
+[1ALoading checkpoint shards:  19%|█▉        | 3/16 [00:06<00:26,  2.04s/it]
+[1ALoading checkpoint shards:  25%|██▌       | 4/16 [00:08<00:23,  2.00s/it]
+[1ALoading checkpoint shards:  31%|███▏      | 5/16 [00:10<00:21,  1.97s/it]
+[1ALoading checkpoint shards:  38%|███▊      | 6/16 [00:12<00:19,  1.99s/it]
+[1ALoading checkpoint shards:  44%|████▍     | 7/16 [00:14<00:17,  1.99s/it]
+[1ALoading checkpoint shards:  50%|█████     | 8/16 [00:16<00:16,  2.02s/it]
+[1ALoading checkpoint shards:  56%|█████▋    | 9/16 [00:18<00:14,  2.02s/it]
+[1ALoading checkpoint shards:  62%|██████▎   | 10/16 [00:20<00:11,  1.99s/it]
+[1ALoading checkpoint shards:  69%|██████▉   | 11/16 [00:22<00:09,  1.99s/it]
+[1ALoading checkpoint shards:  75%|███████▌  | 12/16 [00:24<00:07,  1.99s/it]
+[1ALoading checkpoint shards:  81%|████████▏ | 13/16 [00:26<00:06,  2.03s/it]
+[1ALoading checkpoint shards:  88%|████████▊ | 14/16 [00:28<00:04,  2.08s/it]
+[1ALoading checkpoint shards:  94%|█████████▍| 15/16 [00:30<00:02,  2.11s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [00:31<00:00,  1.66s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [00:31<00:00,  1.95s/it]
+
+=== Qwen/Qwen3-Coder-30B-A3B-Instruct  (rc=0) ===
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=Qwen/Qwen3-Coder-30B-A3B-Instruct  trials/goal=4  maxAttempts=3  ticks=6  temp=0.7
+    [grow C a1] 15s
+    [grow C a1] 6s
+    [grow C a2] 6s
+    [grow C a3] 6s
+    [grow C a1] 6s
+    [grow C a2] 12s
+    [grow C a1] 12s
+  CONTROL  grow   3/4  meanAtt 1.3
+    [flee C a1] 8s
+    [flee C a1] 5s
+    [flee C a1] 5s
+    [flee C a1] 5s
+  CONTROL  flee   4/4  meanAtt 1.0
+    [score C a1] 13s
+    [score C a2] 13s
+    [score C a3] 13s
+    [score C a1] 6s
+    [score C a2] 7s
+    [score C a3] 7s
+    [score C a1] 6s
+    [score C a2] 6s
+    [score C a3] 7s
+    [score C a1] 6s
+    [score C a2] 11s
+    [score C a3] 11s
+  CONTROL  score  0/4  meanAtt -
+    [wilt C a1] 5s
+    [wilt C a2] 11s
+    [wilt C a1] 11s
+    [wilt C a1] 5s
+    [wilt C a2] 6s
+    [wilt C a3] 5s
+    [wilt C a1] 11s
+  CONTROL  wilt   3/4  meanAtt 1.3
+    [grow F a1] 5s
+    [grow F a2] 5s
+    [grow F a3] 5s
+    [grow F a1] 10s
+    [grow F a1] 5s
+    [grow F a2] 5s
+    [grow F a3] 5s
+    [grow F a1] 10s
+  FEEDBACK grow   2/4  meanAtt 1.0
+    [flee F a1] 4s
+    [flee F a1] 4s
+    [flee F a1] 4s
+    [flee F a1] 4s
+  FEEDBACK flee   4/4  meanAtt 1.0
+    [score F a1] 10s
+    [score F a2] 6s
+    [score F a3] 41s
+    [score F a1] 6s
+    [score F a2] 6s
+    [score F a3] 5s
+    [score F a1] 6s
+    [score F a2] 49s
+    [score F a3] 6s
+    [score F a1] 10s
+    [score F a2] 5s
+    [score F a3] 6s
+  FEEDBACK score  0/4  meanAtt -
+    [wilt F a1] 5s
+    [wilt F a2] 5s
+    [wilt F a3] 5s
+    [wilt F a1] 10s
+    [wilt F a1] 10s
+    [wilt F a1] 5s
+    [wilt F a2] 5s
+    [wilt F a3] 5s
+  FEEDBACK wilt   2/4  meanAtt 1.0
+
+TOTAL: CONTROL 10/16   FEEDBACK 8/16   unsafe events: 0 (must be 0)
+
+--- STDERR (tail) ---
+      [score F a3] REJECTED unknown_field :: {"name":"score","match":{"type":"zone","where":{"id":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a1] REJECTED unknown_field :: {"name":"score_zone","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a2] REJECTED unknown_field,unknown_field :: {"name":"score","match":{"type":"zone","where":{"id":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"growth":{">=":100}}}}}]}
+      [score F a3] REJECTED unknown_field :: {"name":"score","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a1] REJECTED unknown_field :: { "name": "update_zone_score", "match": { "type": "zone", "where": { "field": "id", "cmp": "==", "value": "u0" } }, "effects": [ { "set": "tally", "to": { "count": { "type": "crop", "where": { "field": "growth", "cmp": ">=", "value": 100 } } } } ] }
+      [score F a2] REJECTED unknown_field :: {"name":"score crops","match":{"type":"zone","where":{"id":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a3] REJECTED unknown_field :: {"name":"score crops","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [wilt F a1] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a2] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a3] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}}
+      [wilt F a1] REJECTED malformed_json :: {"name":"wilt","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}},]}
+      [wilt F a2] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a3] REJECTED malformed_json :: {"name":"wilt","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+
+Runner terminated.
+✓ App completed. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-OuqKOGhJyg1SV5rPIEdqUN

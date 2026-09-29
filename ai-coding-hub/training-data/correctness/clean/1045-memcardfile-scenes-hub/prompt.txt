@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/scenes/hub.js: * hub.js — Archive Plaza, the central hub (extends WorldScene).

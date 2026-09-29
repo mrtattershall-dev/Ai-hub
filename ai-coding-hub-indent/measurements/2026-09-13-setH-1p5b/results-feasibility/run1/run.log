@@ -1,0 +1,58 @@
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:1.5b   goals [64,74]   seeds [1,2,3,4,5,6,7,8]   conditions [R,A,B]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/feas-run1
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+--- A  goal 64 ---
+  [A g64 s1 ] 1800tok/length     loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb' wanted '<p>a b</p>' | 'a\n\nb' -> 
+  [A g64 s2 ] 194tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<h1>a</h1>\n<h1>b</h1>' wanted '<p>a b</
+  [A g64 s3 ] 302tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p><p>b</p>' wanted '<p>a b</p>' | 
+  [A g64 s4 ] 188tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>\na\n</p>\nb\n</p>' wanted '<p>a b</p
+  [A g64 s5 ] 120tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p><ul><li>b</li></ul>' wanted '<p>
+  [A g64 s6 ] 81tok/stop         loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<html><body>a\n\n\nb\n</body></html>' wa
+  [A g64 s7 ] 558tok/stop        loads=false old=false delta=false LOAD: load_error ["SyntaxError: cannot use assignment expressions with
+  [A g64 s8 ] 605tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' threw Invalid heading level | 'a\n\nb' threw
+
+--- B  goal 64 ---
+  [B g64 s1 ] sites 0/7          loads=null  old=null  delta=null  empty snippet
+  [B g64 s2 ] sites 0/7          loads=null  old=null  delta=null  empty snippet
+  [B g64 s3 ] sites 0/7          loads=null  old=null  delta=null  empty snippet
+  [B g64 s4 ] sites 3/7          loads=null  old=null  delta=null  site 4 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g64 s5 ] sites 0/7          loads=null  old=null  delta=null  empty snippet
+  [B g64 s6 ] sites 0/7          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g64 s7 ] sites 0/7          loads=null  old=null  delta=null  empty snippet
+  [B g64 s8 ] sites 0/7          loads=null  old=null  delta=null  empty snippet
+
+--- A  goal 74 ---
+  [A g74 s1 ] 503tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>'
+  [A g74 s2 ] 386tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb' wanted '<p>a b</p>' | 'a\n\nb' -> 
+  [A g74 s3 ] 212tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g74 s4 ] 244tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wanted '<p>a b</p>' 
+  [A g74 s5 ] 388tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n\n<p>b</p>' wanted '<p>a b</p>
+  [A g74 s6 ] 195tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<html><body>\na\n\n\n\n\nb\n</body></htm
+  [A g74 s7 ] 163tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb' wanted '<p>a b</p>' | 'a\n\nb' -> 
+  [A g74 s8 ] 159tok/stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a\nb</p>' wanted '<p>a b</p>' | 'a\n\
+
+--- B  goal 74 ---
+  [B g74 s1 ] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g74 s2 ] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+  [B g74 s3 ] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g74 s4 ] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: unindent does not
+  [B g74 s5 ] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: expected an inden
+  [B g74 s6 ] sites 1/3          loads=null  old=null  delta=null  site 2: anchor_ambiguous (3 occurrences)
+  [B g74 s7 ] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: unindent does not
+  [B g74 s8 ] sites 0/3          loads=null  old=null  delta=null  site 1 does not load: load_error ["SyntaxError: unterminated string li
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  A_instruction_only             loads 7/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 64  B_oracle_localized_insertion   loads 0/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  A_instruction_only             loads 8/8   OLD KEPT 0/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  B_oracle_localized_insertion   loads 1/8   OLD KEPT 1/8   NEW DELTA 0/8   VERIFIED 0/8
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 32/32
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/feas-run1

@@ -1,0 +1,1 @@
+[REVIEW - backtranslate] A complete, self-contained single-file HTML5 canvas game (family: ai-game). Source: ai-game-trainer-vol2.html

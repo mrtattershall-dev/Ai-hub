@@ -1,0 +1,39 @@
+body {
+  background-color: #fefef0;
+  font-family: Garamond;
+  padding: 0px;
+  font-size: 14pt;
+  color: #555;
+}
+h1 {
+  font-size: 11pt;
+}
+h2 {
+  font-size: 8pt;
+}
+#framerate {
+ font-size: 10pt;
+}
+#pause_button {
+  background-color: #f8ce90;
+  font-size: 10pt;
+  border-radius: 8px;
+  padding: 0.5em 3em;
+  margin: 0.5em;
+}
+.page {
+  text-align: center;
+  margin: 0 auto;
+  padding: 0.2em;
+}
+.footer {
+  font-size: 8pt;
+  font-family: Courier;
+}
+.footer a {
+  color: #37a;
+  font-weight: bold;
+}
+.footer a:hover {
+  color: #00f;
+}

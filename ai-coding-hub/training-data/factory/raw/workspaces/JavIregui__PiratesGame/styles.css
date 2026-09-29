@@ -1,0 +1,18 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /*background-color: gray;*/
+    background-image: url("assets/fondo.png");
+    text-align: center;
+    background-repeat: repeat;
+}
+
+canvas {
+    background-color: #00c9ff;
+    border: solid 15px rgb(90, 52, 16);
+    margin-top: 20px;
+}

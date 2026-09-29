@@ -1,0 +1,38 @@
+.s9-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+.s9-left, .s9-right {
+    position: absolute;
+    top: 5px;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #999;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.s9-left {
+    left: 5px;
+}
+
+.s9-right {
+    right: 5px;
+}
+
+#s9-todo, #s9-doing, #s9-done {
+    display: inline-block;
+    width: 30%;
+    vertical-align: top;
+    margin: 10px;
+}
+
+#s9-todo h2, #s9-doing h2, #s9-done h2 {
+    margin-top: 0;
+}

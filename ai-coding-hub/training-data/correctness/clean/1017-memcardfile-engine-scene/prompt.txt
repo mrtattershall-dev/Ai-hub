@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/engine/scene.js: * scene.js — scene base class + a stack-based scene manager.

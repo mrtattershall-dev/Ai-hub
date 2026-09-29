@@ -1,0 +1,4 @@
+{
+  "test_s2_logs.py::test_parse_log": true,
+  "test_s2_logs.py::test_bad_lines": true
+}

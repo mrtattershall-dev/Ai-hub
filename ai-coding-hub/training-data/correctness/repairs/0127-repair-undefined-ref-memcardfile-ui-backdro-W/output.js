@@ -1,0 +1,84 @@
+/**
+ * backdrop.js — parallax sky, silhouette layers, and distance fog.
+ *
+ * Draws the GDD's "stylized, foggy, readable" world background entirely from
+ * gradients and procedurally placed shapes (no art assets). Parallax layers
+ * scroll at fractions of the camera speed to fake depth, and a fog gradient
+ * over the far layers sells the sixth-generation "draw distance" look.
+ *
+ * @module ui/backdrop
+ */
+
+import { CONFIG } from "../config.js";
+
+const W = CONFIG.view.width;
+const H = CONFIG.view.height;
+
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {{skyTop:string,skyBottom:string,fog:number,width:number,height:number}} world
+ * @param {{x:number,y:number}} cam camera position
+ * @param {number} seed stable per-level layout seed
+ */
+export function drawBackdrop(ctx, world, cam, seed = 1) {
+  // Sky gradient.
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, world.skyTop ?? "#1a2444");
+  g.addColorStop(1, world.skyBottom ?? "#05060b");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  // Far layer: distant towers (slow parallax).
+  drawSilhouettes(ctx, cam.x * 0.18, 0.18, seed, {
+    count: 16, baseY: H * 0.62, minH: 120, maxH: 300, color: "rgba(40,52,90,0.55)", width: 90,
+  });
+  // Mid layer.
+  drawSilhouettes(ctx, cam.x * 0.4, 0.4, seed * 3, {
+    count: 22, baseY: H * 0.74, minH: 80, maxH: 220, color: "rgba(28,36,66,0.8)", width: 70,
+  });
+
+  // Distance fog band fading the far layers into the sky.
+  const fog = ctx.createLinearGradient(0, H * 0.35, 0, H * 0.85);
+  const a = world.fog ?? 0.25;
+  fog.addColorStop(0, `rgba(120,140,190,${a * 0.5})`);
+  fog.addColorStop(1, "rgba(120,140,190,0)");
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, 0, W, H);
+}
+
+/** Deterministic pseudo-random so layouts are stable frame to frame. */
+function hash(n) {
+  const s = Math.sin(n * 127.1) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+function drawSilhouettes(ctx, offsetX, _factor, seed, opts) {
+  const spacing = opts.width + 30;
+  const start = Math.floor(offsetX / spacing) - 1;
+  for (let i = 0; i < opts.count + 2; i++) {
+    const idx = start + i;
+    const r = hash(idx * 1.7 + seed);
+    const h = opts.minH + r * (opts.maxH - opts.minH);
+    const x = idx * spacing - offsetX;
+    ctx.fillStyle = opts.color;
+    ctx.fillRect(x, opts.baseY - h, opts.width, h);
+    // A couple of lit windows for character.
+    ctx.fillStyle = "rgba(255,216,107,0.10)";
+    const rows = Math.floor(h / 40);
+    for (let w = 0; w < rows; w++) {
+      if (hash(idx * 9.1 + w + seed) > 0.7) {
+        ctx.fillRect(x + 12 + (w % 2) * 30, opts.baseY - h + 14 + w * 36, 14, 14);
+      }
+    }
+  }
+}
+
+/** Foreground vignette/fog applied after the world is drawn. */
+export function drawForegroundFog(ctx, world) {
+  if (!world.fog) return;
+  const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.8);
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, `rgba(10,7,16,${0.3 + world.fog * 0.4})`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}

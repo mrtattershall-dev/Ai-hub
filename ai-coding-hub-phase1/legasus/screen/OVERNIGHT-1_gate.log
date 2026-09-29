@@ -1,0 +1,4 @@
+GATE OVERNIGHT-1 stage1 2026-09-25T20:01:23Z: accrued $0.00 of the overnight's $5; max ~$4.8 conservative (8400s watchdog + retries + scaledown) -> OK; pilot conditions all HELD (3abcef2)
+GATE OVERNIGHT-1 stage2 2026-09-25T20:03:52Z: accrued ~$0.05; campaign max ~$4.8 conservative; cap $5 -> OK; seed probe identical=true
+INTERVENTION 2026-09-25T20:07:23Z: stage2 attempt 1 died with exit 127 after unit 1 (root autodiag1-lmCYpf preserved); relaunching stage2 once; GPU live since 20:01:33Z
+INTERVENTION 2026-09-25T21:06:43Z: Windows resumed from SLEEP at 21:04:51Z (Power-Troubleshooter event 1); the machine slept ~20:46Z-21:04Z mid-campaign, unit 30 (AUTODIAG pascal) overran 909s while asleep, GPU billed idle ~19 min. Starting an application-level keep-awake (SetThreadExecutionState ES_SYSTEM_REQUIRED, no power-setting change) until 22:25Z, the watchdog horizon.

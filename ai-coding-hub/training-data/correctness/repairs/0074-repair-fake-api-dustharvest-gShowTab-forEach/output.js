@@ -1,0 +1,7 @@
+function gShowTab(id) {
+  document.querySelectorAll('.gsec').forEach(s => s.classList.remove('ga'));
+  document.querySelectorAll('.gtab').forEach(t => t.classList.remove('ga'));
+  document.getElementById('gsec-' + id).classList.add('ga');
+  document.getElementById('gtab-' + id).classList.add('ga');
+  document.getElementById('guideBody').scrollTop = 0;
+}

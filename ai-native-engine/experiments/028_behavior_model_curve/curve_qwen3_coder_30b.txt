@@ -1,0 +1,46 @@
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=Qwen/Qwen3-Coder-30B-A3B-Instruct  trials/goal=2  maxAttempts=3  ticks=6  temp=0.7
+    [grow C attempt 1] 11s
+    [grow C attempt 2] 16s
+    [grow C attempt 1] 8s
+    [grow C attempt 2] 17s
+  CONTROL  grow   2/2  meanAtt 2.0
+    [flee C attempt 1] 7s
+    [flee C attempt 1] 7s
+  CONTROL  flee   2/2  meanAtt 1.0
+    [score C attempt 1] 9s
+    [score C attempt 2] 17s
+    [score C attempt 3] 17s
+    [score C attempt 1] 17s
+    [score C attempt 2] 9s
+    [score C attempt 3] 18s
+  CONTROL  score  0/2  meanAtt -
+    [wilt C attempt 1] 9s
+    [wilt C attempt 2] 17s
+    [wilt C attempt 1] 17s
+  CONTROL  wilt   2/2  meanAtt 1.5
+    [grow F attempt 1] 8s
+    [grow F attempt 2] 8s
+    [grow F attempt 3] 8s
+    [grow F attempt 1] 9s
+    [grow F attempt 2] 9s
+    [grow F attempt 3] 8s
+  FEEDBACK grow   0/2  meanAtt -
+    [flee F attempt 1] 7s
+    [flee F attempt 1] 12s
+  FEEDBACK flee   2/2  meanAtt 1.0
+    [score F attempt 1] 9s
+    [score F attempt 2] 9s
+    [score F attempt 3] 9s
+    [score F attempt 1] 9s
+    [score F attempt 2] 9s
+    [score F attempt 3] 9s
+  FEEDBACK score  0/2  meanAtt -
+    [wilt F attempt 1] 8s
+    [wilt F attempt 2] 8s
+    [wilt F attempt 3] 8s
+    [wilt F attempt 1] 16s
+  FEEDBACK wilt   1/2  meanAtt 1.0
+
+TOTAL: CONTROL 6/8   FEEDBACK 3/8   unsafe events: 0 (must be 0)

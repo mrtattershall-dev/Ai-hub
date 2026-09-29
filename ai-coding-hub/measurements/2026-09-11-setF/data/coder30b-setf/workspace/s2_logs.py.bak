@@ -1,0 +1,310 @@
+import re
+from collections import Counter
+from urllib.parse import urlparse
+
+def parse_line(line):
+    # Apache access log format: ip - - [time] "request" status bytes time
+    # Example: 127.0.0.1 - - [10/Oct/2023:13:55:36 +0000] "GET /index.html HTTP/1.1" 200 2326 0.045
+    
+    pattern = r'^(\S+) \S+ \S+ \[([^\]]+)\] "(\S+ \S+ \S+)" (\d+) (\d+|-) (\d+\.\d+)$'
+    match = re.match(pattern, line.strip())
+    
+    if not match:
+        raise ValueError("Line does not match expected format")
+    
+    ip, time, request, status, bytes_str, seconds = match.groups()
+    
+    # Parse request into method and path
+    method, path, _ = request.split(' ')
+    
+    # Convert status to int
+    status = int(status)
+    
+    # Convert bytes to int, handling "-" case
+    if bytes_str == "-":
+        bytes_val = 0
+    else:
+        bytes_val = int(bytes_str)
+    
+    # Convert seconds to float
+    seconds = float(seconds)
+    
+    return {
+        'ip': ip,
+        'time': time,
+        'method': method,
+        'path': path,
+        'status': status,
+        'bytes': bytes_val,
+        'seconds': seconds
+    }
+if __name__ == "__main__":
+    # Test with the example line
+    test_line = '127.0.0.1 - - [10/Oct/2023:13:55:36 +0000] "GET /index.html HTTP/1.1" 200 2326 0.045'
+    result = parse_line(test_line)
+    
+    expected = {
+        'ip': '127.0.0.1',
+        'time': '10/Oct/2023:13:55:36 +0000',
+        'method': 'GET',
+        'path': '/index.html',
+        'status': 200,
+        'bytes': 2326,
+        'seconds': 0.045
+    }
+    
+    assert result == expected, f"Expected {expected}, got {result}"
+    
+    # Test with "-" bytes
+    test_line2 = '192.168.1.1 - - [11/Oct/2023:14:00:00 +0000] "POST /api/data HTTP/1.1" 201 - 0.123'
+    result2 = parse_line(test_line2)
+    
+    expected2 = {
+        'ip': '192.168.1.1',
+        'time': '11/Oct/2023:14:00:00 +0000',
+        'method': 'POST',
+        'path': '/api/data',
+        'status': 201,
+        'bytes': 0,
+        'seconds': 0.123
+    }
+    
+    assert result2 == expected2, f"Expected {expected2}, got {result2}"
+    
+    # Test ValueError for invalid line
+    try:
+        parse_line('invalid line format')
+        assert False, "Should have raised ValueError"
+    except ValueError:
+        pass  # Expected
+    
+    print("All tests passed!")
+def parse_log(text):
+    """Parse log text and return list of parsed dicts for valid lines."""
+    lines = text.strip().split('\n')
+    result = []
+    
+    for line in lines:
+        if not line.strip():  # Skip blank lines
+            continue
+        try:
+            parsed = parse_line(line)
+            result.append(parsed)
+        except ValueError:
+            # Skip malformed lines
+            continue
+    
+    return result
+
+def bad_lines(text):
+    """Return 1-based line numbers of malformed lines that are not blank."""
+    lines = text.strip().split('\n')
+    result = []
+    
+    for i, line in enumerate(lines, 1):  # 1-based indexing
+        if not line.strip():  # Skip blank lines
+            continue
+        try:
+            parse_line(line)
+        except ValueError:
+            result.append(i)
+    
+    return result
+
+def status_counts(entries):
+    """Return a dictionary mapping status codes to their counts."""
+    counts = {}
+    for entry in entries:
+        status = entry['status']
+        counts[status] = counts.get(status, 0) + 1
+    return counts
+
+def error_rate(entries):
+    """Return the fraction of entries whose status is 500 or more, rounded to 4 decimals.
+    
+    Returns 0.0 when there are no entries.
+    """
+    if not entries:
+        return 0.0
+    
+    error_count = 0
+    for entry in entries:
+        if entry['status'] >= 500:
+            error_count += 1
+    
+    return round(error_count / len(entries), 4)
+
+def top_paths(entries, n=3):
+    """Return a list of (path, count) tuples for the n most requested paths.
+    
+    Paths with query strings are stripped of the query part.
+    Ties are broken by path name (lexicographically).
+    """
+    # Extract paths from entries
+    paths = []
+    for entry in entries:
+        path = entry['path']
+        # Remove query string if present
+        parsed = urlparse(path)
+        clean_path = parsed.path
+        paths.append(clean_path)
+    
+    # Count occurrences
+    counter = Counter(paths)
+    
+    # Get most common items
+    most_common = counter.most_common(n)
+    
+    # If there are ties, sort by path name
+    if most_common:
+        # Group by count value
+        groups = {}
+        for path, count in most_common:
+            if count not in groups:
+                groups[count] = []
+            groups[count].append(path)
+        
+        # Sort each group lexicographically
+        for count in groups:
+            groups[count].sort()
+        
+        # Build result in order of count (descending) then path (ascending)
+        result = []
+        for count in sorted(groups.keys(), reverse=True):
+            for path in groups[count]:
+                result.append((path, count))
+        
+        return result
+    
+    return []
+
+def percentile(entries, p):
+    """Return the p-th percentile of the seconds values by nearest rank.
+    
+    The smallest value such that at least p percent of the values are less than or equal to it.
+    Raises ValueError unless 0 < p <= 100 and there is at least one value.
+    """
+    if not entries:
+        raise ValueError("No entries provided")
+    
+    if not (0 < p <= 100):
+        raise ValueError("p must be greater than 0 and less than or equal to 100")
+    
+    # Extract seconds values
+    seconds_values = [entry['seconds'] for entry in entries]
+    
+    # Sort the values
+    sorted_values = sorted(seconds_values)
+    
+    # Calculate the rank
+    n = len(sorted_values)
+    rank = (p / 100.0) * n
+    
+    # Find the nearest rank (smallest value such that at least p percent are <= it)
+    # If rank is an integer, we want the value at that index
+    # If rank is not an integer, we want the value at the next integer index
+    if rank.is_integer():
+        # Exact match - return the value at that index
+        index = int(rank) - 1  # Convert to 0-based index
+    else:
+        # Round up to nearest integer to get the "nearest rank"
+        index = int(rank)  # This gives us the next higher rank
+    
+    # Ensure index is within bounds
+    if index >= n:
+        index = n - 1
+    
+    return sorted_values[index]
+# Test the new functions
+import sys
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description='Process Apache log files')
+    parser.add_argument('file', help='Path to the log file')
+    parser.add_argument('--top', type=int, default=3, help='Number of top paths to show (default: 3)')
+    
+    args = parser.parse_args()
+    
+    # Read the log file
+    try:
+        with open(args.file, 'r') as f:
+            log_content = f.read()
+    except FileNotFoundError:
+        print(f"Error: File '{args.file}' not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        sys.exit(1)
+    
+    # Parse the log
+    entries = parse_log(log_content)
+    
+    # Count valid requests
+    requests = len(entries)
+    
+    # Count errors (status 500 or more)
+    errors = sum(1 for entry in entries if entry['status'] >= 500)
+    
+    # Get top paths
+    top_n = args.top
+    top_paths_list = top_paths(entries, top_n)
+    
+    # Print results
+    print(f"requests: {requests}")
+    print(f"errors: {errors}")
+    for path, count in top_paths_list:
+        print(f"{path} {count}")
+
+if __name__ == "__main__":
+    main()
+def between(entries, start, end):
+    """
+    Return entries whose time t satisfies start <= t < end.
+    start and end are "YYYY-MM-DD HH:MM:SS" strings.
+    """
+    # Convert the start and end times to the format used in the log entries
+    # The log format is "10/Oct/2023:13:55:36 +0000"
+    # We'll need to parse and compare these times
+    
+    # For simplicity, we'll assume the entries are already sorted by time
+    # and we'll do a simple string comparison since the format is consistent
+    
+    result = []
+    for entry in entries:
+        time_str = entry['time']
+        # Extract just the date/time part (before the timezone)
+        # Format: "10/Oct/2023:13:55:36 +0000"
+        # We want to compare "10/Oct/2023:13:55:36" with our start/end times
+        time_part = time_str.split(' ')[0]  # This gets "10/Oct/2023:13:55:36"
+        
+        # Convert the log time format to a comparable format
+        # We'll convert "10/Oct/2023:13:55:36" to "2023-10-10 13:55:36"
+        # This is a bit tricky because we have to parse the month name
+        
+        # Parse the log time format
+        # Example: "10/Oct/2023:13:55:36"
+        # Split on ':' to separate date and time parts
+        parts = time_part.split(':')
+        date_part = parts[0]  # "10/Oct/2023"
+        time_part = ':'.join(parts[1:])  # "13:55:36"
+        
+        day, month_str, year = date_part.split('/')
+        hour, minute, second = time_part.split(':')
+        
+        # Convert month name to number
+        month_map = {
+            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+        }
+        month = month_map[month_str]
+        
+        # Format as "YYYY-MM-DD HH:MM:SS"
+        log_time_formatted = f"{year}-{month}-{day} {hour}:{minute}:{second}"
+        
+        # Compare with start and end times
+        if start <= log_time_formatted < end:
+            result.append(entry)
+    
+    return result

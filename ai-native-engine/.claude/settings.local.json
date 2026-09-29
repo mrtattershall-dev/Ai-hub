@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node core/tick_test.js)",
+      "PowerShell($suites = 'integration_test','protocol_test','persistence_test','history_test','ordered_test','tombstone_gc_test','live_loop_test'; $bad = 0; foreach \\($s in $suites\\) { node \"core/$s.js\" > $null; if \\($LASTEXITCODE -ne 0\\) { $bad++; Write-Output \"FAIL $s\" } else { Write-Output \"PASS $s\" } }; Write-Output \"-- $bad failing\")",
+      "Bash(node experiments/037_ai_native_editor/intent2_test.js)"
+    ]
+  }
+}

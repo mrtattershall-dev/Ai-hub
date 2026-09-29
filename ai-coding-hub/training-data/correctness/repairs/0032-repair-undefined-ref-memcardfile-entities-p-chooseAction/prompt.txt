@@ -1,0 +1,538 @@
+The following JavaScript throws "ReferenceError: chooseAction is not defined" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+/**
+ * player.js — Vex Torrent: movement + combat avatar.
+ *
+ * The player is the densest system in the game and showcases most engine
+ * pieces working together:
+ *   - a finite state machine (engine/fsm.js) drives movement/combat states
+ *   - physics integration + collision via systems/physics.js
+ *   - attacks build hitboxes (systems/combat.js) resolved against enemies
+ *   - juice (particles, screen shake, hitstop, audio) on every impactful action
+ *
+ * Feel tuning lives in config.js; per-run stat boosts come from progression.js
+ * (max HP, dodge i-frames, combo length, air-dash). The "world" argument passed
+ * to update() is the active level scene, which exposes the collision solids,
+ * enemy list, particle system, camera, and hooks for projectiles/style.
+ *
+ * @module entities/player
+ */
+
+import { CONFIG, PHYSICS, COMBAT } from "../config.js";
+import { StateMachine } from "../engine/fsm.js";
+import { moveAndCollide } from "../systems/physics.js";
+import { makeHitbox, resolveHits, Hitstop } from "../systems/combat.js";
+import { approach, clamp } from "../engine/mathx.js";
+
+/**
+ * Attack definitions. `active` is the [start,end] window (seconds into the
+ * state) during which the hitbox deals damage; `dur` is total recovery time.
+ */
+function buildAttacks(prog) {
+  const L = COMBAT.lightDamage;
+  const light = (i, extra = {}) => ({
+    reach: 8, width: 56, height: 48, yOffset: -4,
+    damage: L + (extra.bonus ?? 0), knockback: extra.knockback ?? 150,
+    type: "light", dur: extra.dur ?? 0.26, active: extra.active ?? [0.05, 0.15],
+    sfx: "light", style: extra.style ?? 8, launch: extra.launch ?? 0,
+  });
+  const chain = [
+    light(0),
+    light(1, { active: [0.04, 0.13], dur: 0.24 }),
+    light(2, { bonus: 6, knockback: 300, style: 14, dur: 0.34, active: [0.06, 0.18] }),
+  ];
+  if (prog.comboMax() >= 5) {
+    chain.push(light(3, { active: [0.04, 0.12], dur: 0.22 }));
+    chain.push(light(4, { bonus: 10, knockback: 360, launch: -260, style: 20, dur: 0.4, active: [0.07, 0.2] }));
+  }
+  return {
+    chain,
+    heavy: {
+      reach: 10, width: 66, height: 62, yOffset: -6,
+      damage: COMBAT.heavyDamage, knockback: 220, launch: -560,
+      type: "heavy", dur: 0.44, active: [0.13, 0.26], sfx: "heavy", style: 18,
+    },
+    air: {
+      reach: 8, width: 60, height: 52, yOffset: 0,
+      damage: COMBAT.lightDamage + 2, knockback: 180, launch: 0,
+      type: "air", dur: 0.3, active: [0.05, 0.18], sfx: "light", style: 10,
+    },
+    slam: {
+      reach: 0, width: 84, height: 56, yOffset: 18,
+      damage: COMBAT.slamDamage, knockback: 260, launch: 0,
+      type: "slam", dur: 0.2, active: [0, 0.18], sfx: "slam", style: 22,
+    },
+  };
+}
+
+export class Player {
+  constructor(app, x = 0, y = 0) {
+    this.app = app;
+    this.w = 34;
+    this.h = 52;
+    this.reset(x, y);
+
+    // Pull live stats from progression so upgrades take effect immediately.
+    this.maxHp = app.progression.maxHP();
+    this.hp = this.maxHp;
+    this.attacks = buildAttacks(app.progression);
+
+    this.fsm = new StateMachine(this, STATES, "fall");
+  }
+
+  reset(x, y) {
+    this.x = x; this.y = y;
+    this.vx = 0; this.vy = 0;
+    this.facing = 1;          // 1 right, -1 left
+    this.grounded = false;
+    this.hitCeiling = false;
+    this.touchingWall = false;
+    this.wallDir = 0;
+
+    // timers / flags
+    this.coyote = 0;
+    this.jumpBuffer = 0;
+    this.doubleJumpUsed = false;
+    this.airDashUsed = false;
+    this.dodgeCooldown = 0;
+    this.iframes = 0;
+    this.burstCooldown = 0;
+
+    // combat
+    this.comboIndex = 0;
+    this.queuedChain = false;
+    this.activeHitbox = null;
+    this.style = 0;           // current style/combo meter
+    this.styleTimer = 0;
+
+    this.alive = true;
+    this.dead = false;
+  }
+
+  get aabb() {
+    return { x: this.x, y: this.y, w: this.w, h: this.h };
+  }
+
+  // ---- damage in ----------------------------------------------------------
+
+  /** Incoming damage from enemies/hazards. Ignored during i-frames. */
+  takeDamage(amount, knockX = 0) {
+    if (this.iframes > 0 || !this.alive) return false;
+    this.hp = Math.max(0, this.hp - amount);
+    this.iframes = COMBAT.baseIFrames;
+    this.style = Math.max(0, this.style - 30); // getting hit hurts your style
+    this.vx = knockX;
+    this.vy = -240;
+    this.app.audio.sfx(this.hp <= 0 ? "death" : "hurt");
+    this.app.bus.emit("player:damaged", { amount, hp: this.hp });
+    if (this.hp <= 0) {
+      this.alive = false;
+      this.fsm.change("dead");
+    } else {
+      this.fsm.change("hurt");
+    }
+    return true;
+  }
+
+  addStyle(points) {
+    this.style = clamp(this.style + points, 0, 999);
+    this.styleTimer = 0;
+    this.app.bus.emit("style:changed", this.style);
+  }
+
+  // ---- main update --------------------------------------------------------
+
+  update(dt, world) {
+    this.world = world;
+    const input = this.app.input;
+
+    // Global timers tick regardless of state.
+    this.iframes = Math.max(0, this.iframes - dt);
+    this.dodgeCooldown = Math.max(0, this.dodgeCooldown - dt);
+    this.burstCooldown = Math.max(0, this.burstCooldown - dt);
+    this.coyote = Math.max(0, this.coyote - dt);
+    this.jumpBuffer = Math.max(0, this.jumpBuffer - dt);
+
+    // Style meter decays when idle.
+    this.styleTimer += dt;
+    if (this.styleTimer > 0.6) this.style = Math.max(0, this.style - COMBAT.styleDecay * dt);
+
+    // Buffer a jump press so it survives a few frames of being airborne.
+    if (input.pressed("jump")) this.jumpBuffer = PHYSICS.jumpBuffer;
+
+    this.fsm.update(dt);
+
+    // Integrate + collide (states set vx/vy; physics resolves position).
+    moveAndCollide(this, world.solids, dt);
+
+    if (this.grounded) {
+      this.coyote = PHYSICS.coyoteTime;
+      this.doubleJumpUsed = false;
+      this.airDashUsed = false;
+    }
+    if (this.hitCeiling && this.vy < 0) this.vy = 0;
+
+    // Hazards (electrified rails, etc.).
+    for (const hz of world.hazards ?? []) {
+      if (
+        this.x < hz.x + hz.w && this.x + this.w > hz.x &&
+        this.y < hz.y + hz.h && this.y + this.h > hz.y
+      ) {
+        this.takeDamage(hz.damage, this.facing * -300);
+      }
+    }
+
+    // Fell out of the world.
+    if (this.y > world.height + 200 && this.alive) this.takeDamage(9999, 0);
+  }
+
+  // ---- shared movement helpers --------------------------------------------
+
+  _horizontal(dt, accelOverride) {
+    const input = this.app.input;
+    const dir = input.axisX();
+    const onGround = this.grounded;
+    const target = dir * this.app.progression.runSpeed();
+    if (dir !== 0) this.facing = dir > 0 ? 1 : -1;
+    const accel = accelOverride ?? (onGround ? PHYSICS.runAccel : PHYSICS.airAccel);
+    if (dir !== 0) {
+      this.vx = approach(this.vx, target, accel * dt);
+    } else {
+      const friction = onGround ? PHYSICS.groundFriction : PHYSICS.airFriction;
+      this.vx = approach(this.vx, 0, friction * dt);
+    }
+  }
+
+  _gravity(dt, scale = 1) {
+    const g = PHYSICS.gravity * (this.app.progression.cheatOn("lowgrav") ? 0.45 : 1) * scale;
+    this.vy = Math.min(this.vy + g * dt, PHYSICS.maxFallSpeed);
+  }
+
+  /** Returns true if a jump (ground/coyote or double) was consumed. */
+  _tryJump() {
+    if (this.jumpBuffer <= 0) return false;
+    if (this.grounded || this.coyote > 0) {
+      this.vy = -PHYSICS.jumpSpeed;
+      this.coyote = 0;
+      this.jumpBuffer = 0;
+      this.app.audio.sfx("jump");
+      this.world.particles.dust(this.x + this.w / 2, this.y + this.h, 0);
+      return true;
+    }
+    if (!this.doubleJumpUsed) {
+      this.vy = -PHYSICS.doubleJumpSpeed;
+      this.doubleJumpUsed = true;
+      this.jumpBuffer = 0;
+      this.app.audio.sfx("doublejump");
+      this.world.particles.sparkle(this.x + this.w / 2, this.y + this.h, "#4fd1ff", 8);
+      return true;
+    }
+    return false;
+  }
+
+  /** Variable jump height: releasing jump while rising cuts the arc. */
+  _jumpCut() {
+    if (!this.app.input.down("jump") && this.vy < 0) {
+      this.vy *= PHYSICS.jumpCutMultiplier;
+    }
+  }
+
+  _fireBurst() {
+    if (this.burstCooldown > 0) return false;
+    this.burstCooldown = this.app.progression.burstCooldown();
+    const px = this.facing > 0 ? this.x + this.w : this.x;
+    this.world.spawnProjectile({
+      x: px, y: this.y + this.h * 0.4, vx: this.facing * 560, vy: 0,
+      damage: COMBAT.burstDamage, owner: "player", color: "#4fd1ff", radius: 7, pierce: false,
+    });
+    this.app.audio.sfx("shoot");
+    this.addStyle(6);
+    return true;
+  }
+
+  // ---- attack execution shared by attack states ---------------------------
+
+  _runAttack(def, dt, fsm) {
+    const t = fsm.timer;
+    // Spawn the hitbox exactly once, when the active window opens.
+    if (!this.activeHitbox && t >= def.active[0] && t <= def.active[1]) {
+      this.activeHitbox = makeHitbox(this, def);
+    }
+    // While active, resolve hits each frame (dedup is internal to the hitbox).
+    if (this.activeHitbox && t <= def.active[1]) {
+      const hits = resolveHits(this.activeHitbox, this.world.enemies);
+      if (hits.length) this._onHit(hits, def);
+    }
+    if (t > def.active[1]) this.activeHitbox = null;
+  }
+
+  _onHit(hits, def) {
+    Hitstop.add(COMBAT.hitstop);
+    this.world.camera.shake(def.type === "heavy" || def.type === "slam" ? 9 : 5);
+    this.addStyle(def.style * hits.length);
+    this.app.audio.sfx("hit");
+    for (const e of hits) {
+      this.world.particles.hitSpark(
+        e.x + e.w / 2, e.y + e.h / 2,
+        def.type === "heavy" ? "#ffd86b" : "#fff", def.type === "slam" ? 16 : 10
+      );
+    }
+  }
+
+  // ---- rendering ----------------------------------------------------------
+
+  render(ctx, cam) {
+    const x = Math.round(this.x - cam.x);
+    const y = Math.round(this.y - cam.y);
+
+    // Flicker while invulnerable.
+    if (this.iframes > 0 && Math.floor(this.iframes * 30) % 2 === 0) return;
+
+    const bigHead = this.app.progression.cheatOn("bighead");
+
+    // Body
+    ctx.fillStyle = "#222a44";
+    ctx.fillRect(x, y + (bigHead ? 16 : 0), this.w, this.h - (bigHead ? 16 : 0));
+    // Jacket accent
+    ctx.fillStyle = "#ff5d8f";
+    ctx.fillRect(x + 4, y + 18, this.w - 8, 10);
+    // Head
+    const headH = bigHead ? 34 : 18;
+    const headW = bigHead ? this.w + 14 : this.w - 8;
+    ctx.fillStyle = "#ffd3b0";
+    ctx.fillRect(x + (this.w - headW) / 2, y - (bigHead ? 16 : 0), headW, headH);
+    // Visor (faces movement direction)
+    ctx.fillStyle = "#4fd1ff";
+    const vx = this.facing > 0 ? x + headW / 2 : x + (this.w - headW) / 2 + 2;
+    ctx.fillRect(vx, y + 4 - (bigHead ? 12 : 0), headW / 2 - 2, 5);
+
+    // Active hitbox debug (only with debug overlay on).
+    if (this.app.debug && this.activeHitbox) {
+      ctx.strokeStyle = "rgba(255,80,120,0.8)";
+      ctx.strokeRect(
+        this.activeHitbox.x - cam.x, this.activeHitbox.y - cam.y,
+        this.activeHitbox.w, this.activeHitbox.h
+      );
+    }
+  }
+}
+
+/* ------------------------------------------------------------------------- *
+ *  State table. Each state mutates the player and may return a state name.
+ *  Movement states share helpers on the player; combat states drive _runAttack.
+ * ------------------------------------------------------------------------- */
+const STATES = {
+  idle: {
+    update(p, dt) {
+      p._horizontal(dt);
+      p._gravity(dt);
+      if (!p.grounded) return "fall";
+      if (p._tryJump()) return "jump";
+      return chooseAction(p) ?? (Math.abs(p.vx) > 8 ? "run" : null);
+    },
+  },
+
+  run: {
+    enter(p) { p._dustTimer = 0; },
+    update(p, dt) {
+      p._horizontal(dt);
+      p._gravity(dt);
+      if (!p.grounded) return "fall";
+      if (p._tryJump()) return "jump";
+      const act = chooseAction(p);
+      if (act) return act;
+      // Footstep dust.
+      p._dustTimer = (p._dustTimer ?? 0) + dt;
+      if (p._dustTimer > 0.18 && Math.abs(p.vx) > 60) {
+        p.world.particles.dust(p.x + p.w / 2, p.y + p.h, -p.facing, 2);
+        p._dustTimer = 0;
+      }
+      if (Math.abs(p.vx) <= 8) return "idle";
+    },
+  },
+
+  jump: {
+    enter(p) { p.app.audio; },
+    update(p, dt) {
+      p._horizontal(dt);
+      p._gravity(dt);
+      p._jumpCut();
+      if (p._tryJump()) return "jump"; // double jump
+      const act = chooseAirAction(p);
+      if (act) return act;
+      if (p.vy >= 0) return "fall";
+      if (p.grounded) return "idle";
+    },
+  },
+
+  fall: {
+    update(p, dt) {
+      p._horizontal(dt);
+      p._gravity(dt);
+      if (p._tryJump()) return "jump";
+      const act = chooseAirAction(p);
+      if (act) return act;
+      if (p.grounded) {
+        p.app.audio.sfx("land");
+        p.world.particles.dust(p.x + p.w / 2, p.y + p.h, 0, 5);
+        return Math.abs(p.vx) > 8 ? "run" : "idle";
+      }
+    },
+  },
+
+  dodge: {
+    enter(p) {
+      p.iframes = Math.max(p.iframes, p.app.progression.dodgeIFrames());
+      p.dodgeCooldown = PHYSICS.dodgeCooldown;
+      const dir = p.app.input.axisX() || p.facing;
+      p.facing = dir > 0 ? 1 : -1;
+      p.vx = p.facing * PHYSICS.dodgeSpeed;
+      p.app.audio.sfx("dodge");
+    },
+    update(p, dt) {
+      p.vx = approach(p.vx, p.facing * PHYSICS.dodgeSpeed * 0.4, 1800 * dt);
+      p._gravity(dt, 0.6);
+      p.world.particles.spawn({
+        x: p.x + p.w / 2, y: p.y + p.h / 2, vx: -p.facing * 60, vy: 0,
+        life: 0.25, size: 5, color: "rgba(79,209,255,0.5)", drag: 3,
+      });
+      if (p.fsm.timer >= PHYSICS.dodgeTime) {
+        return p.grounded ? "idle" : "fall";
+      }
+    },
+  },
+
+  airdash: {
+    enter(p) {
+      p.airDashUsed = true;
+      const dir = p.app.input.axisX() || p.facing;
+      p.facing = dir > 0 ? 1 : -1;
+      p.vx = p.facing * PHYSICS.airDashSpeed;
+      p.vy = 0;
+      p.app.audio.sfx("dodge");
+    },
+    update(p, dt) {
+      p.vy = 0; // float during the dash
+      p.world.particles.spawn({
+        x: p.x + p.w / 2, y: p.y + p.h / 2, vx: -p.facing * 120, vy: 0,
+        life: 0.3, size: 6, color: "rgba(125,255,176,0.6)", drag: 2,
+      });
+      if (p.fsm.timer >= PHYSICS.airDashTime) return "fall";
+    },
+  },
+
+  attackLight: {
+    enter(p) {
+      p.activeHitbox = null;
+      p.queuedChain = false;
+      p.app.audio.sfx(p.attacks.chain[p.comboIndex].sfx);
+    },
+    update(p, dt) {
+      const def = p.attacks.chain[p.comboIndex];
+      // Light momentum: small lunge, mostly planted.
+      p.vx = approach(p.vx, 0, PHYSICS.groundFriction * 1.4 * dt);
+      if (!p.grounded) p._gravity(dt);
+      p._runAttack(def, dt, p.fsm);
+      // Queue the next chain link if pressed after the active window.
+      if (p.app.input.pressed("light") && p.comboIndex + 1 < p.attacks.chain.length) {
+        p.queuedChain = true;
+      }
+      if (p.fsm.timer >= def.dur) {
+        if (p.queuedChain) {
+          p.comboIndex++;
+          p.fsm.change("attackLight", true);
+          return;
+        }
+        p.comboIndex = 0;
+        return p.grounded ? "idle" : "fall";
+      }
+    },
+    exit(p) { p.activeHitbox = null; },
+  },
+
+  attackHeavy: {
+    enter(p) { p.activeHitbox = null; p.app.audio.sfx("heavy"); p.vx *= 0.3; },
+    update(p, dt) {
+      if (!p.grounded) p._gravity(dt);
+      p.vx = approach(p.vx, 0, PHYSICS.groundFriction * dt);
+      p._runAttack(p.attacks.heavy, dt, p.fsm);
+      if (p.fsm.timer >= p.attacks.heavy.dur) return p.grounded ? "idle" : "fall";
+    },
+    exit(p) { p.activeHitbox = null; },
+  },
+
+  attackAir: {
+    enter(p) { p.activeHitbox = null; p.app.audio.sfx("light"); },
+    update(p, dt) {
+      p._horizontal(dt, PHYSICS.airAccel * 0.6);
+      p._gravity(dt, 0.8);
+      p._runAttack(p.attacks.air, dt, p.fsm);
+      if (p.grounded || p.fsm.timer >= p.attacks.air.dur) {
+        p.activeHitbox = null;
+        return p.grounded ? "idle" : "fall";
+      }
+    },
+    exit(p) { p.activeHitbox = null; },
+  },
+
+  slam: {
+    enter(p) { p.activeHitbox = null; p.vx = 0; p.vy = 0; p._slamWind = 0; },
+    update(p, dt) {
+      // Brief hover, then rocket down. Hitbox lives on impact.
+      p._slamWind += dt;
+      if (p._slamWind < 0.12) {
+        p.vy = -40;
+      } else {
+        p.vy = PHYSICS.slamSpeed;
+      }
+      p._horizontal(dt, PHYSICS.airAccel * 0.3);
+      if (p.grounded) {
+        p.app.audio.sfx("slam");
+        p.world.camera.shake(12);
+        p.world.particles.dust(p.x + p.w / 2, p.y + p.h, 0, 14);
+        p.activeHitbox = makeHitbox(p, p.attacks.slam);
+        const hits = resolveHits(p.activeHitbox, p.world.enemies);
+        if (hits.length) p._onHit(hits, p.attacks.slam);
+        return "idle";
+      }
+    },
+    exit(p) { p.activeHitbox = null; },
+  },
+
+  hurt: {
+    update(p, dt) {
+      p.vx = approach(p.vx, 0, 1200 * dt);
+      p._gravity(dt);
+      if (p.fsm.timer >= 0.28) return p.grounded ? "idle" : "fall";
+    },
+  },
+
+  dead: {
+    enter(p) {
+      p.dead = true;
+      p.vx = 0;
+      p.app.bus.emit("player:died");
+    },
+    update(p, dt) {
+      p.vx = approach(p.vx, 0, 800 * dt);
+      p._gravity(dt);
+    },
+  },
+};
+
+/** Pick a grounded action from current input (attacks/dodge/burst). */
+
+
+/** Pick an airborne action (air attack/slam/air-dash/burst). */
+function chooseAirAction(p) {
+  const input = p.app.input;
+  if (input.pressed("dodge")) {
+    if (p.app.progression.hasAirDash() && !p.airDashUsed) return "airdash";
+  }
+  if (input.pressed("heavy")) return "slam";
+  if (input.pressed("light")) return "attackAir";
+  if (input.pressed("ability")) { p._fireBurst(); return null; }
+  return null;
+}
+```

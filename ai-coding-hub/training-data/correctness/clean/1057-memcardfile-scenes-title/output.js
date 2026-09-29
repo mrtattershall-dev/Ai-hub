@@ -1,0 +1,111 @@
+/**
+ * title.js — title screen with a "press start" beat and a small main menu.
+ *
+ * Demonstrates the menu pattern reused across the game: a list of items, cursor
+ * movement via the `up`/`down` actions, `confirm`/`cancel` to act, and audible
+ * cursor feedback. Selecting PLAY routes to save-select; the CRT toggle flips
+ * the DOM overlay class so the cosmetic option is honoured immediately.
+ *
+ * @module scenes/title
+ */
+
+import { Scene } from "../engine/scene.js";
+import { title, text, menu, panel } from "../ui/widgets.js";
+import { CONFIG } from "../config.js";
+import { SaveSelectScene } from "./saveSelect.js";
+import { GalleryScene } from "./gallery.js";
+
+const W = CONFIG.view.width;
+const H = CONFIG.view.height;
+
+export class TitleScene extends Scene {
+  onEnter() {
+    this.phase = "press"; // "press" -> "menu"
+    this.index = 0;
+    this.t = 0;
+    this.app.audio.playMusic("title");
+    this.items = [
+      { label: "PLAY", hint: "Begin or continue your run" },
+      { label: "GALLERY", hint: "Emblems, art, logs, sound test" },
+      { label: this._crtLabel(), hint: "Toggle the retro screen filter" },
+    ];
+  }
+
+  _crtLabel() {
+    const on = document.getElementById("overlay-fx").classList.contains("on");
+    return `CRT FILTER: ${on ? "ON" : "OFF"}`;
+  }
+
+  update(dt) {
+    this.t += dt;
+    const input = this.app.input;
+
+    if (this.phase === "press") {
+      if (input.pressed("confirm") || input.pressed("pause")) {
+        this.phase = "menu";
+        this.app.audio.sfx("confirm");
+      }
+      return;
+    }
+
+    if (input.pressed("up")) { this.index = (this.index + this.items.length - 1) % this.items.length; this.app.audio.sfx("cursor"); }
+    if (input.pressed("down")) { this.index = (this.index + 1) % this.items.length; this.app.audio.sfx("cursor"); }
+    if (input.pressed("confirm")) this._select();
+    if (input.pressed("cancel")) { this.phase = "press"; this.app.audio.sfx("cancel"); }
+  }
+
+  _select() {
+    this.app.audio.sfx("confirm");
+    switch (this.index) {
+      case 0: this.app.scenes.push(new SaveSelectScene(this.app)); break;
+      case 1: this.app.scenes.push(new GalleryScene(this.app)); break;
+      case 2: {
+        const fx = document.getElementById("overlay-fx");
+        fx.classList.toggle("on");
+        this.items[2].label = this._crtLabel();
+        break;
+      }
+    }
+  }
+
+  render(ctx) {
+    // Animated gradient + scanning grid background.
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#1a2444");
+    g.addColorStop(1, "#080b16");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    this._grid(ctx);
+
+    title(ctx, "PROJECT", W / 2, 130, { size: 64, glow: "#4fd1ff" });
+    title(ctx, "MEMORY CARD", W / 2, 196, { size: 54, glow: "#ff5d8f", color: "#ff9ec0" });
+    text(ctx, "A LOST CONSOLE-ERA ADVENTURE", W / 2, 240, {
+      size: 13, align: "center", color: "#8b95b8",
+    });
+
+    if (this.phase === "press") {
+      if (Math.sin(this.t * 4) > -0.3) {
+        text(ctx, "PRESS  ENTER", W / 2, H - 120, {
+          size: 24, align: "center", color: "#ffffff", weight: 700,
+        });
+      }
+    } else {
+      panel(ctx, W / 2 - 180, H - 230, 360, 190, { glow: 14 });
+      menu(ctx, this.items, this.index, W / 2 - 140, H - 190, { gap: 52 });
+    }
+
+    text(ctx, `v${CONFIG.version}`, W - 16, H - 14, { size: 11, align: "right", color: "#566089" });
+  }
+
+  _grid(ctx) {
+    ctx.strokeStyle = "rgba(79,209,255,0.10)";
+    ctx.lineWidth = 1;
+    const off = (this.t * 40) % 48;
+    for (let x = -off; x < W; x += 48) {
+      ctx.beginPath(); ctx.moveTo(x, H * 0.55); ctx.lineTo(x + 120, H); ctx.stroke();
+    }
+    for (let y = H * 0.55; y < H; y += 28) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+  }
+}

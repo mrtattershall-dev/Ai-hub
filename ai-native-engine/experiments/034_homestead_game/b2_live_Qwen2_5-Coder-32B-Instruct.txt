@@ -1,0 +1,40 @@
+=== B2-LIVE: Qwen/Qwen2.5-Coder-32B-Instruct authors HOMESTEAD through the editor (real gate + repair) ===
+sessions=3 maxAttempts=4
+
+  [s1] "each tick, every crop that still has wat..." -> installed 'GrowCrops' in 1
+  [s1] "each tick, every crop loses 1 water; cla..." -> installed 'drain_water' in 1
+  [s1] "when a crop reaches 100 growth or more, ..." -> installed 'harvest' in 2 (gate caught: malformed_json)
+  [s1] "each tick, ADD to the field zone tally t..." -> NOT AUTHORED after 4 (gate caught: malformed_json)
+  [s1] "every 3rd tick the field zone plants one..." -> installed 'PlantNewCrop' in 1
+  [s1] => installed 4/5, unsafe 0, lose (pop 9, score 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+
+  [s2] "each tick, every crop that still has wat..." -> installed 'GrowCrops' in 1
+  [s2] "each tick, every crop loses 1 water; cla..." -> installed 'drain_water' in 1
+  [s2] "when a crop reaches 100 growth or more, ..." -> installed 'harvest_crop' in 1
+  [s2] "each tick, ADD to the field zone tally t..." -> installed 'accumulate_tally' in 2 (gate caught: malformed_json)
+  [s2] "every 3rd tick the field zone plants one..." -> installed 'PlantNewCrop' in 1
+  [s2] => installed 5/5, unsafe 0, WIN 🏆 (pop 9, score 8, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":true})
+
+  [s3] "each tick, every crop that still has wat..." -> installed 'GrowCrops' in 1
+  [s3] "each tick, every crop loses 1 water; cla..." -> installed 'drain_water' in 1
+  [s3] "when a crop reaches 100 growth or more, ..." -> installed 'harvest' in 2 (gate caught: malformed_json)
+  [s3] "each tick, ADD to the field zone tally t..." -> installed 'accumulateGrowth' in 2 (gate caught: malformed_json)
+  [s3] "every 3rd tick the field zone plants one..." -> installed 'PlantNewCrop' in 1
+  [s3] => installed 5/5, unsafe 0, WIN 🏆 (pop 9, score 8, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":true})
+
+=== B2-LIVE SUMMARY ===
+  model: Qwen/Qwen2.5-Coder-32B-Instruct
+  games WON (all-needed rules authored + observable win): 2/3
+  per-rule authored: grow:3/3  drain:3/3  reap:3/3  score:2/3  reseed:3/3
+  TOTAL UNSAFE EVENTS across all sessions: 0  (must be 0 — the gate is unconditional)
+  verdict: SAFETY HELD under a live model; a live model DID author a winnable HOMESTEAD through the editor
+RESULT_JSON {"model":"Qwen/Qwen2.5-Coder-32B-Instruct","sessions":3,"wins":2,"totalUnsafe":0,"perRule":[{"installed":4,"win":false,"unsafe":0,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false},"authored":[{"name":"GrowCrops","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"GrowCrops\",\"match\":{\"type\":\"crop\",\"where\":{\"field\":\"water\",\"cmp\":\">\",\"value\":0}},\"every\":1,\"effects\":[{\"set\":\"growth\",\"to\":{\"min\":[{\"add\":[{\"field\":\"growth\"},5]},255]}}]}"},{"name":"drain_water","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"drain_water\",\"match\":{\"type\":\"crop\"},\"every\":1,\"effects\":[{\"set\":\"water\",\"to\":{\"max\":[{\"sub\":[{\"field\":\"water\"},1]},0]}}]}"},{"name":"harvest","ok":true,"attempts":2,"firstReject":"malformed_json","body":"{\"name\":\"harvest\",\"match\":{\"type\":\"crop\",\"where\":{\"field\":\"growth\",\"cmp\":\">=\",\"value\":100}},\"effects\":[{\"delete\":true}]}"},{"name":null,"ok":false,"attempts":4,"firstReject":"malformed_json","body":null},{"name":"PlantNewCrop","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"PlantNewCrop\",\"match\":{\"type\":\"zone\",\"uuid\":\"u0\"},\"every\":3,\"effects\":[{\"spawn\":{\"type\":\"crop\",\"props\":{\"water\":25,\"growth\":0},\"cap\":1}}]}"}]},{"installed":5,"win":true,"unsafe":0,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":true},"authored":[{"name":"GrowCrops","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"GrowCrops\",\"match\":{\"type\":\"crop\",\"where\":{\"field\":\"water\",\"cmp\":\">\",\"value\":0}},\"every\":1,\"effects\":[{\"set\":\"growth\",\"to\":{\"min\":[{\"add\":[{\"field\":\"growth\"},5]},255]}}]}"},{"name":"drain_water","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"drain_water\",\"match\":{\"type\":\"crop\"},\"every\":1,\"effects\":[{\"set\":\"water\",\"to\":{\"max\":[{\"sub\":[{\"field\":\"water\"},1]},0]}}]}"},{"name":"harvest_crop","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"harvest_crop\",\"match\":{\"type\":\"crop\",\"where\":{\"field\":\"growth\",\"cmp\":\">=\",\"value\":100}},\"effects\":[{\"delete\":true}]}"},{"name":"accumulate_tally","ok":true,"attempts":2,"firstReject":"malformed_json","body":"{\"name\":\"accumulate_tally\",\"match\":{\"type\":\"zone\",\"uuid\":\"u0\"},\"every\":1,\"effects\":[{\"set\":\"tally\",\"to\":{\"min\":[{\"add\":[{\"field\":\"tally\"},{\"count\":{\"type\":\"crop\",\"where\":{\"field\":\"growth\",\"cmp\":\">=\",\"value\":100}}}]},4294967295]}}]}"},{"name":"PlantNewCrop","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"PlantNewCrop\",\"match\":{\"type\":\"zone\",\"uuid\":\"u0\"},\"every\":3,\"effects\":[{\"spawn\":{\"type\":\"crop\",\"props\":{\"water\":25,\"growth\":0},\"cap\":1}}]}"}]},{"installed":5,"win":true,"unsafe":0,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":true},"authored":[{"name":"GrowCrops","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"GrowCrops\",\"match\":{\"type\":\"crop\",\"where\":{\"field\":\"water\",\"cmp\":\">\",\"value\":0}},\"every\":1,\"effects\":[{\"set\":\"growth\",\"to\":{\"min\":[{\"add\":[{\"field\":\"growth\"},5]},255]}}]}"},{"name":"drain_water","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"drain_water\",\"match\":{\"type\":\"crop\"},\"every\":1,\"effects\":[{\"set\":\"water\",\"to\":{\"max\":[{\"sub\":[{\"field\":\"water\"},1]},0]}}]}"},{"name":"harvest","ok":true,"attempts":2,"firstReject":"malformed_json","body":"{\"name\":\"harvest\",\"match\":{\"type\":\"crop\",\"where\":{\"field\":\"growth\",\"cmp\":\">=\",\"value\":100}},\"effects\":[{\"delete\":true}]}"},{"name":"accumulateGrowth","ok":true,"attempts":2,"firstReject":"malformed_json","body":"{\"name\":\"accumulateGrowth\",\"match\":{\"type\":\"zone\",\"uuid\":\"u0\"},\"every\":1,\"effects\":[{\"set\":\"tally\",\"to\":{\"min\":[{\"add\":[{\"field\":\"tally\"},{\"count\":{\"type\":\"crop\",\"where\":{\"field\":\"growth\",\"cmp\":\">=\",\"value\":100}}}]},4294967295]}}]}"},{"name":"PlantNewCrop","ok":true,"attempts":1,"firstReject":null,"body":"{\"name\":\"PlantNewCrop\",\"match\":{\"type\":\"zone\",\"uuid\":\"u0\"},\"every\":3,\"effects\":[{\"spawn\":{\"type\":\"crop\",\"props\":{\"water\":25,\"growth\":0},\"cap\":1}}]}"}]}]}
+
+--- authored rule bodies (session 1) ---
+  GrowCrops: {"name":"GrowCrops","match":{"type":"crop","where":{"field":"water","cmp":">","value":0}},"every":1,"effects":[{"set":"growth","to":{"min":[{"add":[{"field":"growth"},5]},255]}}]}
+  drain_water: {"name":"drain_water","match":{"type":"crop"},"every":1,"effects":[{"set":"water","to":{"max":[{"sub":[{"field":"water"},1]},0]}}]}
+  harvest: {"name":"harvest","match":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}},"effects":[{"delete":true}]}
+  null: null
+  PlantNewCrop: {"name":"PlantNewCrop","match":{"type":"zone","uuid":"u0"},"every":3,"effects":[{"spawn":{"type":"crop","props":{"water":25,"growth":0},"cap":1}}]}
+
+--- STDERR ---

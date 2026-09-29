@@ -1,0 +1,52 @@
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+35 goals, sequential: Qwen3-Coder-30B / H100 — 35 goals
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-pN18Go\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done          11     5   0   0    12  q1_math.js:runs
+   2  done          32    19   0   0    30  q2_str.js:runs
+   3  stopped        6     3   0   0    33  q3_list.js:runs
+   4  done          13     6   0   0    15  q4_time.py:THROWS
+   5  done           7     4   0   0    12  q5_page.html:ok
+   6  done          16     9   0   0    15  q1_math.js:runs
+   7  done          17    10   0   0    21  q2_str.js:runs
+   8  done          22    13   1   0    21  q3_list.js:runs
+   9  done          13     8   0   0    15  q1_math.js:runs
+  10  done          13     8   0   0    15  q3_list.js:runs
+  11  done          13     9   0   0    12  q1_math.js:runs
+  12  done          15    10   0   0    15  q2_str.js:runs
+  13  done          19    12   0   0    18  q3_list.js:runs
+  14  done          10     6   0   0    12  q1_math.js:runs
+  15  done          10     6   0   0     9  q2_str.js:runs
+  16  done          17    11   1   0    30  q3_list.js:runs
+  17  done          12     8   0   0    12  q3_list.js:runs
+  18  done          16     9   0   0    18  q6_index.js:runs q1_math.js:runs q2_str.js:runs q3_list.js:runs
+  19  done          15     8   0   0    15  q7_check.js:runs q6_index.js:runs
+  20  done          17    13   0   0    15  q6_index.js:runs q7_check.js:runs
+  21  done           9     5   0   0    12  q8_broken.js:runs
+  22  done          17    12   2   0    15  q8_broken.js:runs
+  23  done          26    15   2   0    18  q9_slow.js:runs
+  24  done          10     6   0   0     9  q9_slow.js:runs
+  25  done           7     5   0   0    12  Q_MATH.md:ok q1_math.js:runs
+  26  done           8     5   0   0    12  Q_LIST.md:ok q3_list.js:runs
+  27  done          12     9   0   0    15  Q_MATH.md:ok
+  28  done           6     3   0   0    60  q10_game.html:ok
+  29  done          22    16   2   0    48  q10_game.html:ok
+  30  done          23    20   0   0    42  Q_GAME.md:ok q10_game.html:ok
+  31  stopped        8     5   0   0    54  q11_json.js:runs
+  32  done          44    29   0   0    45  q11_json.js:runs
+  33  done          34    24   2   0    51  q12_args.py:runs
+  34  done          31    21   0   0    36  q9_slow.js:runs
+  35  stopped       35    30   0   0    36  Q_INDEX.md:ok
+
+--- summary ---
+goals run           : 35
+status 'done'       : 32/35
+WORK ACTUALLY DONE  : 34/35   <- the number that matters
+tool errors         : 10
+guard refusals      : 0   (the system working)
+total model calls   : 382
+wall clock          : 13.6 min
+files: .screenshots, ESCALATIONS.md, package.json, q10_game.html, q10_game.js, q11_json.js, q12_args.py, q1_math.js, q2_str.js, q3_list.js, q4_time.py, q5_page.html, q6_index.js, q7_check.js, q8_broken.js, q9_slow.js, Q_GAME.md, Q_INDEX.md, Q_LIST.md, Q_MATH.md, TASKS.md, test_chunk.js, test_q11_json.js, test_q1_math.js, test_q2_str.js, test_q3_list.js, test_q6_index.js, test_q9_slow.js, _snippet.py, __pycache__
+tok/s: min 12.2 max 169.4

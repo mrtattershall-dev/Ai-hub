@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Native Engine — Editor</title>
+<style>
+  :root { --bg:#101613; --panel:#18211c; --card:#1f2b24; --edge:#2e4034; --ink:#d7e4da; --dim:#8aa392;
+          --water:#5aa7d6; --growth:#8fc97a; --warn:#e0b352; --bad:#e07a6a; --ok:#8fc97a; --accent:#c9a95a; --ai:#9a8fd6; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--ink); font:14px/1.45 "Segoe UI",system-ui,sans-serif; height:100vh; display:flex; flex-direction:column; }
+  header { display:flex; gap:16px; align-items:baseline; padding:9px 16px; background:var(--panel); border-bottom:1px solid var(--edge); flex-wrap:wrap; }
+  header h1 { font-size:15px; color:var(--accent); font-weight:600; letter-spacing:.4px; }
+  header .stat b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  header .stat { color:var(--dim); font-size:12.5px; }
+  #ver { margin-left:auto; color:var(--dim); font-size:11px; }
+  #join { padding:48px; text-align:center; }
+  #join input { background:var(--card); color:var(--ink); border:1px solid var(--edge); padding:8px 12px; border-radius:6px; font-size:15px; }
+  #join button, .btn { background:#2c3f33; color:var(--ink); border:1px solid var(--edge); padding:7px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .btn:hover { background:#39503f; }
+  .btn.small { padding:3px 9px; font-size:12px; }
+  .btn.ai { background:#2e2a44; border-color:#4a4370; }
+  .btn.ai:hover { background:#3a3558; }
+  .btn:disabled { opacity:.45; cursor:default; }
+  main { flex:1; display:grid; grid-template-columns:1fr 340px; min-height:0; }
+  #left { display:flex; flex-direction:column; min-width:0; }
+  #world { flex:1; padding:12px 16px; overflow-y:auto; }
+  #world h2, aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--dim); margin:6px 0 8px; }
+  #cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:10px; }
+  .card { background:var(--card); border:1px solid var(--edge); border-radius:8px; padding:9px 11px; cursor:pointer; position:relative; }
+  .card.sel { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .card .nm { font-weight:600; margin-bottom:1px; }
+  .card .id { color:var(--dim); font-size:10px; font-family:consolas,monospace; }
+  .bar { height:7px; border-radius:4px; background:#0d1210; margin-top:6px; overflow:hidden; }
+  .bar i { display:block; height:100%; border-radius:4px; transition:width .3s; }
+  .lbl { display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-top:4px; }
+  .claimbadge { position:absolute; top:7px; right:9px; font-size:10.5px; background:#4a3a1c; color:var(--warn); border:1px solid #6b5426; padding:1px 7px; border-radius:10px; }
+  .ripe { outline:1px dashed var(--growth); }
+  /* THE command bar — the primary way to talk to the world */
+  #cmdwrap { padding:10px 16px 14px; background:var(--panel); border-top:1px solid var(--edge); }
+  #cmdecho { min-height:20px; font-size:12.5px; color:var(--dim); padding:0 2px 6px; }
+  #cmdecho.ok { color:var(--ok); } #cmdecho.err { color:var(--bad); } #cmdecho.ask { color:var(--warn); }
+  #cmdrow { display:flex; gap:8px; }
+  #cmd { flex:1; background:#0d1210; border:1px solid var(--edge); color:var(--ink); padding:10px 13px; border-radius:8px; font-size:14.5px; }
+  #cmd:focus { outline:none; border-color:var(--accent); }
+  #cmdopts { display:flex; gap:6px; flex-wrap:wrap; padding-top:6px; }
+  aside { background:var(--panel); border-left:1px solid var(--edge); padding:12px 14px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+  .box { background:var(--card); border:1px solid var(--edge); border-radius:8px; padding:11px; }
+  .row { display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+  .row input { width:60px; background:#0d1210; border:1px solid var(--edge); color:var(--ink); padding:5px 7px; border-radius:5px; }
+  .row input.wide { flex:1; width:auto; }
+  #goal { width:100%; background:#0d1210; border:1px solid #4a4370; color:var(--ink); padding:8px 10px; border-radius:6px; font-size:13px; margin-top:6px; }
+  #proposal { display:none; margin-top:8px; border-top:1px dotted var(--edge); padding-top:8px; }
+  #prop-say { font-size:12.5px; color:var(--ink); }
+  #prop-json { display:none; width:100%; height:96px; background:#0d1210; color:var(--dim); border:1px solid var(--edge); border-radius:6px; font:11px consolas,monospace; padding:6px; margin-top:6px; resize:vertical; }
+  #ruleout { font-size:12px; white-space:pre-wrap; margin-top:6px; }
+  #ruleout.err { color:var(--bad); } #ruleout.ok { color:var(--ok); } #ruleout.warn { color:var(--warn); }
+  .rulechip { display:inline-flex; gap:6px; align-items:center; background:#0d1210; border:1px solid var(--edge); border-radius:12px; padding:2px 4px 2px 10px; margin:2px 3px; font-size:12px; cursor:pointer; }
+  .rulechip button { background:none; border:none; color:var(--dim); cursor:pointer; font-size:12px; }
+  .rulechip button:hover { color:var(--bad); }
+  #ruleexplain { font-size:12px; color:var(--dim); margin-top:6px; min-height:16px; }
+  #feed { flex:1; min-height:110px; overflow-y:auto; font-size:12px; }
+  #feed div { padding:2px 0; border-bottom:1px dotted #22302a; }
+  .f-ev { color:var(--accent); } .f-def { color:var(--warn); } .f-rej { color:var(--bad); } .f-ok { color:var(--ok); } .f-dim { color:var(--dim); } .f-ai { color:var(--ai); }
+  #zone { margin-bottom:10px; color:var(--dim); font-size:13px; }
+  #zone b { color:var(--ink); }
+  .muted { color:var(--dim); font-size:11.5px; margin-top:6px; }
+  .spin { display:inline-block; animation:sp 1s linear infinite; }
+  @keyframes sp { to { transform:rotate(360deg); } }
+  @media (max-width: 900px) {
+    main { grid-template-columns:1fr; overflow-y:auto; }
+    aside { border-left:none; border-top:1px solid var(--edge); }
+    #left, #world { overflow:visible; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>AI-NATIVE ENGINE</h1>
+  <span class="stat">tick <b id="s-tick">—</b></span>
+  <span class="stat">entities <b id="s-pop">—</b></span>
+  <span class="stat">score <b id="s-tally">—</b></span>
+  <span class="stat">dropped rule tx <b id="s-drops">0</b></span>
+  <span class="stat" id="s-you"></span>
+  <span id="ver"></span>
+</header>
+
+<div id="join">
+  <p style="margin-bottom:12px; color:var(--dim)">join the live world — terminal players share it with you</p>
+  <input id="name" placeholder="your name" maxlength="24">
+  <button id="go" class="btn">join the farm</button>
+  <p id="joinerr" style="color:var(--bad); margin-top:10px"></p>
+</div>
+
+<main style="display:none" id="ui">
+  <div id="left">
+    <section id="world">
+      <div id="zone"></div>
+      <canvas id="stage" width="512" height="512" style="display:none; background:#0d1210; border:1px solid var(--edge); border-radius:8px; max-width:100%; image-rendering:pixelated"></canvas>
+      <p class="muted" id="stagehelp" style="display:none">arrow keys drive your entity — every keypress is a gated transaction, not a direct write</p>
+      <h2 id="cardhead">the field — click a crop, or just tell the farm what to do below</h2>
+      <div id="cards"></div>
+    </section>
+    <div id="cmdwrap">
+      <div id="cmdecho"></div>
+      <div id="cmdopts"></div>
+      <div id="cmdrow">
+        <input id="cmd" placeholder='say it in plain words — "water the driest crop", "plant 3 corn", "who claimed what?"' autocomplete="off">
+        <button id="cmdgo" class="btn">do it</button>
+      </div>
+    </div>
+  </div>
+  <aside>
+    <div class="box" id="inspector">
+      <h2>inspector</h2>
+      <div id="sel" class="muted">nothing selected</div>
+      <div id="selctl" style="display:none">
+        <div class="row"><button class="btn small" id="b-water">water</button><input id="i-water" value="200">
+          <button class="btn small" id="b-claim">claim</button><input id="i-claim" value="40"><span class="muted">ticks</span></div>
+        <div class="row"><button class="btn small" id="b-harvest">harvest</button>
+          <input id="i-name" class="wide" placeholder="rename"><button class="btn small" id="b-name">rename</button></div>
+      </div>
+    </div>
+    <div class="box" style="border-color:#4a4370">
+      <h2 style="color:var(--ai)">ask the AI to write a rule</h2>
+      <input id="goal" placeholder='describe a behavior — "dry crops slowly wilt"' autocomplete="off">
+      <div class="row"><button class="btn ai small" id="b-propose">propose</button><span class="muted" id="prop-status"></span></div>
+      <div id="proposal">
+        <div id="prop-say"></div>
+        <a class="muted" id="prop-toggle" style="cursor:pointer">show the JSON ▸</a>
+        <textarea id="prop-json" spellcheck="false"></textarea>
+        <div class="row"><button class="btn small" id="b-install">✓ accept &amp; install</button>
+          <button class="btn small" id="b-retry" style="display:none">↻ try again with a clearer goal</button>
+          <button class="btn small" id="b-discard">✗ reject</button></div>
+      </div>
+      <div id="ruleout"></div>
+      <p class="muted">the AI drafts in a sandbox copy of the world; nothing touches the real world until you install — and the gate re-checks it even then.</p>
+    </div>
+    <div class="box" style="border-color:#3a5a46">
+      <h2 style="color:#8fc97a">create a new type — the world's vocabulary is yours</h2>
+      <div class="row"><input id="nt-name" class="wide" placeholder="type name, e.g. tower" autocomplete="off"></div>
+      <textarea id="nt-fields" spellcheck="false" style="width:100%;height:74px;background:#0d1210;color:var(--ink);border:1px solid var(--edge);border-radius:6px;font:11px consolas,monospace;padding:6px;margin-top:6px">{"x":{"range":[0,255],"init":128},"y":{"range":[0,255],"init":128},"hp":{"range":[0,100],"init":100}}</textarea>
+      <div class="row"><label class="muted"><input type="checkbox" id="nt-spatial" checked> has coordinates (fields x, y)</label>
+        <button class="btn small" id="b-deftype">define it through the gate</button></div>
+      <div id="deftypeout" style="font-size:12px;white-space:pre-wrap;margin-top:6px"></div>
+      <p class="muted">a rejected definition changes nothing. once defined, spawn one with the command bar ("create a tower at 40,60") and give it behavior with the AI above.</p>
+    </div>
+    <div class="box">
+      <h2>live rules — click one to read it in English</h2>
+      <div id="rules"></div>
+      <div id="ruleexplain"></div>
+    </div>
+    <div class="box" style="flex:1; display:flex; flex-direction:column">
+      <h2>what's happening</h2>
+      <div id="feed"></div>
+    </div>
+  </aside>
+</main>
+
+<script src="/lib/intent.js"></script>
+<script src="/lib/intent2.js"></script>
+<script src="/lib/explain.js"></script>
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+let me = null, view = null, selected = null, proposal = null;
+const hasNL = typeof window.INTENT?.parse === 'function' || typeof window.INTENT2?.parse === 'function';
+// RD-034 ROUTING: the GENERIC schema-driven parser answers first; the farm parser
+// is a SPECIALIZATION consulted only when this world actually contains crops. On a
+// double miss, prefer whichever produced something other than a bare error.
+function parseNL(text, ctx) {
+  const gsnap = { tick: view.tick, you: me, entities: view.entities ?? [], schemaDefs: SCHEMA ?? [], claims: view.claims ?? [] };
+  const gen = window.INTENT2?.parse ? INTENT2.parse(gsnap, text, ctx) : null;
+  if (gen && gen.kind !== 'error') return gen;
+  if ((SCHEMA ?? []).some(d => d.name === 'crop') && window.INTENT?.parse) {
+    const fsnap = { ...view, you: me, crops: (view.crops ?? []).map(c => ({ ...c, displayName: displayName(c) })) };
+    const farm = INTENT.parse(fsnap, text, ctx);
+    if (farm.kind !== 'error') return farm;
+    return { kind: 'error', say: `${gen ? gen.say : farm.say}` };
+  }
+  return gen ?? { kind: 'error', say: 'the language modules are still being built — use the buttons for now' };
+}
+const EX = window.EXPLAIN ?? {};
+const exRule = (src) => { try { return EX.explainRule ? EX.explainRule(src) : JSON.stringify(src); } catch { return JSON.stringify(src); } };
+const exReason = (r) => { try { return EX.explainReason ? EX.explainReason(r) : r; } catch { return r; } };
+
+// ---- human names ------------------------------------------------------------
+// The world's truth is unchanged (rule-spawned crops are all literally named
+// 'seed' — a rule-grammar expressivity gap, logged). The editor gives every
+// entity a stable human name derived from its uuid, and shows the real name
+// when a human chose one.
+const PETS = ['Basil','Clover','Fern','Hazel','Ivy','Juniper','Maple','Olive','Poppy','Rowan','Sage','Willow',
+  'Aspen','Birch','Cedar','Dahlia','Elm','Flora','Ginger','Heather','Iris','Jasmine','Marigold','Nettle',
+  'Oak','Pepper','Quince','Rose','Sorrel','Thyme','Violet','Wren','Yarrow','Zinnia'];
+const hash = (s) => { let h = 0; for (const ch of s) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
+const isCodeName = (n) => !n || n === 'seed' || /^c\d+$/.test(n) || /^(crop|zone|enemy|fish)-\d+$/.test(n);
+const petTaken = new Map(); // uuid -> assigned pet (stable per session)
+function displayName(c) {
+  if (!isCodeName(c.name)) return c.name;
+  if (petTaken.has(c.uuid)) return petTaken.get(c.uuid);
+  let i = hash(c.uuid) % PETS.length, pet = PETS[i];
+  const used = new Set(petTaken.values());
+  for (let k = 0; used.has(pet) && k < PETS.length; k++) pet = PETS[(i + k + 1) % PETS.length];
+  if (used.has(pet)) pet = `${PETS[i]} ${1 + [...used].filter(p => p.startsWith(PETS[i])).length}`;
+  petTaken.set(c.uuid, pet);
+  return pet;
+}
+const entOf = (uuid) => (view?.entities ?? []).find(e => e.uuid === uuid);
+const nameOf = (uuid) => { const e = entOf(uuid); if (!e) return uuid; return e.type === 'crop' ? displayName({ uuid: e.uuid, name: e.name }) : e.name; };
+
+// ---- transport ----------------------------------------------------------------
+const post = async (msg) => {
+  const r = await fetch('/msg', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: me, msg }) });
+  return r.json();
+};
+const tx = async (ops, sayText) => {
+  const r = await post({ t: 'tx', ops });
+  if (r.t === 'error') return feed('f-rej', `that didn't go through: ${r.err}`);
+  if (sayText) feed('f-dim', `→ ${sayText} (queued for the next tick)`);
+};
+const feed = (cls, text) => {
+  // RD-034: dedupe — a repeating condition (the user's session had one line every
+  // tick for hundreds of ticks) collapses into one line with a live ×N counter.
+  const top = $('feed').firstChild;
+  if (top && top.dataset.raw === text) {
+    top.dataset.n = String(Number(top.dataset.n ?? 1) + 1);
+    top.textContent = `${text}  (×${top.dataset.n})`;
+    return;
+  }
+  const d = document.createElement('div');
+  d.className = cls; d.textContent = text; d.dataset.raw = text; d.dataset.n = '1';
+  $('feed').prepend(d);
+  while ($('feed').children.length > 300) $('feed').lastChild.remove();
+};
+
+// ---- render -------------------------------------------------------------------
+// ---- RD-033: the generic renderer -------------------------------------------
+// Draws ANY world from `schemaDefs` + `entities`. No genre branches: a type that
+// declares spatial:{x,y} is drawn at its coordinates; its size comes from a
+// numeric field if it has an obvious one; colour is derived from the type name so
+// paddles, balls, enemies and crops are distinguishable without being enumerated.
+// Everything here is READ-ONLY against the view — the only writes leave via
+// POST /msg -> submit() (the M6 invariant, now exercised by a real-time game).
+let SCHEMA = null;
+const COLORS = ['#5aa7d6', '#8fc97a', '#e0b352', '#e07a6a', '#9a8fd6', '#6ad6c1', '#d68fb5', '#c9a95a'];
+const typeColor = (t) => { let h = 0; for (const c of t) h = (h * 31 + c.codePointAt(0)) >>> 0; return COLORS[h % COLORS.length]; };
+const spatialOf = (t) => SCHEMA?.find(d => d.name === t)?.spatial ?? null;
+const fieldRange = (t, f) => SCHEMA?.find(d => d.name === t)?.fields?.[f]?.range ?? null;
+
+function drawStage(v) {
+  const cv = $('stage'), ctx = cv.getContext('2d');
+  const spatialTypes = (SCHEMA ?? []).filter(d => d.spatial).map(d => d.name);
+  if (!spatialTypes.length) { cv.style.display = 'none'; $('stagehelp').style.display = 'none'; return; }
+  cv.style.display = ''; $('stagehelp').style.display = '';
+  // world extent = the declared range of the coordinate fields (no magic numbers)
+  const d0 = SCHEMA.find(d => d.spatial);
+  const [xlo, xhi] = d0.fields[d0.spatial.x].range, [ylo, yhi] = d0.fields[d0.spatial.y].range;
+  const sx = cv.width / (xhi - xlo + 1), sy = cv.height / (yhi - ylo + 1);
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  // HONEST NOTE (RD-033 finding): the first version sized entities by a field
+  // matching /^(hp|life|growth)$/ — hardcoded field names, i.e. genre knowledge
+  // smuggled into a "generic" renderer. It is gone. The schema declares WHERE an
+  // entity is (spatial:{x,y}) but never WHAT A FIELD MEANS, so there is no
+  // principled way to know which field is health, size, or facing. Everything
+  // draws as an equal square, coloured by type. Semantic field ROLES
+  // (role:'health'|'size'|'facing') are the next schema card — earned by this
+  // renderer, not guessed in advance.
+  const size = Math.max(5, 9 * sx);
+  for (const e of v.entities ?? []) {
+    const sp = spatialOf(e.type);
+    if (!sp) continue;
+    const x = (e.fields[sp.x] - xlo) * sx, y = (e.fields[sp.y] - ylo) * sy;
+    ctx.fillStyle = typeColor(e.type);
+    ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    if (e.uuid === selected) {
+      ctx.strokeStyle = '#c9a95a'; ctx.lineWidth = 2;
+      ctx.strokeRect(x - size / 2 - 3, y - size / 2 - 3, size + 6, size + 6);
+    }
+  }
+  // legend, generated from the schema
+  ctx.font = '11px consolas'; let ly = 12;
+  for (const t of spatialTypes) { ctx.fillStyle = typeColor(t); ctx.fillText('■ ' + t, 6, ly); ly += 13; }
+}
+
+function render(v) {
+  view = v;
+  const prevTypes = SCHEMA?.length ?? 0;
+  SCHEMA = v.schemaDefs ?? SCHEMA;
+  if ((SCHEMA?.length ?? 0) !== prevTypes) localizePlaceholders(SCHEMA);   // vocabulary grew mid-session
+  v.crops = v.crops ?? [];                       // worlds without crops are not farms
+  // recycle pet names of crops that left the world — the farm churns crops
+  // constantly, and a name held by a dead uuid forever exhausts the pool
+  // (first visual pass: every card read 'Sorrel 3' by tick ~270).
+  const live = new Set(v.crops.map(c => c.uuid));
+  for (const u of [...petTaken.keys()]) if (!live.has(u)) petTaken.delete(u);
+  drawStage(v);
+  $('s-tick').textContent = v.tick;
+  $('s-pop').textContent = (v.entities ?? []).length;
+  $('s-tally').textContent = v.tally ?? '—';
+  // world line, generated from whatever types this world actually has
+  const counts = {};
+  for (const e of v.entities ?? []) counts[e.type] = (counts[e.type] ?? 0) + 1;
+  $('zone').innerHTML = Object.entries(counts).map(([t, n]) => `<b>${n}</b> ${t}${n === 1 ? '' : 's'}`).join(' · ')
+    + (v.tally != null ? ` — score <b>${v.tally}</b>` : '');
+  $('cardhead').textContent = SCHEMA?.some(d => d.name === 'crop')
+    ? 'the field — click a crop, or just tell the farm what to do below'
+    : 'entities — click one to inspect it';   // RD-034: farm words only in farm worlds
+  const claimsBy = Object.fromEntries((v.claims ?? []).map(c => [c.uuid, c]));
+  const cards = $('cards'); cards.innerHTML = '';
+  // RD-033: ONE card renderer for EVERY world. Each numeric field draws a bar
+  // scaled by its DECLARED range — the farm's water/growth stopped being special;
+  // they are two fields that happen to be 0..255, like a ball's vx or an enemy's hp.
+  for (const e of (v.entities ?? [])) {
+    const cl = claimsBy[e.uuid];
+    const dn = e.type === 'crop' ? displayName({ uuid: e.uuid, name: e.name }) : e.name;
+    const el = document.createElement('div');
+    el.className = 'card' + (selected === e.uuid ? ' sel' : '') + (e.fields.growth >= 100 ? ' ripe' : '');
+    el.dataset.uuid = e.uuid;
+    const bars = Object.entries(e.fields).map(([f, val]) => {
+      const r = fieldRange(e.type, f);
+      if (!r) return '';
+      const pct = r[1] === r[0] ? 0 : ((val - r[0]) / (r[1] - r[0])) * 100;
+      return `<div class="bar"><i style="width:${Math.max(0, Math.min(100, pct))}%;background:${typeColor(e.type)}"></i></div>`
+        + `<div class="lbl"><span>${f}</span><span>${val}</span></div>`;
+    }).join('');
+    el.innerHTML = `<div class="nm">${dn}</div><div class="id">${e.type} · ${e.uuid}</div>`
+      + (cl ? `<span class="claimbadge">🔒 ${cl.holder} · t${cl.until}</span>` : '') + bars;
+    el.onclick = () => select(e.uuid);
+    cards.appendChild(el);
+  }
+  if (v.rules) {
+    $('rules').innerHTML = '';
+    for (const name of v.rules) {
+      const chip = document.createElement('span');
+      chip.className = 'rulechip';
+      chip.innerHTML = `${name} <button title="uninstall">✕</button>`;
+      chip.onclick = async () => {  // click chip -> English explanation (needs source; ask server for it via propose-less path: rules only carry names, so explain from cache)
+        const src = ruleSrcCache.get(name);
+        $('ruleexplain').textContent = src ? exRule(src) : `(source for '${name}' unknown to this client — rules installed before you joined explain after any change)`;
+      };
+      chip.querySelector('button').onclick = async (e) => {
+        e.stopPropagation();
+        const r = await post({ t: 'uninstall', name });
+        if (!r.ok) feed('f-rej', `couldn't uninstall '${name}': ${JSON.stringify(r.errors)}`);
+      };
+      $('rules').appendChild(chip);
+    }
+  }
+  if (selected && !(v.entities ?? []).some(e => e.uuid === selected)) {
+    feed('f-def', `${nameOf(selected)} is gone (harvested or removed) — selection cleared`);
+    select(null);
+  }
+}
+const ruleSrcCache = new Map(); // name -> source (rules we saw installed this session)
+
+function select(uuid) {
+  selected = uuid;
+  const e = uuid && entOf(uuid);
+  // RD-033: describe ANY entity from its own fields — no crop vocabulary
+  $('sel').textContent = e
+    ? `${nameOf(uuid)} (${e.type}) — ${Object.entries(e.fields).map(([f, v2]) => `${f} ${v2}`).join(', ')}`
+    : 'nothing selected';
+  $('selctl').style.display = uuid ? '' : 'none';
+  document.querySelectorAll('.card').forEach(el => el.classList.toggle('sel', el.dataset.uuid === uuid));
+}
+
+// ---- the command bar ----------------------------------------------------------
+// RD-UI1 intent confirmation: mutating commands NEVER run straight from parse.
+// parse -> "I understood: ..." + ✓/✗ -> only ✓ (or Enter again) submits.
+const echo = (cls, text) => { $('cmdecho').className = cls; $('cmdecho').textContent = text; $('cmdopts').innerHTML = ''; };
+const uxlog = (event, text, say) => { post({ t: 'uxlog', event, text: text.slice(0, 200), say: String(say ?? '').slice(0, 200) }).catch(() => {}); };
+const hist = []; let histAt = -1, pending = null; // pending = {ops, say, text}
+function clearPending(logIt) {
+  if (pending && logIt) uxlog('cmd-cancelled', pending.text, pending.say);
+  pending = null;
+}
+function confirmPending() {
+  if (!pending) return;
+  const p = pending; pending = null;
+  echo('ok', p.say); tx(p.ops, p.say); $('cmd').value = '';
+}
+async function runCommand(text) {
+  if (!text.trim()) return;
+  if (pending) { clearPending(false); }             // new input replaces any pending card
+  hist.unshift(text); histAt = -1;
+  if (!hasNL) return echo('err', 'the language modules are still being built — use the buttons for now');
+  let r;
+  try { r = parseNL(text, { selected }); }
+  catch (e) { return echo('err', `parser error: ${e.message}`); }
+  if (r.kind === 'ops') {
+    pending = { ops: r.ops, say: r.say, text };
+    echo('ask', `I understood: ${r.say} — press Enter to confirm`);
+    const yes = document.createElement('button');
+    yes.className = 'btn small'; yes.textContent = '✓ do it';
+    yes.onclick = confirmPending;
+    const no = document.createElement('button');
+    no.className = 'btn small'; no.textContent = '✗ cancel';
+    no.onclick = () => { clearPending(true); echo('f-dim', 'cancelled — nothing ran'); };
+    $('cmdopts').append(yes, no);
+  }
+  else if (r.kind === 'clarify') {
+    echo('ask', r.say);
+    uxlog('parse-clarify', text, r.say);
+    for (const uuid of (r.options ?? []).slice(0, 8)) {
+      const b = document.createElement('button');
+      b.className = 'btn small'; b.textContent = nameOf(uuid);
+      b.onclick = () => { select(uuid); echo('ok', `selected ${nameOf(uuid)} — say it again or use the buttons`); };
+      $('cmdopts').appendChild(b);
+    }
+  }
+  else if (r.kind === 'info') { echo('ok', r.say); if (r.select) select(r.select); $('cmd').value = ''; }
+  else { echo('err', r.say); uxlog('parse-fail', text, r.say); }
+}
+$('cmdgo').onclick = () => (pending ? confirmPending() : runCommand($('cmd').value));
+$('cmd').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { if (pending) confirmPending(); else runCommand($('cmd').value); }
+  else if (e.key === 'Escape') { if (pending) { clearPending(true); echo('f-dim', 'cancelled — nothing ran'); } }
+  else if (e.key === 'ArrowUp') { if (histAt < hist.length - 1) $('cmd').value = hist[++histAt]; e.preventDefault(); }
+  else if (e.key === 'ArrowDown') { $('cmd').value = histAt > 0 ? hist[--histAt] : (histAt = -1, ''); e.preventDefault(); }
+  else if (pending && e.key.length === 1) { clearPending(true); echo('', ''); }  // typing = new thought
+});
+
+// ---- inspector buttons (still first-class — language is an addition, not a toll) ----
+$('b-water').onclick = () => selected && tx([{ kind: 'setfield', target: selected, field: 'water', value: Number($('i-water').value) }], `watering ${nameOf(selected)}`);
+$('b-claim').onclick = () => selected && tx([{ kind: 'claim', target: selected, ticks: Number($('i-claim').value) || 40 }], `claiming ${nameOf(selected)}`);
+$('b-harvest').onclick = () => selected && tx([{ kind: 'delete', target: selected }], `harvesting ${nameOf(selected)}`);
+$('b-name').onclick = () => selected && $('i-name').value && tx([{ kind: 'setfield', target: selected, field: 'name', value: $('i-name').value }], `renaming to ${$('i-name').value}`);
+
+// ---- AI rule authoring ----------------------------------------------------------
+$('b-propose').onclick = async () => {
+  const goal = $('goal').value.trim();
+  if (!goal) return;
+  $('b-propose').disabled = true;
+  $('prop-status').innerHTML = '<span class="spin">◐</span> the AI is drafting in a sandbox copy of the world…';
+  $('proposal').style.display = 'none'; $('ruleout').textContent = '';
+  const r = await post({ t: 'propose', goal }).catch(e => ({ ok: false, err: e.message }));
+  $('b-propose').disabled = false; $('prop-status').textContent = '';
+  if (!r.ok) {
+    // REFUSAL CARD (round-2 user finding: refusals need accept/reject too, and
+    // the human must SEE what the AI tried): last draft + why + retry/dismiss.
+    proposal = null;
+    let draft = '';
+    try { draft = 'its last draft, in English: ' + exRule(JSON.parse(r.lastRaw)); }
+    catch { draft = r.lastRaw ? `its last draft (not valid JSON): ${String(r.lastRaw).slice(0, 160)}…` : ''; }
+    $('prop-say').textContent = `the AI tried ${r.attempts ?? '?'} time(s) and the gate refused every draft — the world is untouched. ${draft}`;
+    $('prop-json').value = r.lastRaw ?? '';
+    $('proposal').style.display = '';
+    $('b-install').style.display = 'none';
+    $('b-discard').textContent = '✗ dismiss';
+    $('b-retry').style.display = '';
+    $('ruleout').className = 'err';
+    $('ruleout').textContent = r.errors?.length
+      ? 'why the gate refused:\n' + (EX.explainErrors ? EX.explainErrors(r.errors) : r.errors.map(e => `${e.code}: ${e.detail ?? ''}`).join('\n'))
+      : r.err;
+    feed('f-ai', `the AI could not produce a valid rule for "${goal}" — refused ${r.attempts ?? '?'} time(s), world untouched`);
+    return;
+  }
+  proposal = r;
+  $('b-install').style.display = ''; $('b-retry').style.display = 'none'; $('b-discard').textContent = '✗ reject';
+  $('prop-say').textContent = `after ${r.attempts} attempt(s), the AI proposes — ${exRule(r.source)}`;
+  $('prop-json').value = JSON.stringify(r.source, null, 1);
+  $('proposal').style.display = '';
+  // RD-035: show the unconditional-write advisory in the PREVIEW, before install.
+  if (r.warnings?.length) { $('ruleout').className = 'warn'; $('ruleout').textContent = fmtWarn(r.warnings); }
+  else { $('ruleout').className = ''; $('ruleout').textContent = ''; }
+  feed('f-ai', `the AI drafted '${r.name}' for "${r.goal}" — waiting for your ✓/✗${r.warnings?.length ? ' (with an advisory)' : ''}`);
+};
+// RD-035: an advisory is NOT a rejection — the rule is valid and safe. It names the
+// unconditional-write smell ("a branchless conditional write is still an unconditional
+// write") so the author confirms intent instead of debugging silent deferral spam.
+function fmtWarn(ws) {
+  return `⚠ ${ws.length} advisory${ws.length > 1 ? 'ies' : ''} — the rule is installed and SAFE, just confirm you meant it:\n`
+    + ws.map((w) => `  • ${w.detail || w.code}`).join('\n');
+}
+$('prop-toggle').onclick = () => { const j = $('prop-json'); j.style.display = j.style.display === 'none' || !j.style.display ? 'block' : 'none'; };
+$('b-retry').onclick = () => { $('proposal').style.display = 'none'; $('ruleout').textContent = ''; $('goal').focus(); };
+$('b-discard').onclick = () => {
+  const wasProposal = !!proposal;
+  post({ t: 'decision', goal: $('goal').value, name: proposal?.name ?? null, verdict: wasProposal ? 'rejected' : 'dismissed' }).catch(() => {});
+  $('proposal').style.display = 'none'; $('ruleout').textContent = ''; proposal = null;
+  feed('f-dim', wasProposal ? 'proposal rejected — the world never saw it' : 'dismissed');
+};
+$('b-install').onclick = async () => {
+  let src; try { src = JSON.parse($('prop-json').value); } catch (e) { $('ruleout').className = 'err'; $('ruleout').textContent = 'edited JSON is invalid: ' + e.message; return; }
+  const r = await post({ t: 'rule', source: src, replace: true });
+  if (r.ok) {
+    ruleSrcCache.set(r.name, src);
+    post({ t: 'decision', goal: $('goal').value, name: r.name, verdict: 'accepted' }).catch(() => {});
+    $('ruleout').className = r.warnings?.length ? 'warn' : 'ok';
+    $('ruleout').textContent = `'${r.name}' is LIVE. In English: ${exRule(src)}` + (r.warnings?.length ? `\n\n${fmtWarn(r.warnings)}` : '');
+    $('proposal').style.display = 'none'; proposal = null;
+  } else {
+    $('ruleout').className = 'err';
+    $('ruleout').textContent = 'the gate refused it — the world is untouched:\n' + (EX.explainErrors ? EX.explainErrors(r.errors ?? []) : (r.errors ?? []).map(e => `[${e.where}] ${e.code}: ${e.detail ?? ''}`).join('\n'));
+  }
+};
+$('goal').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('b-propose').click(); });
+
+// ---- RD-034: define a NEW TYPE through the gate, from the browser --------------
+$('b-deftype').onclick = async () => {
+  const out = $('deftypeout');
+  let fields;
+  try { fields = JSON.parse($('nt-fields').value); }
+  catch (e) { out.style.color = 'var(--bad)'; out.textContent = 'fields is not valid JSON: ' + e.message; return; }
+  const spec = { name: $('nt-name').value.trim(), fields };
+  if ($('nt-spatial').checked) spec.spatial = { x: 'x', y: 'y' };
+  const r = await post({ t: 'deftype', spec });
+  if (r.ok) {
+    out.style.color = 'var(--ok)';
+    out.textContent = `'${r.name}' exists now. Try: create a ${r.name}${spec.spatial ? ' at 128,128' : ''}`;
+    $('nt-name').value = '';
+  } else {
+    out.style.color = 'var(--bad)';
+    out.textContent = 'the gate refused it — nothing changed:\n' + (r.errors ?? []).map(e => `  [${e.where}] ${e.code}: ${e.detail ?? ''}`).join('\n');
+  }
+};
+
+// RD-034: the surface introduces itself in the WORLD's language, not the farm's.
+function localizePlaceholders(defs) {
+  const spatial = (defs ?? []).find(d => d.spatial);
+  const anyType = (defs ?? [])[0];
+  const hasFarm = (defs ?? []).some(d => d.name === 'crop');
+  if (hasFarm) {
+    $('cmd').placeholder = 'say it in plain words — "water the driest crop", "move the ball right", "who claimed what?"';
+    $('goal').placeholder = 'describe a behavior — "dry crops slowly wilt"';
+  } else if (spatial) {
+    const f = Object.keys(spatial.fields).find(k => !['x', 'y'].includes(k)) ?? 'x';
+    $('cmd').placeholder = `say it in plain words — "move the ${spatial.name} down", "what is the ${spatial.name}'s ${f}?", "create a ${spatial.name} at 40,60"`;
+    $('goal').placeholder = `describe a behavior — "the ${spatial.name}'s ${f} slowly drains"`;
+  } else if (anyType) {
+    $('cmd').placeholder = `say it in plain words — "select the ${anyType.name}", "what types are there?"`;
+    $('goal').placeholder = `describe a behavior for your ${anyType.name}s`;
+  } else {
+    $('cmd').placeholder = 'an empty world — define a type on the right, then "create a <type>"';
+    $('goal').placeholder = 'define a type first, then describe how it should behave';
+  }
+}
+
+// ---- join / stream ----------------------------------------------------------
+$('go').onclick = () => {
+  const name = $('name').value.trim();
+  if (!name) return;
+  const es = new EventSource(`/events?name=${encodeURIComponent(name)}`);
+  es.onerror = () => { if (!me) $('joinerr').textContent = 'could not connect — is the server running? is the name taken?'; };
+  es.onmessage = (ev) => {
+    const m = JSON.parse(ev.data);
+    if (m.t === 'welcome') {
+      me = m.you; $('s-you').innerHTML = `you are <b>${me}</b>`;
+      $('join').style.display = 'none'; $('ui').style.display = '';
+      render(m.view);
+      localizePlaceholders(m.view.schemaDefs);
+      // RD-034: never say "farm" unless the world IS one — the world describes itself
+      feed('f-dim', `you joined a world of ${(m.view.schemaDefs ?? []).map(d => d.name).join(', ') || 'nothing yet — define a type to begin'} at tick ${m.view.tick}`);
+      if (!hasNL) feed('f-def', 'language modules not loaded — plain-English commands are off, buttons still work');
+      $('cmd').focus();
+    } else if (m.t === 'tick') {
+      render({ ...view, tick: m.tick, tally: m.tally, entities: m.entities, crops: m.crops, claims: m.claims, rows: m.rows, rules: m.rules ?? view.rules, schemaDefs: m.schemaDefs ?? view.schemaDefs });
+      $('s-drops').textContent = m.drops ?? 0;
+      for (const y of m.yours) {
+        if (y.status === 'committed') feed('f-ok', `✓ your action went through at tick ${m.tick}`);
+        else feed('f-rej', `✗ ${exReason(y.reasons.join('; '))}`);
+      }
+      for (const d of m.deferrals)
+        feed('f-def', `⚖ ${d.competing.map(x => x.actor).join(' and ')} want different ${d.field} for ${nameOf(d.target)} — the world is holding both until one wins`);
+    } else if (m.t === 'event') feed('f-ev', m.msg);
+    else if (m.t === 'view') render(m.view);
+  };
+};
+$('name').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('go').click(); });
+
+// ---- RD-033: live input. THE INVARIANT, TESTED: a keypress is not a write. It is
+// a setfield tx POSTed to /msg -> queued -> submit() on the next tick, gated exactly
+// like an AI proposal or a terminal client's command. The renderer never touches
+// engine state. `input_dir`/`input_x`/`input_y`/`fire` are discovered from the
+// SCHEMA — the page knows no genre; a world without input fields simply has no
+// keyboard control.
+let driving = null;                        // the entity this browser drives
+const inputFields = (type) => {
+  const d = SCHEMA?.find(x => x.name === type);
+  return d ? Object.keys(d.fields).filter(f => /^(input_dir|input_x|input_y|fire)$/.test(f)) : [];
+};
+function pickDriveable() {
+  if (!SCHEMA || !view?.entities) return null;
+  const cand = view.entities.find(e => inputFields(e.type).length);
+  return cand ? cand.uuid : null;
+}
+const held = new Set();
+async function sendInput() {
+  const u = driving ?? (driving = pickDriveable());
+  if (!u) return;
+  const e = entOf(u); if (!e) { driving = null; return; }
+  const fs = inputFields(e.type), ops = [];
+  const set = (f, v) => { if (fs.includes(f) && e.fields[f] !== v) ops.push({ kind: 'setfield', target: u, field: f, value: v }); };
+  const x = (held.has('ArrowRight') ? 1 : 0) - (held.has('ArrowLeft') ? 1 : 0);
+  const y = (held.has('ArrowDown') ? 1 : 0) - (held.has('ArrowUp') ? 1 : 0);
+  set('input_x', x); set('input_y', y);
+  set('input_dir', y);                      // 1-axis worlds (Pong's paddle) use input_dir
+  set('fire', held.has(' ') ? 1 : 0);
+  if (ops.length) tx(ops);                  // -> POST /msg -> pending -> submit(). The only write path.
+}
+window.addEventListener('keydown', (ev) => {
+  if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
+  if (!/^Arrow|^ $/.test(ev.key)) return;
+  ev.preventDefault();
+  if (!held.has(ev.key)) { held.add(ev.key); sendInput(); }
+});
+window.addEventListener('keyup', (ev) => { if (held.delete(ev.key)) sendInput(); });
+fetch('/version').then(r => r.json()).then(v => { $('ver').textContent = `${v.version} · AI: ${v.model ?? 'not configured'}`; }).catch(() => {});
+</script>
+</body>
+</html>

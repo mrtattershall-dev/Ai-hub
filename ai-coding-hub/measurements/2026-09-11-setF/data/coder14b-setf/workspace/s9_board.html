@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+    <title>Task Board</title>
+</head>
+<body>
+    <div id="todo">
+<h2>To Do</h2>
+<ul>
+  <li class="card">
+    <p>Card Content</p>
+    <button class="s9-del">Delete</button>
+  </li>
+</ul>
+    </div>
+    <div id="s9-doing">
+        <h2>Doing</h2>
+        <ul></ul>
+    </div>
+    <div id="s9-done">
+        <h2>Done</h2>
+        <ul></ul>
+    </div>
+    <input type="text" id="s9-new" placeholder="Add a new task">
+    <button id="s9-add">Add</button>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('s9-filter').addEventListener('input', function() {
+        const filterText = this.value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const cardText = card.textContent.toLowerCase();
+            if (cardText.includes(filterText)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>
+<div id="s9-count-todo">0</div>
+<div id="s9-count-doing">0</div>
+<div id="s9-count-done">0</div>
+<input type="text" id="s9-filter" placeholder="Filter cards...">
+<button id="s9-clear-done">Clear Done</button>

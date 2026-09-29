@@ -1,0 +1,129 @@
+✓ Initialized. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-9PI5yyOqF80L9keQU0ZQ3c
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\028_behavior
+│   _model_curve\modal_behavior_curve.py
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior
+│   _live
+├── 🔨 Created mount C:\Users\tatte\OneDrive\Documents\ai-native-engine\core
+└── 🔨 Created function run_curve.
+
+[1ALoading checkpoint shards:   0%|          | 0/16 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   6%|▋         | 1/16 [00:58<14:39, 58.60s/it]
+[1ALoading checkpoint shards:  12%|█▎        | 2/16 [04:24<33:57, 145.50s/it]
+[1ALoading checkpoint shards:  19%|█▉        | 3/16 [06:00<26:37, 122.90s/it]
+[1ALoading checkpoint shards:  25%|██▌       | 4/16 [06:47<18:32, 92.73s/it] 
+[1ALoading checkpoint shards:  31%|███▏      | 5/16 [07:09<12:19, 67.27s/it]
+[1ALoading checkpoint shards:  38%|███▊      | 6/16 [07:32<08:41, 52.14s/it]
+[1ALoading checkpoint shards:  44%|████▍     | 7/16 [07:55<06:25, 42.80s/it]
+[1ALoading checkpoint shards:  50%|█████     | 8/16 [08:19<04:53, 36.69s/it]
+[1ALoading checkpoint shards:  56%|█████▋    | 9/16 [08:41<03:45, 32.17s/it]
+[1ALoading checkpoint shards:  62%|██████▎   | 10/16 [09:05<02:56, 29.43s/it]
+[1ALoading checkpoint shards:  69%|██████▉   | 11/16 [09:28<02:18, 27.73s/it]
+[1ALoading checkpoint shards:  75%|███████▌  | 12/16 [09:50<01:44, 26.01s/it]
+[1ALoading checkpoint shards:  81%|████████▏ | 13/16 [10:48<01:47, 35.68s/it]
+[1ALoading checkpoint shards:  88%|████████▊ | 14/16 [11:27<01:13, 36.52s/it]
+[1ALoading checkpoint shards:  94%|█████████▍| 15/16 [11:46<00:31, 31.40s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [11:51<00:00, 23.29s/it]Loading checkpoint shards: 100%|██████████| 16/16 [11:51<00:00, 44.46s/it]
+
+=== Qwen/Qwen3-Coder-30B-A3B-Instruct  (rc=0) ===
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=Qwen/Qwen3-Coder-30B-A3B-Instruct  trials/goal=4  maxAttempts=3  ticks=6  temp=0.7
+    [grow C a1] 8s
+    [grow C a2] 6s
+    [grow C a3] 12s
+    [grow C a1] 12s
+    [grow C a1] 7s
+    [grow C a2] 6s
+    [grow C a3] 12s
+    [grow C a1] 6s
+    [grow C a2] 6s
+    [grow C a3] 6s
+  CONTROL  grow   3/4  meanAtt 2.3
+    [flee C a1] 5s
+    [flee C a1] 5s
+    [flee C a1] 5s
+    [flee C a1] 5s
+  CONTROL  flee   4/4  meanAtt 1.0
+    [score C a1] 7s
+    [score C a2] 7s
+    [score C a3] 13s
+    [score C a1] 14s
+    [score C a2] 12s
+    [score C a3] 7s
+    [score C a1] 7s
+    [score C a2] 13s
+    [score C a3] 7s
+    [score C a1] 7s
+    [score C a2] 7s
+    [score C a3] 13s
+  CONTROL  score  0/4  meanAtt -
+    [wilt C a1] 12s
+    [wilt C a1] 6s
+    [wilt C a2] 6s
+    [wilt C a3] 6s
+    [wilt C a1] 12s
+    [wilt C a1] 12s
+  CONTROL  wilt   3/4  meanAtt 1.0
+    [grow F a1] 6s
+    [grow F a2] 6s
+    [grow F a3] 6s
+    [grow F a1] 6s
+    [grow F a2] 6s
+    [grow F a3] 6s
+    [grow F a1] 12s
+    [grow F a1] 6s
+    [grow F a2] 6s
+    [grow F a3] 6s
+  FEEDBACK grow   1/4  meanAtt 1.0
+    [flee F a1] 5s
+    [flee F a1] 5s
+    [flee F a1] 5s
+    [flee F a1] 5s
+  FEEDBACK flee   4/4  meanAtt 1.0
+    [score F a1] 12s
+    [score F a2] 7s
+    [score F a3] 7s
+    [score F a1] 7s
+    [score F a2] 7s
+    [score F a3] 7s
+    [score F a1] 7s
+    [score F a2] 7s
+    [score F a3] 7s
+    [score F a1] 7s
+    [score F a2] 7s
+    [score F a3] 7s
+  FEEDBACK score  0/4  meanAtt -
+    [wilt F a1] 6s
+    [wilt F a2] 6s
+    [wilt F a3] 6s
+    [wilt F a1] 6s
+    [wilt F a2] 6s
+    [wilt F a3] 6s
+    [wilt F a1] 12s
+    [wilt F a1] 12s
+  FEEDBACK wilt   2/4  meanAtt 1.0
+
+TOTAL: CONTROL 10/16   FEEDBACK 7/16   unsafe events: 0 (must be 0)
+
+--- STDERR (tail) ---
+ects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a1] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a2] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"name","cmp":"==","value":"field"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a3] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"root","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a1] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a2] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"name","cmp":"==","value":"field"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a3] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"root","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [wilt F a1] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a2] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a3] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a1] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a2] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a3] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+
+Stopping app - local entrypoint completed.
+✓ App completed. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-9PI5yyOqF80L9keQU0ZQ3c

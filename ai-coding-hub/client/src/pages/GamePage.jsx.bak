@@ -1,0 +1,185 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, RotateCcw, Download, Trash2, Gamepad2 } from 'lucide-react';
+import { useStore } from '../store/useStore.js';
+import { extractCodeBlocks } from '../lib/markdown.js';
+import { PHASER_STARTER, PIXI_STARTER, THREE_STARTER } from '../lib/gameTemplate.js';
+import ChipGroup from '../components/ChipGroup.jsx';
+
+// Per-engine config: CDN script + the global it exposes (used to detect load failure).
+const ENGINES = {
+  phaser: { label: 'Phaser', cdn: 'https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js', global: 'Phaser', template: PHASER_STARTER },
+  pixi:   { label: 'PixiJS', cdn: 'https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js',    global: 'PIXI',   template: PIXI_STARTER },
+  three:  { label: 'Three.js', cdn: 'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js', global: 'THREE', template: THREE_STARTER },
+};
+const ENGINE_CHIPS = Object.entries(ENGINES).map(([id, e]) => ({ id, label: e.label }));
+
+// Wrap the user's code in a minimal HTML doc that loads the chosen engine from a CDN
+// and forwards errors + console output to the parent via postMessage. The iframe runs
+// with sandbox="allow-scripts" only (no same-origin), so it's isolated from the hub.
+function buildSrcDoc(engineId, code) {
+  const e = ENGINES[engineId] || ENGINES.phaser;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;height:100%;background:#0c0d11;overflow:hidden}canvas{display:block;margin:0 auto}</style>
+<script src="${e.cdn}"><\/script>
+<script>
+(function(){
+  function send(t,m){try{parent.postMessage({__game:true,type:t,msg:String(m)},'*')}catch(e){}}
+  window.addEventListener('error',function(e){send('error',e.message+(e.lineno?' (line '+e.lineno+')':''))});
+  window.addEventListener('unhandledrejection',function(e){send('error',(e.reason&&e.reason.message)||e.reason)});
+  ['log','warn','error'].forEach(function(k){var o=console[k];console[k]=function(){send(k,Array.prototype.slice.call(arguments).join(' '));o.apply(console,arguments)}});
+  window.addEventListener('load',function(){if(!window.${e.global})send('error','${e.label} failed to load — check your internet connection.')});
+})();
+<\/script></head><body>
+<script>
+try {
+${code}
+} catch (err) { parent.postMessage({__game:true,type:'error',msg:String((err&&err.message)||err)},'*'); }
+<\/script>
+</body></html>`;
+}
+
+export default function GamePage() {
+  const gameEngine = useStore(s => s.gameEngine);
+  const setGameEngine = useStore(s => s.setGameEngine);
+  const phaserCode = useStore(s => s.gameCode);
+  const pixiCode = useStore(s => s.gamePixiCode);
+  const threeCode = useStore(s => s.gameThreeCode);
+  const setPhaserCode = useStore(s => s.setGameCode);
+  const setPixiCode = useStore(s => s.setGamePixiCode);
+  const setThreeCode = useStore(s => s.setGameThreeCode);
+  const chatThreads = useStore(s => s.chatThreads);
+  const activeThreadId = useStore(s => s.activeThreadId);
+  const addToast = useStore(s => s.addToast);
+
+  // Read/write the stored code for a given engine.
+  const codeByEngine = { phaser: phaserCode, pixi: pixiCode, three: threeCode };
+  const setByEngine = { phaser: setPhaserCode, pixi: setPixiCode, three: setThreeCode };
+  const storedFor = (eng) => codeByEngine[eng] || ENGINES[eng].template;
+  const saveFor = (eng, c) => setByEngine[eng](c);
+
+  const [code, setCode] = useState(storedFor(gameEngine));
+  const [srcDoc, setSrcDoc] = useState('');
+  const [runNonce, setRunNonce] = useState(0);
+  const [logs, setLogs] = useState([]);
+  const ranOnce = useRef(false);
+
+  // Capture console/errors postMessaged from the sandboxed iframe.
+  useEffect(() => {
+    const onMsg = (e) => {
+      const d = e.data;
+      if (!d || !d.__game) return;
+      setLogs(l => [...l.slice(-200), { type: d.type, msg: d.msg }]);
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  // Build + reload the preview. `eng`/`src` default to current engine/buffer.
+  const run = (src, eng) => {
+    const e = eng || gameEngine;
+    const c = src != null ? src : code;
+    saveFor(e, c);
+    setLogs([]);
+    setSrcDoc(buildSrcDoc(e, c));
+    setRunNonce(n => n + 1);   // force the iframe to fully reload
+  };
+
+  // Auto-run once on mount so the preview isn't blank.
+  useEffect(() => {
+    if (!ranOnce.current) { ranOnce.current = true; run(code, gameEngine); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Switching engines: persist the current buffer, load the other engine's code, run it.
+  const switchEngine = (next) => {
+    if (next === gameEngine || !ENGINES[next]) return;
+    saveFor(gameEngine, code);
+    const nextCode = storedFor(next);
+    setCode(nextCode);
+    setGameEngine(next);
+    run(nextCode, next);
+  };
+
+  const resetTemplate = () => {
+    const tpl = ENGINES[gameEngine].template;
+    setCode(tpl);
+    run(tpl, gameEngine);
+  };
+
+  // Grab the most recent code block the AI produced in the Code tab.
+  const pullFromCode = () => {
+    const threadId = activeThreadId['code'];
+    const thread = threadId ? chatThreads[threadId] : null;
+    if (!thread) { addToast('No Code conversation yet — generate a game in the Code tab first.', 'error'); return; }
+    const lastAsst = [...thread.messages].reverse().find(m => m.role === 'assistant' && m.content);
+    if (!lastAsst) { addToast('No AI reply to pull from.', 'error'); return; }
+    const blocks = extractCodeBlocks(lastAsst.content);
+    const pick = blocks.find(b => ['js', 'javascript'].includes(b.lang))
+      || blocks.find(b => b.lang === 'html')
+      || blocks[0];
+    if (!pick) { addToast('No code block found in the last reply.', 'error'); return; }
+    setCode(pick.code);
+    run(pick.code, gameEngine);
+    addToast(`Pulled latest code into ${ENGINES[gameEngine].label}.`);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); run(); }
+  };
+
+  return (
+    <div className="game-layout">
+      <div className="game-toolbar">
+        <span className="game-toolbar-title"><Gamepad2 size={14} /> Preview</span>
+        <ChipGroup items={ENGINE_CHIPS} activeId={gameEngine} onChange={switchEngine} compact />
+        <span style={{ flex: 1 }} />
+        <button className="btn btn-sm" onClick={pullFromCode} title="Load the latest code block from the Code tab">
+          <Download size={13} /> Pull from Code
+        </button>
+        <button className="btn btn-sm" onClick={resetTemplate} title="Restore the starter template for this engine">
+          <RotateCcw size={13} /> Reset
+        </button>
+        <button className="btn btn-primary btn-sm" onClick={() => run()} title="Run (⌘/Ctrl+Enter)">
+          <Play size={13} /> Run
+        </button>
+      </div>
+
+      <div className="game-body">
+        <textarea
+          className="game-editor"
+          value={code}
+          spellCheck={false}
+          onChange={(e) => setCode(e.target.value)}
+          onBlur={() => saveFor(gameEngine, code)}
+          onKeyDown={onKeyDown}
+          placeholder="// Game code — runs in a sandboxed iframe with the selected engine loaded"
+        />
+
+        <div className="game-preview-wrap">
+          <iframe
+            key={runNonce}
+            title="game-preview"
+            className="game-frame"
+            sandbox="allow-scripts"
+            srcDoc={srcDoc}
+          />
+          <div className="game-console">
+            <div className="game-console-head">
+              <span>Console</span>
+              <button className="btn-icon" onClick={() => setLogs([])} title="Clear console">
+                <Trash2 size={12} />
+              </button>
+            </div>
+            <div className="game-console-body">
+              {logs.length === 0
+                ? <div className="game-log-line muted">No output yet. Errors and console.log from the game appear here.</div>
+                : logs.map((l, i) => (
+                    <div key={i} className={`game-log-line ${l.type}`}>{l.msg}</div>
+                  ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

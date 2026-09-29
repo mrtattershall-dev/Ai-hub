@@ -1,0 +1,15 @@
+### 14B + append-preferred (3 passes)
+create       stopped       12     6    0     33   15.3    | runs
+append       stopped       12     7    2     30   21.9    | THROWS
+surgical     stopped        9     7    0     24   22.5    | THROWS
+multi-site   stopped       13     7    0     27   20.3    | THROWS
+python       stopped       22    11    0     51   21.7   p2_str.py
+docs         stopped        5     4    0     12   18.5   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 2/6   <- the number that matters
+tool errors        : 2
+--- pass 1
+create       done          18    10    1     45   17.5    | runs
+append       done          10     5    0     18   21.2    | runs
+surgical     done           7     5    0     15   22.7    | runs
+multi-site   done           6     4    0     12   18.6    | runs

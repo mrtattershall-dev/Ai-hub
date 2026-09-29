@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./style.css">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet"> -->
+    
+    <title>Space Blast | Game</title>
+
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="status-display">
+            <table id="status-table">
+                <tr>
+                    <td id="score-legend">
+                        score
+                    </td>
+                    <td id="score-value">
+                        0
+                    </td>
+                </tr>
+                <tr>
+                    <td id="level-legend">
+                        level
+                    </td>
+                    <td id="level-value">
+                        1
+                    </td>
+                </tr>
+                <tr>
+                    <td id="hp-legend">
+                        hp
+                    </td>
+                    <td id="hp-value">
+                        0
+                    </td>
+                </tr>
+                <tr>
+                    <td id="ammo-legend">
+                        ammo
+                    </td>
+                    <td id="ammo-value">
+                        0
+                    </td>
+                </tr>
+                <tr>
+                    <td id="blast-legend">
+                        blast
+                    </td>
+                    <td id="blast-value">
+                        0
+                    </td>
+                </tr>
+            </table>
+            <table id="tutorial-table">
+                <tr>
+                    <td>
+                        ← / →
+                    </td>
+                    <td>
+                        Left / Right
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        ↑ / ↓
+                    </td>
+                    <td>
+                        Up / Down
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Space
+                    </td>
+                    <td>
+                        Shoot
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        0 
+                    </td>
+                    <td>
+                        Blast
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        P 
+                    </td>
+                    <td>
+                        Pause
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        D 
+                    </td>
+                    <td>
+                        Dark mode
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        S 
+                    </td>
+                    <td>
+                        Sound
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        M 
+                    </td>
+                    <td>
+                        Music
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        N 
+                    </td>
+                    <td>
+                        new Game
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Enter 
+                    </td>
+                    <td>
+                        Start Game
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="main-display">
+            <div id="message" style="display: none;">
+                GO-GO!!
+            </div>
+            <!-- <canvas id="gameCanvas" width="640" height="480"></canvas> -->
+            <canvas id="gameCanvas" width="680" height="510"></canvas>
+        </div>
+        <div class="button-display">
+            
+            <button id="btn-dark-mode"              >dark mode</button>
+            <button id="btn-sound-mode"             >sound on</button>
+            <button id="btn-music-mode"             >music on</button>
+            <button id="btn-difficult-mode" disabled>difficult</button>
+            <button id="btn-start"                  >start</button>
+            <button id="btn-pause"                  >pause off</button>
+            <button id="btn-new-game"               >new game</button>
+            <button id="btn-exit-game"              >exit</button>
+        </div>
+    </div>
+    <script type="module" src="game.js"></script>
+</body>
+
+</html>

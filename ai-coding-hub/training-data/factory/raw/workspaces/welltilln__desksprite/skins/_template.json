@@ -1,0 +1,48 @@
+{
+  "name": "my-sprite",
+  "author": "your-name",
+  "palette": {
+    ".": null,
+    "X": "#000000"
+  },
+  "size": {
+    "w": 5,
+    "h": 5
+  },
+  "anchor": {
+    "x": 2,
+    "y": 5
+  },
+  "frames": {
+    "idle": [
+      ".XXX.",
+      "X...X",
+      "X.X.X",
+      "X...X",
+      ".XXX."
+    ],
+    "held": [
+      ".XXX.",
+      "X...X",
+      "X.X.X",
+      "X...X",
+      ".XXX."
+    ],
+    "walk": [
+      [
+        ".XXX.",
+        "X...X",
+        "X.X.X",
+        "X...X",
+        ".XX.."
+      ],
+      [
+        ".XXX.",
+        "X...X",
+        "X.X.X",
+        "X...X",
+        "..XX."
+      ]
+    ]
+  }
+}

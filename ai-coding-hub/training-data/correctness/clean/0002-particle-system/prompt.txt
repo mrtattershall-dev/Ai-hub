@@ -1,0 +1,8 @@
+Write a 2D particle system for a canvas game in vanilla JavaScript using the IIFE revealing-module pattern.
+
+Requirements:
+- Spawn particles (and bursts of many) with position, velocity, lifetime, color, and size.
+- update(dt) each frame: move by velocity, apply drag/gravity, age particles by lifetime, and remove dead ones.
+- render(ctx) to draw each particle to a 2D canvas context, fading out as it ages.
+- Keep it efficient (reuse/pool where reasonable) and self-contained.
+- Use section-header comments to organize the file.

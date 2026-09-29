@@ -1,0 +1,43 @@
+[2026-09-25T20:03:53Z] STAGE2 start; HEAD 3abcef2
+[2026-09-25T20:03:53Z] experiment OVERNIGHT-1 arms RECOVERY_ARM,AUTODIAG_ARM reps 2 seeds 606,707 total 7800s per-task 240s tasks all max-steps 25 policy {"maxAttempts":2,"maxRepeats":2,"maxProvisional":3}
+OVERNIGHT-1 START 2026-09-25T20:03:54.083Z hub 3abcef2
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+arms (identical seed + guidance in every arm): RECOVERY_ARM = full diagnostic (opening + after every edit) PLUS the recovery controller: verified checkpoint, exact rollback of rejected edits, repeat refusal, attempt/provisional bounds | AUTODIAG_ARM = the Hub runs the graded cases and delivers the full result (counts plus up to 6 failing cases, expected vs actual)
+seeds: 606,707   order: arm order for task index ti in replicate r starts at (ti + r - 1) mod 2
+queue: 22 tasks x 2 arms x 2 replicate(s) = 88 units
+limits: 240s/task, 7800s total, no retries
+
+measuring seed baselines (no model involved):
+  baseline ext-bucketsort: 1/7 graded cases pass on the seed
+  baseline ext-find_in_sorted: 5/7 graded cases pass on the seed
+  baseline ext-flatten: 1/7 graded cases pass on the seed
+  baseline ext-gcd: 1/6 graded cases pass on the seed
+  baseline ext-get_factors: 1/11 graded cases pass on the seed
+  baseline ext-is_valid_parenthesization: 2/3 graded cases pass on the seed
+  baseline ext-kheapsort: 1/4 graded cases pass on the seed
+  baseline ext-kth: 3/7 graded cases pass on the seed
+  baseline ext-lcs_length: 1/9 graded cases pass on the seed
+  baseline ext-lis: 8/12 graded cases pass on the seed
+  baseline ext-longest_common_subsequence: 6/10 graded cases pass on the seed
+  baseline ext-max_sublist_sum: 2/6 graded cases pass on the seed
+  baseline ext-mergesort: 1/14 graded cases pass on the seed
+  baseline ext-next_palindrome: 4/5 graded cases pass on the seed
+  baseline ext-pascal: 1/5 graded cases pass on the seed
+  baseline ext-possible_change: 1/10 graded cases pass on the seed
+  baseline ext-powerset: 1/5 graded cases pass on the seed
+  baseline ext-quicksort: 12/13 graded cases pass on the seed
+  baseline ext-shunting_yard: 2/6 graded cases pass on the seed
+  baseline ext-sieve: 1/6 graded cases pass on the seed
+  baseline ext-subsequences: 2/12 graded cases pass on the seed
+  baseline ext-to_base: 3/10 graded cases pass on the seed
+  1. [RECOVERY_ARM] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+[2026-09-25T20:05:56Z] campaign process exited 127
+[2026-09-25T20:05:57Z] app state now:
+    "description": "legasus-7b",
+    "state": "deployed",
+    "tasks": "1",
+    "created_at": "2026-09-25 15:01:33-05:00",
+--
+    "description": "legasus-7b",
+stage2 exit 127

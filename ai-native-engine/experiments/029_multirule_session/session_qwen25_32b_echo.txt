@@ -1,0 +1,61 @@
+=== RD-B5: live multi-rule authoring session (REAL model) ===
+
+model=Qwen/Qwen2.5-Coder-32B-Instruct  sessions/arm=4  maxAttempts=4  ticks=40  temp=0.7  fb=echo  tickBudget=off
+  CONTROL  session 1/4
+    [C a1] 15s
+      [C a1] rules=3 installed=3 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=linear unsafe=0
+    [C a2] 13s
+      [C a2] rules=3 installed=3 observable=fail reaps=3 spawns=4 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a3] 12s
+      [C a3] rules=3 installed=3 observable=PASS reaps=5 spawns=8 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 2/4
+    [C a1] 8s
+      [C a1] rules=5 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [C a2] 11s
+      [C a2] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [C a3] 15s
+      [C a3] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [C a4] 15s
+      [C a4] rules=4 installed=4 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 3/4
+    [C a1] 6s
+      [C a1] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [C a2] 6s
+      [C a2] rules=4 installed=3 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [C a3] 13s
+      [C a3] rules=3 installed=3 observable=PASS reaps=5 spawns=8 fold=0 rej=5 budget=0 ops=bounded unsafe=0
+  CONTROL  session 4/4
+    [C a1] 12s
+      [C a1] rules=4 installed=4 observable=PASS reaps=5 spawns=8 fold=0 rej=10 budget=0 ops=bounded unsafe=0
+  => CONTROL  3/4  meanAtt 2.3  unsafe 0  foldArb 0  rejTx 15  budgetTrips 0  opGrowth {"bounded":4}
+  FEEDBACK session 1/4
+    [F a1] 6s
+      [F a1] rules=4 installed=3 observable=fail reaps=0 spawns=4 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 6s
+      [F a2] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=2 rej=8 budget=0 ops=linear unsafe=0
+    [F a3] 7s
+      [F a3] rules=5 installed=5 observable=PASS reaps=5 spawns=8 fold=2 rej=15 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 2/4
+    [F a1] 7s
+      [F a1] rules=5 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [F a2] 8s
+      [F a2] rules=5 installed=5 observable=fail reaps=3 spawns=4 fold=0 rej=3 budget=0 ops=bounded unsafe=0
+    [F a3] 8s
+      [F a3] rules=5 installed=5 observable=fail reaps=3 spawns=4 fold=0 rej=3 budget=0 ops=bounded unsafe=0
+    [F a4] 8s
+      [F a4] rules=5 installed=5 observable=fail reaps=3 spawns=4 fold=0 rej=3 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 3/4
+    [F a1] 7s
+      [F a1] rules=5 installed=5 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [F a2] 8s
+      [F a2] rules=5 installed=5 observable=PASS reaps=5 spawns=8 fold=0 rej=10 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 4/4
+    [F a1] 7s
+      [F a1] rules=4 installed=3 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [F a2] 7s
+      [F a2] rules=4 installed=4 observable=PASS reaps=5 spawns=8 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  => FEEDBACK 3/4  meanAtt 2.3  unsafe 0  foldArb 2  rejTx 28  budgetTrips 0  opGrowth {"bounded":4}
+
+TOTAL: CONTROL 3/4  FEEDBACK 3/4  unsafe 0 (must be 0)
+
+--- STDERR ---

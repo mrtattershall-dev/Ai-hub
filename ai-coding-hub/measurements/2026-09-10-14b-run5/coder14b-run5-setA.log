@@ -1,0 +1,39 @@
+coder14b-run5 set A start 23:11:54
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":"/adapters/run5"}
+
+20 goals, sequential: coder14b-run5-setA
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-dSbzo6\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  stopped        9     4   0   0    24  t1_temp.js:runs
+   2  stopped        7     4   2   0    21  t1_temp.js:runs FN-MISSING(kToC)
+   3  done           6     2   0   0    12  t2_text.py:runs
+   4  stopped        6     3   0   0    24  t3_inventory.js:runs
+   5  stopped       12     8   5   0    39  t3_inventory.js:runs
+   6  stopped        4     3   0   0    15  T_NOTES.md:MISSING t3_inventory.js:runs
+   7  done           8     4   0   0    24  t4_intervals.js:runs
+   8  stopped        7     4   0   0    45  t4_intervals.js:runs T_INTERVALS.md:MISSING
+   9  stopped        6     3   0   0    21  t5_page.html:LINKS-MISSING(t5_page.js) t5_page.js:MISSING
+  10  stopped        6     3   0   0    15  t5_page.html:LINKS-MISSING(t5_page.js) t5_page.js:MISSING
+  11  done          10     4   0   0    18  t6_stats.py:runs
+  12  stopped        9     5   0   0    21  t7_router.js:runs
+  13  stopped        9     5   0   0    78  t7_router.js:runs
+  14  stopped        7     4   0   0    51  t8_game.html:MISSING t8_game.js:parses
+  15  stopped       10     7   0   0    27  t8_game.js:parses
+  16  done           6     2   0   0    21  t9_csvsum.py:runs
+  17  running        1     1   0   0   657  t10_debounce.js:MISSING
+  18  START FAILED {"error":"fetch failed"}
+  19  START FAILED {"error":"a run is already working in this workspace (stoppe
+  20  START FAILED {"error":"a run is already working in this workspace (stoppe
+
+--- summary ---
+goals run           : 17
+status 'done'       : 4/17
+WORK ACTUALLY DONE  : 10/17   <- the number that matters
+tool errors         : 7
+guard refusals      : 0   (the system working)
+total model calls   : 66
+wall clock          : 18.6 min
+files: ESCALATIONS.md, index.html, package.json, t1_temp.js, t2_text.py, t3_inventory.js, t4_intervals.js, t5_page.html, t6_stats.py, t7_router.js, t8_game.js, t9_csvsum.py, TASKS.md, __pycache__
+tok/s: min 13.6 max 39.7
+harness exit 0 at 23:30:31

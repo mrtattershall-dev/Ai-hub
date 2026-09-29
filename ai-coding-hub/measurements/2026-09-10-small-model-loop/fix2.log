@@ -1,0 +1,13 @@
+### WITH nothing-new detection (3 passes)
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 1
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 2/6   <- the number that matters
+tool errors        : 3
+--- pass 2
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 5
+--- pass 3

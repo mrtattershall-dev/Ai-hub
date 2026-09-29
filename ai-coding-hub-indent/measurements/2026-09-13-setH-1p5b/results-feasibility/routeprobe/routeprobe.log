@@ -1,0 +1,40 @@
+  ROUTE PROBE (apparatus development, not the experiment)
+  goal 64  sites [1,5]  seeds [1,2,3,4]  routes [V1_comment_only,V2_indent_primer,V3_chat]
+
+--- site 1  (indent 4)  declare the accumulator list for ordered-list items, beside the existing i ---
+  [V1_comment_only   s1]   15B  nonempty=true  echo=false loads=true  old=true       items = []\n
+  [V1_comment_only   s2]    0B  nonempty=false echo=false loads=null  old=null   
+  [V1_comment_only   s3]    0B  nonempty=false echo=false loads=null  old=null   
+  [V1_comment_only   s4]  236B  nonempty=true  echo=false loads=true  old=true       # and then in the existing s4_markdown.py: add this bl
+  [V2_indent_primer  s1]  101B  nonempty=true  echo=false loads=true  old=true       # and then proceed with the existing code block struct
+  [V2_indent_primer  s2]   21B  nonempty=true  echo=false loads=true  old=false      items.append("")\n
+  [V2_indent_primer  s3]   20B  nonempty=true  echo=false loads=true  old=false      items.append([])
+  [V2_indent_primer  s4]  584B  nonempty=true  echo=false loads=true  old=true       # AT THIS POINT WRITE ONLY THIS: add a new line in the
+  [V3_chat           s1]   11B  nonempty=true  echo=false loads=false old=false  items = []\n
+  [V3_chat           s2]   11B  nonempty=true  echo=false loads=false old=false  items = []\n
+  [V3_chat           s3]   11B  nonempty=true  echo=false loads=false old=false  items = []\n
+  [V3_chat           s4]   15B  nonempty=true  echo=false loads=true  old=true       items = []\n
+
+--- site 5  (indent 8)  the new branch: a line starting with a number, a dot and a space is an ord ---
+  [V1_comment_only   s1]  288B  nonempty=true  echo=false loads=true  old=true           # AT THIS POINT WRITE ONLY THIS: the new branch: a
+  [V1_comment_only   s2] 2549B  nonempty=true  echo=true  loads=false old=false          # If the line is a heading, flush the paragraph an
+  [V1_comment_only   s3] 1813B  nonempty=true  echo=false loads=false old=false          elif line.startswith("# "):\n            flush_para
+  [V1_comment_only   s4]   68B  nonempty=true  echo=false loads=true  old=true           if re.match(r"^\d+\. ", line):\n            flush_p
+  [V2_indent_primer  s1] 1861B  nonempty=true  echo=false loads=false old=false          elif _is_heading(line):\n            flush_para()\n 
+  [V2_indent_primer  s2]   70B  nonempty=true  echo=false loads=true  old=true           if re.match(r"^\d+\.\s+", line):\n            flush
+  [V2_indent_primer  s3]  153B  nonempty=true  echo=false loads=false old=false          if re.match(r"^\d+\.\s", line):\n            flush_
+  [V2_indent_primer  s4]  348B  nonempty=true  echo=false loads=true  old=true           # AT THIS POINT WRITE ONLY THIS: the new branch: a
+  [V3_chat           s1]   79B  nonempty=true  echo=false loads=false old=false  if line.startswith("1. "):\n    flush_list()\n    items.appe
+  [V3_chat           s2]   79B  nonempty=true  echo=false loads=false old=false  if line.startswith("1. "):\n    flush_list()\n    items.appe
+  [V3_chat           s3]  187B  nonempty=true  echo=false loads=false old=false  flush_list()\nh = _is_heading(line)\nif h:\n    flush_para()\n
+  [V3_chat           s4]  336B  nonempty=true  echo=true  loads=false old=false  flush_list()\nh = _is_heading(line)\nif h:\n    flush_para()\n
+
+===== WHICH ROUTE ACTUALLY PRODUCES A SNIPPET? =====
+  site 1  V1_comment_only    non-empty 2/4   echoed instruction 0/4   loads 2/4   old kept 2/4
+  site 1  V2_indent_primer   non-empty 4/4   echoed instruction 0/4   loads 4/4   old kept 2/4
+  site 1  V3_chat            non-empty 4/4   echoed instruction 0/4   loads 1/4   old kept 1/4
+  site 5  V1_comment_only    non-empty 4/4   echoed instruction 1/4   loads 2/4   old kept 2/4
+  site 5  V2_indent_primer   non-empty 4/4   echoed instruction 0/4   loads 2/4   old kept 2/4
+  site 5  V3_chat            non-empty 4/4   echoed instruction 1/4   loads 0/4   old kept 0/4
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\routeprobe-bLNWuF

@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <title>Kanban Board</title>
+    <style>
+        #s9-todo, #s9-doing, #s9-done {
+            width: 30%;
+            float: left;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .s9-card {
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div id="s9-todo">
+        <h2>To Do</h2>
+        <ul id="s9-todo-list"></ul>
+    </div>
+    <div id="s9-doing">
+        <h2>Doing</h2>
+        <ul id="s9-doing-list"></ul>
+    </div>
+    <div id="s9-done">
+        <h2>Done</h2>
+        <ul id="s9-done-list"></ul>
+    </div>
+    <input type="text" id="s9-new" placeholder="New task">
+    <button id="s9-add">Add</button>
+    <script src="s9_board.js"></script>
+</body>
+</html>

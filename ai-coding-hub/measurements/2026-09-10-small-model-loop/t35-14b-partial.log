@@ -1,0 +1,14 @@
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+35 goals, sequential: 14B int4 / A10G — 35 goals
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-Sg7lpy\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  stopped       10     6   3   0    27  q1_math.js:runs
+   2  stopped       11     6   0   0    24  q2_str.js:runs
+   3  stopped       13     7   2   0    27  q3_list.js:THROWS
+   4  stopped       17    10   0   0    39  q4_time.py:runs
+   5  stopped       18    11   4   0    48  q5_page.html:ok
+   6  stopped       23    14   4   0    87  q1_math.js:THROWS
+   7  stopped       14    10   4   0    39  q2_str.js:runs
+   8  stopped       12     8   0   0    24  q3_list.js:THROWS

@@ -1,0 +1,635 @@
+{
+ "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+ "at": "2026-07-17T02:47:31.966Z",
+ "arms": {
+  "A_unsigned": [
+   {
+    "key": "paddle_input",
+    "goal": "Move each paddle according to the player's held input: input_dir says which way the player is pushing. The paddle must never leave the field (y stays between 0 and 255).",
+    "success": true,
+    "attempts": 2,
+    "rule": {
+     "name": "move_paddle",
+     "match": {
+      "type": "paddle"
+     },
+     "effects": [
+      {
+       "set": "y",
+       "to": {
+        "min": [
+         {
+          "max": [
+           {
+            "add": [
+             {
+              "field": "y"
+             },
+             {
+              "mul": [
+               {
+                "field": "input_dir"
+               },
+               2
+              ]
+             }
+            ]
+           },
+           0
+          ]
+         },
+         255
+        ]
+       }
+      }
+     ]
+    },
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "move_paddle",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "y always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"move_paddle\",\"match\":{\"type\":\"paddle\"},\"effects\":[{\"set\":\"y\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"y\"},{\"mul\":[{\"field\":\"input_dir\"},2]}]},255]},0]}}]}"
+     },
+     {
+      "attempt": 2,
+      "phase": "installed",
+      "name": "move_paddle",
+      "raw": "{\"name\":\"move_paddle\",\"match\":{\"type\":\"paddle\"},\"effects\":[{\"set\":\"y\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"y\"},{\"mul\":[{\"field\":\"input_dir\"},2]}]},0]},255]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "ball_move",
+    "goal": "Each tick, move the ball horizontally by its horizontal velocity vx. The ball must stay inside the field (x between 0 and 255).",
+    "success": true,
+    "attempts": 1,
+    "rule": {
+     "name": "move_ball",
+     "match": {
+      "type": "ball"
+     },
+     "every": 1,
+     "effects": [
+      {
+       "set": "x",
+       "to": {
+        "min": [
+         {
+          "max": [
+           {
+            "add": [
+             {
+              "field": "x"
+             },
+             {
+              "field": "vx"
+             }
+            ]
+           },
+           0
+          ]
+         },
+         255
+        ]
+       }
+      }
+     ]
+    },
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "installed",
+      "name": "move_ball",
+      "raw": "{\"name\":\"move_ball\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"x\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"x\"},{\"field\":\"vx\"}]},0]},255]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "wall_bounce",
+    "goal": "When the ball reaches the top of the field (y is 0 or less), reverse its vertical velocity vy so it travels back down.",
+    "success": false,
+    "attempts": 4,
+    "rule": null,
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "reverse_vy",
+        "where": "effects[0]",
+        "code": "range_unprovable",
+        "detail": "vy could reach [-255,0] but its range is [0,255] — wrap with min/max to state your clamp"
+       }
+      ],
+      "raw": "{\"name\":\"reverse_vy\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"y\",\"cmp\":\"<=\",\"value\":0}},\"effects\":[{\"set\":\"vy\",\"to\":{\"mul\":[{\"field\":\"vy\"},-1]}}]}"
+     },
+     {
+      "attempt": 2,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "reverse_vy",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "vy always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"reverse_vy\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"y\",\"cmp\":\"<=\",\"value\":0}},\"effects\":[{\"set\":\"vy\",\"to\":{\"max\":[{\"min\":[{\"mul\":[{\"field\":\"vy\"},-1]},255]},0]}}]}"
+     },
+     {
+      "attempt": 3,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "reverse_vy",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "vy always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"reverse_vy\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"y\",\"cmp\":\"<=\",\"value\":0}},\"effects\":[{\"set\":\"vy\",\"to\":{\"min\":[{\"max\":[{\"mul\":[{\"field\":\"vy\"},-1]},0]},255]}}]}"
+     },
+     {
+      "attempt": 4,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "reverse_vy",
+        "where": "effects[0]",
+        "code": "range_unprovable",
+        "detail": "vy could reach [-255,0] but its range is [0,255] — wrap with min/max to state your clamp"
+       }
+      ],
+      "raw": "{\"name\":\"reverse_vy\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"y\",\"cmp\":\"<=\",\"value\":0}},\"effects\":[{\"set\":\"vy\",\"to\":{\"min\":[{\"max\":[{\"mul\":[{\"field\":\"vy\"},-1]},-255]},255]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "paddle_bounce",
+    "goal": "When a paddle is within 14 units of the ball and the ball is travelling toward it, reverse the ball horizontal velocity vx so it bounces back.",
+    "success": false,
+    "attempts": 4,
+    "rule": null,
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"where\" is not a rule key — it belongs inside match (match.where) or inside an aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"of\" is not a rule key — it belongs INSIDE a count/sum/min/max aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "effects[0]",
+        "code": "range_unprovable",
+        "detail": "vx could reach [-255,0] but its range is [0,255] — wrap with min/max to state your clamp"
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"mul\":[{\"field\":\"vx\"},-1]}}],\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0},\"of\":{\"near\":14,\"type\":\"paddle\",\"where\":{\"field\":\"input_dir\",\"cmp\":\"==\",\"value\":{\"field\":\"vx\"}}}}"
+     },
+     {
+      "attempt": 2,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"where\" is not a rule key — it belongs inside match (match.where) or inside an aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"of\" is not a rule key — it belongs INSIDE a count/sum/min/max aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "vx always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0}},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"min\":[{\"max\":[{\"mul\":[{\"field\":\"vx\"},-1]},255]},0]}}],\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0},\"of\":{\"near\":14,\"type\":\"paddle\",\"where\":{\"field\":\"input_dir\",\"cmp\":\"==\",\"value\":{\"field\":\"vx\"}}}}"
+     },
+     {
+      "attempt": 3,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "effects[0]",
+        "code": "range_unprovable",
+        "detail": "vx could reach [-255,0] but its range is [0,255] — wrap with min/max to state your clamp"
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0}},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"min\":[{\"max\":[{\"mul\":[{\"field\":\"vx\"},-1]},-255]},255]}}]}"
+     },
+     {
+      "attempt": 4,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "vx always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0}},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"min\":[{\"max\":[{\"mul\":[{\"field\":\"vx\"},-1]},0]},255]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "scoring",
+    "goal": "Give a paddle one point every tick that a ball is in the goal behind the other side (a ball with x of 2 or less). Score must never exceed 255.",
+    "success": false,
+    "attempts": 4,
+    "rule": null,
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "where": "json",
+        "code": "malformed_json",
+        "detail": "Expected ',' or '}' after property value in JSON at position 182 (line 1 column "
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\"},\"u0\"],\"to\":1},255]}]}"
+     },
+     {
+      "attempt": 2,
+      "phase": "rejected",
+      "errors": [
+       {
+        "where": "json",
+        "code": "malformed_json",
+        "detail": "Expected double-quoted property name in JSON at position 169 (line 1 column 170)"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\"},\"u0\"],1]},255}}]}"
+     },
+     {
+      "attempt": 3,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "score_goal",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "score is a paddle field but this rule matches ball"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\", \"uuid\":\"u0\"},1]},255]}}]}"
+     },
+     {
+      "attempt": 4,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "score_goal",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "score is a paddle field but this rule matches ball"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\",\"uuid\":\"u0\"},1]},255]},\"uuid\":\"u0\"}]}"
+     }
+    ]
+   }
+  ],
+  "B_signed_mul": [
+   {
+    "key": "paddle_input",
+    "goal": "Move each paddle according to the player's held input: input_dir says which way the player is pushing. The paddle must never leave the field (y stays between 0 and 255).",
+    "success": true,
+    "attempts": 2,
+    "rule": {
+     "name": "move_paddle",
+     "match": {
+      "type": "paddle"
+     },
+     "effects": [
+      {
+       "set": "y",
+       "to": {
+        "min": [
+         {
+          "max": [
+           {
+            "add": [
+             {
+              "field": "y"
+             },
+             {
+              "mul": [
+               {
+                "field": "input_dir"
+               },
+               2
+              ]
+             }
+            ]
+           },
+           0
+          ]
+         },
+         255
+        ]
+       }
+      }
+     ]
+    },
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "move_paddle",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "y always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"move_paddle\",\"match\":{\"type\":\"paddle\"},\"effects\":[{\"set\":\"y\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"y\"},{\"mul\":[{\"field\":\"input_dir\"},2]}]},255]},0]}}]}"
+     },
+     {
+      "attempt": 2,
+      "phase": "installed",
+      "name": "move_paddle",
+      "raw": "{\"name\":\"move_paddle\",\"match\":{\"type\":\"paddle\"},\"effects\":[{\"set\":\"y\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"y\"},{\"mul\":[{\"field\":\"input_dir\"},2]}]},0]},255]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "ball_move",
+    "goal": "Each tick, move the ball horizontally by its horizontal velocity vx. The ball must stay inside the field (x between 0 and 255).",
+    "success": true,
+    "attempts": 2,
+    "rule": {
+     "name": "move_ball",
+     "match": {
+      "type": "ball"
+     },
+     "every": 1,
+     "effects": [
+      {
+       "set": "x",
+       "to": {
+        "min": [
+         {
+          "max": [
+           {
+            "add": [
+             {
+              "field": "x"
+             },
+             {
+              "field": "vx"
+             }
+            ]
+           },
+           0
+          ]
+         },
+         255
+        ]
+       }
+      }
+     ]
+    },
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "move_ball",
+        "where": "effects[0]",
+        "code": "degenerate_expr",
+        "detail": "x always evaluates to exactly 0 even though it reads fields — the value can never change. A clamp is usually min:[max:[expr, 0], 255] (max with the LOW bound first, then min with the HIGH bound); min:[max:[expr, 255], 0] collapses to a constant."
+       }
+      ],
+      "raw": "{\"name\":\"move_ball\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"x\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"x\"},{\"field\":\"vx\"}]},255]},0]}}]}"
+     },
+     {
+      "attempt": 2,
+      "phase": "installed",
+      "name": "move_ball",
+      "raw": "{\"name\":\"move_ball\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"x\",\"to\":{\"min\":[{\"max\":[{\"add\":[{\"field\":\"x\"},{\"field\":\"vx\"}]},0]},255]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "wall_bounce",
+    "goal": "When the ball reaches the top of the field (y is 0 or less), reverse its vertical velocity vy so it travels back down.",
+    "success": true,
+    "attempts": 1,
+    "rule": {
+     "name": "reverse_vy_on_top",
+     "match": {
+      "type": "ball",
+      "where": {
+       "field": "y",
+       "cmp": "<=",
+       "value": 0
+      }
+     },
+     "effects": [
+      {
+       "set": "vy",
+       "to": {
+        "mul": [
+         {
+          "field": "vy"
+         },
+         -1
+        ]
+       }
+      }
+     ]
+    },
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "installed",
+      "name": "reverse_vy_on_top",
+      "raw": "{\"name\":\"reverse_vy_on_top\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"y\",\"cmp\":\"<=\",\"value\":0}},\"effects\":[{\"set\":\"vy\",\"to\":{\"mul\":[{\"field\":\"vy\"},-1]}}]}"
+     }
+    ]
+   },
+   {
+    "key": "paddle_bounce",
+    "goal": "When a paddle is within 14 units of the ball and the ball is travelling toward it, reverse the ball horizontal velocity vx so it bounces back.",
+    "success": false,
+    "attempts": 4,
+    "rule": null,
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"where\" is not a rule key — it belongs inside match (match.where) or inside an aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"of\" is not a rule key — it belongs INSIDE a count/sum/min/max aggregation. Rule keys: name, match, every, effects"
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"mul\":[{\"field\":\"vx\"},-1]}}],\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0},\"of\":{\"near\":14,\"type\":\"paddle\",\"where\":{\"field\":\"input_dir\",\"cmp\":\"==\",\"value\":0}}}"
+     },
+     {
+      "attempt": 2,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"where\" is not a rule key — it belongs inside match (match.where) or inside an aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "effects[1]",
+        "code": "unknown_effect",
+        "detail": "use set/delete/reparent/spawn"
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"mul\":[{\"field\":\"vx\"},-1]}}],\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0},\"effects\":[{\"set\":\"vx\",\"to\":{\"mul\":[{\"field\":\"vx\"},-1]}},{\"match\":{\"type\":\"paddle\",\"where\":{\"field\":\"input_dir\",\"cmp\":\"==\",\"value\":0}},\"of\":{\"near\":14}}]}"
+     },
+     {
+      "attempt": 3,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"where\" is not a rule key — it belongs inside match (match.where) or inside an aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"of\" is not a rule key — it belongs INSIDE a count/sum/min/max aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "vx is a ball field but this rule matches paddle"
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"mul\":[{\"field\":\"vx\"},-1]}}],\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0},\"match\":{\"type\":\"paddle\",\"where\":{\"field\":\"input_dir\",\"cmp\":\"==\",\"value\":0}},\"of\":{\"near\":14}}"
+     },
+     {
+      "attempt": 4,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "bounce",
+        "where": "rule",
+        "code": "unknown_key",
+        "detail": "\"where\" is not a rule key — it belongs inside match (match.where) or inside an aggregation. Rule keys: name, match, every, effects"
+       },
+       {
+        "rule": "bounce",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "vx is a ball field but this rule matches paddle"
+       }
+      ],
+      "raw": "{\"name\":\"bounce\",\"match\":{\"type\":\"ball\"},\"every\":1,\"effects\":[{\"set\":\"vx\",\"to\":{\"mul\":[{\"field\":\"vx\"},-1]}}],\"where\":{\"field\":\"vx\",\"cmp\":\"!=\",\"value\":0},\"match\":{\"type\":\"paddle\",\"where\":{\"field\":\"input_dir\",\"cmp\":\"==\",\"value\":0}},\"where\":{\"field\":\"x\",\"cmp\":\"==\",\"value\":{\"field\":\"x\"},\"of\":{\"near\":14}}}"
+     }
+    ]
+   },
+   {
+    "key": "scoring",
+    "goal": "Give a paddle one point every tick that a ball is in the goal behind the other side (a ball with x of 2 or less). Score must never exceed 255.",
+    "success": false,
+    "attempts": 4,
+    "rule": null,
+    "transcript": [
+     {
+      "attempt": 1,
+      "phase": "rejected",
+      "errors": [
+       {
+        "where": "json",
+        "code": "malformed_json",
+        "detail": "Expected double-quoted property name in JSON at position 169 (line 1 column 170)"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\"},\"u0\"],255]}}]}"
+     },
+     {
+      "attempt": 2,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "score_goal",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "score is a paddle field but this rule matches ball"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\", \"uuid\":\"u0\"},1]},255]}}]}"
+     },
+     {
+      "attempt": 3,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "score_goal",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "score is a paddle field but this rule matches ball"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\",\"uuid\":\"u0\"},1]},255]},\"uuid\":\"u0\"}]}"
+     },
+     {
+      "attempt": 4,
+      "phase": "rejected",
+      "errors": [
+       {
+        "rule": "score_goal",
+        "where": "effects[0]",
+        "code": "field_not_owned",
+        "detail": "score is a paddle field but this rule matches ball"
+       }
+      ],
+      "raw": "{\"name\":\"score_goal\",\"match\":{\"type\":\"ball\",\"where\":{\"field\":\"x\",\"cmp\":\"<=\",\"value\":2}},\"every\":1,\"effects\":[{\"set\":\"score\",\"to\":{\"min\":[{\"add\":[{\"field\":\"score\",\"uuid\":\"u0\"},1]},255]},\"uuid\":\"u0\"}]}"
+     }
+    ]
+   }
+  ]
+ }
+}

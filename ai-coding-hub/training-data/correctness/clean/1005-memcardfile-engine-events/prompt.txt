@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/engine/events.js: * events.js — a minimal synchronous publish/subscribe bus.

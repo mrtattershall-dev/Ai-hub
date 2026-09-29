@@ -1,0 +1,18 @@
+
+six shapes, sequential: int4/A10G AFTER module-system fix
+workspace C:\Users\tatte\AppData\Local\Temp\shapes7b-pBJIA2\workspace
+
+shape        status      steps calls err   secs  tok/s   ON DISK
+create       stopped       11     5    1     15   29.6    | runs
+append       stopped        5     3    1      9   36.3    | runs
+surgical     stopped        4     3    1      6   32.1    | runs
+multi-site   stopped        4     3    1      9   48.3    | runs
+python       stopped        8     4    1     15     49   p2_str.py
+docs         stopped        4     3    1      6   26.3   MISSING
+
+--- summary ---
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 5/6   <- the number that matters
+tool errors        : 6
+files: ESCALATIONS.md, p1_calc.js, p2_str.py, package.json, TASKS.md, __pycache__
+tok/s: min 26.3 max 66.8 n=27

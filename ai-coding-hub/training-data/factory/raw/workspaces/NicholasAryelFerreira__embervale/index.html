@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMBERVALE — A Fox Tale</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #0b0d12;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+  }
+  #wrap {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: #000;
+    box-shadow: 0 0 0 4px #1d2433, 0 0 60px rgba(80,140,255,.12), 0 24px 60px rgba(0,0,0,.6);
+    border-radius: 2px;
+  }
+  #hint {
+    color: #5a6a8a; font-size: 12px; letter-spacing: 1px; text-align: center;
+    user-select: none;
+  }
+  #hint b { color: #9fb4d8; }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="game" width="256" height="224"></canvas>
+    <div id="hint">
+      <b>ARROWS / WASD</b> move &nbsp;·&nbsp; <b>Z / SPACE</b> sword · talk &nbsp;·&nbsp; <b>X</b> item &nbsp;·&nbsp; <b>ENTER</b> pause · inventory &nbsp;·&nbsp; <b>M</b> mute
+    </div>
+  </div>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

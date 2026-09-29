@@ -1,0 +1,41 @@
+BIND C:\Users\tatte\Projects\ai-coding-hub\server\approvalPolicy.js :: segments
+load sampler: legasus/loadSample.mjs (stand-in); ceiling 40 node processes; start=10
+witnesses: 1 (1 case-level), unobservable(budget): 0
+  baseline server/policy_test.mjs: exit=0 cases=93 fn=0
+  M001-RETURN_EMPTY        body := return []              discriminated by 71/93
+  M002-RETURN_UNDEFINED    body := return undefined       discriminated by 1/93
+  M003-BOUNDARY            0 := 1                         discriminated by 54/93
+  M004-BOUNDARY            0 := -1                        discriminated by 54/93
+  M005-BOUNDARY            < := <=                        discriminated by 16/93
+  M006-INVERT_COND         invert test @6962              discriminated by 21/93
+  M007-DROP_BRANCH         drop consequent @6969          discriminated by 6/93
+  M008-DROP_EFFECT         drop AssignmentExpression @6977 discriminated by 3/93
+  M009-INVERT_COND         invert test @6997              discriminated by 6/93
+  M010-DROP_BRANCH         drop consequent @7031          discriminated by 0/93
+  M011-BOUNDARY            < := <=                        discriminated by 0/93
+  M012-BOUNDARY            1 := 2                         discriminated by 0/93
+  M013-BOUNDARY            1 := 0                         discriminated by 0/93
+  M014-DROP_EFFECT         drop AssignmentExpression @7033 discriminated by 0/93
+  M015-INVERT_COND         invert test @7089              discriminated by 7/93
+  M016-DROP_BRANCH         drop consequent @7102          discriminated by 4/93
+  M017-DROP_EFFECT         drop AssignmentExpression @7102 discriminated by 4/93
+  M018-INVERT_COND         invert test @7146              discriminated by 21/93
+  M019-DROP_BRANCH         drop consequent @7170          discriminated by 6/93
+  M020-DROP_EFFECT         drop AssignmentExpression @7172 discriminated by 6/93
+  M021-DROP_EFFECT         drop AssignmentExpression @7183 discriminated by 3/93
+  M022-BOUNDARY            2 := 3                         discriminated by 0/93
+  M023-BOUNDARY            2 := 1                         discriminated by 0/93
+  M024-INVERT_COND         invert test @7250              discriminated by 71/93
+  M025-DROP_BRANCH         drop consequent @7280          discriminated by 0/93
+  M026-DROP_EFFECT         drop CallExpression @7282      discriminated by 2/93
+  M027-DROP_EFFECT         drop AssignmentExpression @7297 discriminated by 6/93
+  M028-DROP_EFFECT         drop UpdateExpression @7307    discriminated by 0/93
+  M029-INVERT_COND         invert test @7332              discriminated by 71/93
+  M030-DROP_BRANCH         drop consequent @7383          discriminated by 15/93
+  M031-DROP_EFFECT         drop CallExpression @7385      discriminated by 3/93
+  M032-DROP_EFFECT         drop AssignmentExpression @7400 discriminated by 15/93
+  M033-DROP_EFFECT         drop AssignmentExpression @7426 discriminated by 71/93
+  M034-DROP_EFFECT         drop CallExpression @7442      discriminated by 68/93
+load verdict: OBSERVED (within every preregistered limit; count worst 10/40, calibration worst 37.4ms vs frozen reference 35ms, 36 samples)
+records: 3162  candidates: 25  dark: 4
+-> C:\Users\tatte\Projects\ai-coding-hub\legasus\out\segments\REPORT.md

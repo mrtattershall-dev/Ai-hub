@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Animation</title>
+</head>
+<body>
+    <canvas id="canvas" width="1600" height="600"></canvas>
+</body>
+<script>
+
+    /** @type {HTMLCanvasElement} */
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+
+    const idleAnimConfig = {
+        imageSrcs: [
+            "images/adventurer-idle-00.png",
+            "images/adventurer-idle-01.png",
+            "images/adventurer-idle-02.png",
+            "images/adventurer-idle-03.png",
+        ],
+        frames: [
+            {
+                idx: 0,
+                duration: 0.2,
+            },
+            {
+                idx: 1,
+                duration: 0.2,
+            },
+            {
+                idx: 2,
+                duration: 0.2,
+            },
+            {
+                idx: 3,
+                duration: 0.2,
+            },
+        ]
+    }
+
+    const fallAnimConfig = {
+        imageSrcs: [
+            "images/adventurer-fall-00.png",
+            "images/adventurer-fall-01.png",
+        ],
+        frames: [
+            {
+                idx: 0,
+                duration: 0.1,
+            },
+            {
+                idx: 1,
+                duration: 0.1,
+            },
+        ]
+    }
+
+    const animConfig = {
+        imageSrcs: [
+            "images/adventurer-run-00.png",
+            "images/adventurer-run-01.png",
+            "images/adventurer-run-02.png",
+            "images/adventurer-run-03.png",
+            "images/adventurer-run-04.png",
+            "images/adventurer-run-05.png",
+        ],
+        frames: [
+            {
+                idx: 0,
+                duration: 0.1
+            },
+            {
+                idx: 1,
+                duration: 0.1
+            },
+            {
+                idx: 2,
+                duration: 0.1
+            },
+            {
+                idx: 3,
+                duration: 0.1
+            },
+            {
+                idx: 4,
+                duration: 0.1
+            },
+            {
+                idx: 5,
+                duration: 0.1
+            }
+        ]
+    }
+    const jumpAnimConfig = {
+        imageSrcs: [
+            "images/adventurer-jump-00.png",
+            "images/adventurer-jump-01.png",
+            "images/adventurer-jump-02.png",
+            "images/adventurer-jump-03.png",
+        ],
+        frames: [
+            {
+                idx: 0,
+                duration: 0.01,
+            },
+            {
+                idx: 1,
+                duration: 0.01,
+            },
+            {
+                idx: 2,
+                duration: 0.08,
+            },
+            {
+                idx: 3,
+                duration: 0.08,
+            },
+        ]
+    }
+
+    class MyAnimation {
+        /**
+         * @typedef {Object} Frame
+         * @property {number} idx
+         * @property {number} duration
+         * 
+         * @typedef {Object} AnimConfig
+         * @property {string[]} imageSrcs
+         * @property {Frame[]} frames
+         * 
+         * @param {AnimConfig} config
+         */
+        constructor(config) {
+            /** @type {Image[]} */
+            this.images = [];
+            this.loadImages(config.imageSrcs);
+            this.frames = config.frames;
+            this.currentFrameIdx = 0;
+            this.frameCount = this.frames.length;
+            this.currentDuration = 0;
+            this.pivotX = 30;
+            this.pivotY = 22;
+            this.scale = 2;
+        }
+
+        /**
+         * @param {string[]} imageSrcs
+         */
+        loadImages(imageSrcs) {
+            for (let src of imageSrcs) {
+                const image = new Image();
+                this.images.push(image)
+                image.src = src;
+            }
+        }
+
+        /**
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} dt
+         * @param {boolean} flip
+         */
+        draw(ctx, dt, flip, x, y) {
+            const frame = this.frames[this.currentFrameIdx];
+            const image = this.images[frame.idx];
+            ctx.save()
+            const w = image.width * this.scale;
+            const h = image.height * this.scale;
+            const px = this.pivotX * this.scale;
+            const py = this.pivotY * this.scale;
+            if (flip) {
+                ctx.translate(x, y);
+                ctx.scale(-1, 1)
+                ctx.fillStyle = "#E87A90C0"
+                ctx.fillRect(-px, -py, w, h);
+                ctx.drawImage(image, -px, -py, w, h);
+            } else {
+                ctx.translate(x, y);
+                ctx.fillStyle = "#78C2C4C0"
+                ctx.fillRect(-px, -py, w, h);
+                ctx.drawImage(image, -px, -py, w, h);
+            }
+            ctx.restore();
+            this.currentDuration += dt;
+            let currentMaxDuration = frame.duration;
+            while (this.currentDuration >= currentMaxDuration) {
+                this.currentDuration -= currentMaxDuration;
+                this.currentFrameIdx = (this.currentFrameIdx + 1) % this.frameCount;
+                currentMaxDuration = this.frames[this.currentFrameIdx].duration;
+            }
+        }
+    }
+
+    ctx.imageSmoothingEnabled = false;
+    const anim = new MyAnimation(jumpAnimConfig);
+    const flipAnim = new MyAnimation(jumpAnimConfig);
+
+    let stop = false;
+    let lastTime = 0;
+    let flip = false;
+    const draw = (timestamp) => {
+        if (timestamp - lastTime < 300 && !stop) {
+            let dt = (timestamp - lastTime) / 1000;
+            ctx.clearRect(0, 0, 1600, 600);
+
+            ctx.beginPath();
+            ctx.moveTo(700, 0);
+            ctx.lineTo(700, 600);
+            ctx.strokeStyle = "#FF00FF";
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, 300);
+            ctx.lineTo(1600, 300);
+            ctx.strokeStyle = "#FF00FF";
+            ctx.stroke();
+            // ctx.fillStyle = "green"
+            // ctx.fillRect(700, 300, 50 * 2, 37 * 2);
+            // ctx.fillStyle = "yellow"
+            // ctx.fillRect(700, 300 + 37 * 2, 50 * 2, 37 * 2);
+            //anim.draw(ctx, dt, false, 700, 300+37*2);
+            {
+                const radius = 12;
+                const halfHeight = 18;
+                const theColor = "#c00000";
+                const a = {
+                    x: 700,
+                    y: 300 - halfHeight,
+                }
+                const b = {
+                    x: 700,
+                    y: 300 + halfHeight,
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(a.x - radius, a.y);
+                ctx.arcTo(a.x - radius, a.y - radius, a.x, a.y - radius, radius);
+                ctx.arcTo(a.x + radius, a.y - radius, a.x + radius, a.y, radius);
+                ctx.lineTo(b.x + radius, b.y);
+                ctx.arcTo(b.x + radius, b.y + radius, b.x, b.y + radius, radius);
+                ctx.arcTo(b.x - radius, b.y + radius, b.x - radius, b.y, radius);
+                ctx.closePath();
+                ctx.fillStyle = theColor;
+                ctx.fill();
+            }
+
+            flipAnim.draw(ctx, dt, flip, 700, 300);
+        }
+        lastTime = timestamp;
+        requestAnimationFrame(draw);
+    };
+    requestAnimationFrame(draw);
+
+    window.onkeydown = (e) => {
+        if (e.code == "Space") {
+            flip = !flip;
+        }
+    }
+
+</script>
+</html>

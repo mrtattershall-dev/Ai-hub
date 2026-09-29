@@ -1,0 +1,62 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-5WpZ3dlFuVwwgS7O9rEWy3
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\028_behavior
+│   _model_curve\modal_behavior_curve.py
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior
+│   _live
+├── 🔨 Created mount C:\Users\tatte\OneDrive\Documents\ai-native-engine\core
+└── 🔨 Created function run_curve.
+
+[1ALoading checkpoint shards:   0%|          | 0/14 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   7%|▋         | 1/14 [00:53<11:33, 53.32s/it]
+[1ALoading checkpoint shards:  14%|█▍        | 2/14 [01:49<10:59, 54.96s/it]
+[1ALoading checkpoint shards:  21%|██▏       | 3/14 [02:39<09:38, 52.57s/it]
+[1ALoading checkpoint shards:  29%|██▊       | 4/14 [03:18<07:51, 47.18s/it]
+[1ALoading checkpoint shards:  36%|███▌      | 5/14 [04:13<07:32, 50.33s/it]
+[1ALoading checkpoint shards:  43%|████▎     | 6/14 [05:00<06:31, 48.91s/it]
+[1ALoading checkpoint shards:  50%|█████     | 7/14 [06:04<06:18, 54.10s/it]
+[1ALoading checkpoint shards:  57%|█████▋    | 8/14 [06:41<04:51, 48.66s/it]
+[1ALoading checkpoint shards:  64%|██████▍   | 9/14 [08:07<05:00, 60.18s/it]
+[1ALoading checkpoint shards:  71%|███████▏  | 10/14 [09:00<03:52, 58.09s/it]
+[1ALoading checkpoint shards:  79%|███████▊  | 11/14 [10:21<03:15, 65.11s/it]
+[1ALoading checkpoint shards:  86%|████████▌ | 12/14 [11:10<01:59, 59.98s/it]
+[1ALoading checkpoint shards:  93%|█████████▎| 13/14 [12:28<01:05, 65.52s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [12:52<00:00, 53.08s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [12:52<00:00, 55.19s/it]
+
+=== Qwen/Qwen2.5-Coder-32B-Instruct  (rc=0) ===
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=Qwen/Qwen2.5-Coder-32B-Instruct  trials/goal=4  maxAttempts=3  ticks=6  temp=0.7
+    [score C a1] 3s
+    [score C a2] 4s
+    [score C a1] 2s
+    [score C a2] 3s
+    [score C a1] 4s
+    [score C a1] 2s
+  CONTROL  score  4/4  meanAtt 1.5
+    [score F a1] 2s
+    [score F a2] 2s
+    [score F a1] 2s
+    [score F a2] 2s
+    [score F a1] 2s
+    [score F a2] 2s
+    [score F a1] 2s
+  FEEDBACK score  4/4  meanAtt 1.8
+
+TOTAL: CONTROL 4/4   FEEDBACK 4/4   unsafe events: 0 (must be 0)
+
+--- STDERR (tail) ---
+      [score C a1] REJECTED malformed_json :: {"name":"update_score","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score C a1] REJECTED malformed_json :: {"name":"CountHarvestReadyCrops","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score F a1] REJECTED malformed_json :: {"name":"update_score","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score F a1] REJECTED malformed_json :: {"name":"CountHarvestReadyCrops","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score F a1] REJECTED malformed_json :: {"name":"ScoreUpdate","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+
+Runner terminated.
+✓ App completed. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-5WpZ3dlFuVwwgS7O9rEWy3

@@ -1,0 +1,81 @@
+=== RD-B5: live multi-rule authoring session (REAL model) ===
+
+model=Qwen/Qwen3-Coder-30B-A3B-Instruct  sessions/arm=4  maxAttempts=4  ticks=40  temp=0.7  fb=errors  tickBudget=off
+  CONTROL  session 1/4
+    [C a1] 42s
+      [C a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 49s
+      [C a2] rules=4 installed=2 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a3] 51s
+      [C a3] rules=4 installed=2 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 43s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 2/4
+    [C a1] 43s
+      [C a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 54s
+      [C a2] rules=4 installed=4 observable=fail reaps=1 spawns=0 fold=0 rej=1 budget=0 ops=bounded unsafe=0
+    [C a3] 45s
+      [C a3] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 40s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 3/4
+    [C a1] 43s
+      [C a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 40s
+      [C a2] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a3] 41s
+      [C a3] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 38s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 4/4
+    [C a1] 38s
+      [C a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 48s
+      [C a2] rules=4 installed=4 observable=fail reaps=1 spawns=0 fold=0 rej=1 budget=0 ops=bounded unsafe=0
+    [C a3] 38s
+      [C a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 38s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  => CONTROL  0/4  meanAtt -  unsafe 0  foldArb 0  rejTx 0  budgetTrips 0  opGrowth {"bounded":4}
+  FEEDBACK session 1/4
+    [F a1] 41s
+      [F a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 44s
+      [F a2] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 38s
+      [F a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 38s
+      [F a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 2/4
+    [F a1] 38s
+      [F a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 38s
+      [F a2] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 38s
+      [F a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 40s
+      [F a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 3/4
+    [F a1] 42s
+      [F a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 44s
+      [F a2] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 46s
+      [F a3] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 45s
+      [F a4] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 4/4
+    [F a1] 41s
+      [F a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 44s
+      [F a2] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 39s
+      [F a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 38s
+      [F a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  => FEEDBACK 0/4  meanAtt -  unsafe 0  foldArb 0  rejTx 0  budgetTrips 0  opGrowth {"bounded":4}
+
+TOTAL: CONTROL 0/4  FEEDBACK 0/4  unsafe 0 (must be 0)
+
+--- STDERR ---

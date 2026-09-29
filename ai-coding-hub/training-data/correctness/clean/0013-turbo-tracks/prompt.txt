@@ -1,0 +1,3 @@
+[REVIEW - replace with a real instruction]
+Module: tracks.js
+Header hint: TRACKS MODULE  –  Track definitions + spline math

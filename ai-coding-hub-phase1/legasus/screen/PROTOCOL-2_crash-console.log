@@ -1,0 +1,156 @@
+PROTOCOL-2 START 2026-09-23T11:04:05.366Z
+model: https://mr-tattershall--legasus-7b-server-web.modal.run   order: frozen in PROTOCOL-2_SCHEDULE.md
+limits: 300s/run, 3600s total, 120s reserve, no retries
+
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'stats.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r1  1. t1-repair-node-average [TREATMENT] stopped req=PASS prot=PASS RETAIN calls=7 50s refusals=3
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'stats.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r1  2. t1-repair-node-average [CONTROL] stopped req=PASS prot=PASS RETAIN calls=11 53s refusals=0
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r1  3. t2-repair-python-parse [CONTROL] stopped req=PASS prot=PASS RETAIN calls=8 45s refusals=0
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+r1  4. t2-repair-python-parse [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 19s refusals=2
+warning: in the working copy of 'numbers.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r1  5. t3-add-node-median [TREATMENT] stopped req=FAIL prot=FAIL RESTORED calls=7 51s refusals=3
+warning: in the working copy of 'numbers.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r1  6. t3-add-node-median [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 36s refusals=0
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+r1  7. t4-add-python-slugify [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=5 23s refusals=0
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r1  8. t4-add-python-slugify [TREATMENT] stopped req=PASS prot=PASS RETAIN calls=7 40s refusals=3
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r1  9. t5-multifile-node-discount [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=6 32s refusals=2
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r1 10. t5-multifile-node-discount [CONTROL] stopped req=FAIL prot=FAIL RESTORED calls=7 42s refusals=0
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'stats.js', LF will be replaced by CRLF the next time Git touches it
+r2 11. t1-repair-node-average [CONTROL] done req=PASS prot=PASS RETAIN calls=4 30s refusals=0
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'stats.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r2 12. t1-repair-node-average [TREATMENT] stopped req=PASS prot=PASS RETAIN calls=6 45s refusals=2
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+r2 13. t2-repair-python-parse [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 20s refusals=2
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+r2 14. t2-repair-python-parse [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=7 28s refusals=0
+warning: in the working copy of 'numbers.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r2 15. t3-add-node-median [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=5 31s refusals=0
+warning: in the working copy of 'numbers.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r2 16. t3-add-node-median [TREATMENT] stopped req=PASS prot=PASS RETAIN calls=6 32s refusals=2
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r2 17. t4-add-python-slugify [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=5 36s refusals=1
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r2 18. t4-add-python-slugify [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 34s refusals=0
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r2 19. t5-multifile-node-discount [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=10 43s refusals=0
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+r2 20. t5-multifile-node-discount [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 22s refusals=2
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'stats.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r3 21. t1-repair-node-average [TREATMENT] stopped req=PASS prot=PASS RETAIN calls=6 32s refusals=2
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'stats.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r3 22. t1-repair-node-average [CONTROL] stopped req=PASS prot=PASS RETAIN calls=6 40s refusals=0
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r3 23. t2-repair-python-parse [CONTROL] stopped req=PASS prot=PASS RETAIN calls=9 50s refusals=0
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'parser.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+r3 24. t2-repair-python-parse [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 20s refusals=2
+warning: in the working copy of 'numbers.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r3 25. t3-add-node-median [TREATMENT] stopped req=PASS prot=PASS RETAIN calls=6 52s refusals=2
+warning: in the working copy of 'numbers.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r3 26. t3-add-node-median [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=5 38s refusals=0
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r3 27. t4-add-python-slugify [CONTROL] done req=PASS prot=PASS RETAIN calls=8 48s refusals=0
+warning: in the working copy of 'text.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+r3 28. t4-add-python-slugify [TREATMENT] done req=PASS prot=PASS RETAIN calls=6 44s refusals=2
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+r3 29. t5-multifile-node-discount [TREATMENT] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=4 22s refusals=2
+warning: in the working copy of 'cart.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+r3 30. t5-multifile-node-discount [CONTROL] stopped req=FAIL prot=PASS PRESERVE_INCOMPLETE calls=9 43s refusals=0
+file:///C:/Users/tatte/Projects/ai-coding-hub-phase1/server/protocol2.mjs:219
+const report = { experiment: 'PROTOCOL-2', controller: 'v2', kind: 'DEVELOPMENT COMPARISON (already-inspected tasks)', at: new Date().toISOString(), model: MODEL_URL, order: ORDER, arms, byReplicate, truncatedAt, results, root: ROOT };
+                                                                                                                                                                              ^
+
+ReferenceError: ORDER is not defined
+    at file:///C:/Users/tatte/Projects/ai-coding-hub-phase1/server/protocol2.mjs:219:175
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.15.0

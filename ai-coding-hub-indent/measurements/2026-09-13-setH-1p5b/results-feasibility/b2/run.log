@@ -1,0 +1,40 @@
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:1.5b   goals [64,74]   seeds [21,22,23,24,25,26,27,28]   conditions [R,B]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/b2-run
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+--- B  goal 64 ---
+  [B g64 s21] sites 7/7          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g64 s22] sites 4/7          loads=null  old=null  delta=null  site 5 does not load: load_error ["IndentationError: expected an inden
+  [B g64 s23] sites 7/7          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g64 s24] sites 7/7          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g64 s25] sites 5/7          loads=null  old=null  delta=null  site 6 does not load: load_error ["SyntaxError: invalid syntax (s4_mar
+  [B g64 s26] sites 7/7          loads=true  old=true  delta=false DELTA: ordered lists not rendered: A False
+B True
+C False
+D True
+E
+  [B g64 s27] sites 7/7          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g64 s28] sites 4/7          loads=null  old=null  delta=null  site 5 does not load: load_error ["IndentationError: expected an inden
+
+--- B  goal 74 ---
+  [B g74 s21] sites 3/3          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g74 s22] sites 3/3          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g74 s23] sites 3/3          loads=true  old=true  delta=false DELTA: NameError: name 'codes' is not defined
+  [B g74 s24] sites 3/3          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g74 s25] sites 3/3          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' threw name 'code' is not defined | 'a\n\nb' 
+  [B g74 s26] sites 3/3          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a</p>\n<p></p>\n<p>b</p>' wanted '<p>
+  [B g74 s27] sites 3/3          loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | 'a
+  [B g74 s28] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  B_oracle_localized_insertion   loads 5/8   OLD KEPT 1/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  B_oracle_localized_insertion   loads 8/8   OLD KEPT 2/8   NEW DELTA 0/8   VERIFIED 0/8
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 16/16
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/b2-run

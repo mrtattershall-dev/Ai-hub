@@ -1,0 +1,3 @@
+[REVIEW - replace with a real instruction]
+Module: index.html
+Header hint: ── CANVAS ──

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Native Engine — Visual Editor</title>
+<style>
+  :root { --bg:#101613; --panel:#18211c; --card:#1f2b24; --edge:#2e4034; --ink:#d7e4da; --dim:#8aa392;
+          --water:#5aa7d6; --growth:#8fc97a; --warn:#e0b352; --bad:#e07a6a; --ok:#8fc97a; --accent:#c9a95a; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--ink); font:14px/1.45 "Segoe UI",system-ui,sans-serif; height:100vh; display:flex; flex-direction:column; }
+  header { display:flex; gap:18px; align-items:baseline; padding:10px 16px; background:var(--panel); border-bottom:1px solid var(--edge); flex-wrap:wrap; }
+  header h1 { font-size:15px; color:var(--accent); font-weight:600; letter-spacing:.4px; }
+  header .stat b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  header .stat { color:var(--dim); font-size:12.5px; }
+  #join { padding:40px; text-align:center; }
+  #join input { background:var(--card); color:var(--ink); border:1px solid var(--edge); padding:8px 12px; border-radius:6px; font-size:15px; }
+  #join button, .btn { background:#2c3f33; color:var(--ink); border:1px solid var(--edge); padding:7px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .btn:hover { background:#39503f; }
+  .btn.small { padding:3px 9px; font-size:12px; }
+  main { flex:1; display:grid; grid-template-columns: 1fr 330px; gap:0; min-height:0; }
+  #world { padding:14px 16px; overflow-y:auto; }
+  #world h2, aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--dim); margin:8px 0 8px; }
+  #cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+  .card { background:var(--card); border:1px solid var(--edge); border-radius:8px; padding:10px 12px; cursor:pointer; position:relative; }
+  .card.sel { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .card .nm { font-weight:600; margin-bottom:2px; }
+  .card .id { color:var(--dim); font-size:11px; font-family:consolas,monospace; }
+  .bar { height:7px; border-radius:4px; background:#0d1210; margin-top:6px; overflow:hidden; }
+  .bar i { display:block; height:100%; border-radius:4px; transition:width .3s; }
+  .lbl { display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-top:5px; }
+  .claimbadge { position:absolute; top:8px; right:10px; font-size:10.5px; background:#4a3a1c; color:var(--warn); border:1px solid #6b5426; padding:1px 7px; border-radius:10px; }
+  .ripe { outline:1px dashed var(--growth); }
+  aside { background:var(--panel); border-left:1px solid var(--edge); padding:14px 16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+  .box { background:var(--card); border:1px solid var(--edge); border-radius:8px; padding:12px; }
+  .row { display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+  .row input { width:64px; background:#0d1210; border:1px solid var(--edge); color:var(--ink); padding:5px 7px; border-radius:5px; }
+  .row input.wide { flex:1; width:auto; }
+  #rulejson { width:100%; height:110px; background:#0d1210; color:var(--ink); border:1px solid var(--edge); border-radius:6px; font:12px consolas,monospace; padding:8px; resize:vertical; }
+  #ruleout { font:11.5px consolas,monospace; white-space:pre-wrap; margin-top:6px; }
+  #ruleout.err { color:var(--bad); } #ruleout.ok { color:var(--ok); }
+  .rulechip { display:inline-flex; gap:6px; align-items:center; background:#0d1210; border:1px solid var(--edge); border-radius:12px; padding:2px 4px 2px 10px; margin:2px 3px; font-size:12px; }
+  .rulechip button { background:none; border:none; color:var(--dim); cursor:pointer; font-size:12px; }
+  .rulechip button:hover { color:var(--bad); }
+  #feed { flex:1; min-height:120px; overflow-y:auto; font:11.5px consolas,monospace; display:flex; flex-direction:column-reverse; }
+  #feed div { padding:1.5px 0; border-bottom:1px dotted #22302a; }
+  .f-ev { color:var(--accent); } .f-def { color:var(--warn); } .f-rej { color:var(--bad); } .f-ok { color:var(--ok); } .f-dim { color:var(--dim); }
+  #zone { margin-bottom:12px; color:var(--dim); font-size:13px; }
+  #zone b { color:var(--ink); }
+  .muted { color:var(--dim); font-size:11.5px; margin-top:6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AI-NATIVE ENGINE — visual editor</h1>
+  <span class="stat">tick <b id="s-tick">—</b></span>
+  <span class="stat">crops <b id="s-pop">—</b></span>
+  <span class="stat">score <b id="s-tally">—</b></span>
+  <span class="stat">rows <b id="s-rows">—</b></span>
+  <span class="stat">dropped rule tx <b id="s-drops">0</b></span>
+  <span class="stat" id="s-you"></span>
+</header>
+
+<div id="join">
+  <p style="margin-bottom:12px; color:var(--dim)">join the live world (the same one the terminal clients are in)</p>
+  <input id="name" placeholder="your name" maxlength="24">
+  <button id="go" class="btn">connect</button>
+  <p id="joinerr" style="color:var(--bad); margin-top:10px"></p>
+</div>
+
+<main style="display:none" id="ui">
+  <section id="world">
+    <div id="zone"></div>
+    <h2>field — click a crop to select it</h2>
+    <div id="cards"></div>
+  </section>
+  <aside>
+    <div class="box" id="inspector">
+      <h2>inspector</h2>
+      <div id="sel" class="muted">nothing selected</div>
+      <div id="selctl" style="display:none">
+        <div class="row"><button class="btn small" id="b-water">water</button><input id="i-water" value="200">
+          <button class="btn small" id="b-claim">claim</button><input id="i-claim" value="40"><span class="muted">ticks</span></div>
+        <div class="row"><button class="btn small" id="b-harvest">harvest</button>
+          <input id="i-name" class="wide" placeholder="rename"><button class="btn small" id="b-name">rename</button></div>
+      </div>
+    </div>
+    <div class="box">
+      <h2>plant</h2>
+      <div class="row"><input id="i-plant" class="wide" placeholder="crop name" value="corn"><button class="btn small" id="b-plant">plant</button></div>
+    </div>
+    <div class="box">
+      <h2>rules — validated before they touch the world</h2>
+      <div id="rules"></div>
+      <textarea id="rulejson" spellcheck="false">{"name":"sprinkler","match":{"type":"crop","where":{"field":"water","cmp":"<","value":5}},"effects":[{"set":"water","to":{"min":[{"add":[{"field":"water"},3]},255]}}]}</textarea>
+      <div class="row"><button class="btn small" id="b-rule">install through the gate</button></div>
+      <div id="ruleout"></div>
+      <p class="muted">a rejected rule changes NOTHING — try removing the min-clamp and watch the range proof refuse it.</p>
+    </div>
+    <div class="box" style="flex:1; display:flex; flex-direction:column">
+      <h2>feed — everything the world did to you (and everyone)</h2>
+      <div id="feed"></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+let me = null, view = null, selected = null;
+
+const post = async (msg) => {
+  const r = await fetch('/msg', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: me, msg }) });
+  return r.json();
+};
+const tx = async (ops) => {
+  const r = await post({ t: 'tx', ops });
+  if (r.t === 'error') feed('f-rej', '! ' + r.err);
+};
+const feed = (cls, text) => {
+  const d = document.createElement('div');
+  d.className = cls; d.textContent = text;
+  $('feed').prepend(d);
+  while ($('feed').children.length > 300) $('feed').lastChild.remove();
+};
+
+function render(v) {
+  view = v;
+  $('s-tick').textContent = v.tick; $('s-pop').textContent = v.crops.length;
+  $('s-tally').textContent = v.tally;
+  if (v.rows) $('s-rows').textContent = `${v.rows.used}/${v.rows.cap}`;
+  $('zone').innerHTML = `zone <b>${v.zone}</b> — score <b>${v.tally}</b>`;
+  const claimsBy = Object.fromEntries((v.claims ?? []).map(c => [c.uuid, c]));
+  const cards = $('cards'); cards.innerHTML = '';
+  for (const c of v.crops) {
+    const cl = claimsBy[c.uuid];
+    const el = document.createElement('div');
+    el.className = 'card' + (selected === c.uuid ? ' sel' : '') + (c.growth >= 100 ? ' ripe' : '');
+    el.innerHTML = `<div class="nm">${c.name}</div><div class="id">${c.uuid}</div>` +
+      (cl ? `<span class="claimbadge">🔒 ${cl.holder} · t${cl.until}</span>` : '') +
+      `<div class="bar"><i style="width:${Math.min(100, c.water / 2.55)}%;background:var(--water)"></i></div><div class="lbl"><span>water</span><span>${c.water}</span></div>` +
+      `<div class="bar"><i style="width:${Math.min(100, c.growth / 2.55)}%;background:var(--growth)"></i></div><div class="lbl"><span>growth</span><span>${c.growth}${c.growth >= 100 ? ' — ripe' : ''}</span></div>`;
+    el.onclick = () => select(c.uuid);
+    cards.appendChild(el);
+  }
+  if (v.rules) {
+    $('rules').innerHTML = '';
+    for (const name of v.rules) {
+      const chip = document.createElement('span');
+      chip.className = 'rulechip';
+      chip.innerHTML = `${name} <button title="uninstall">✕</button>`;
+      chip.querySelector('button').onclick = async () => { const r = await post({ t: 'uninstall', name }); if (!r.ok) feed('f-rej', '! ' + JSON.stringify(r.errors)); };
+      $('rules').appendChild(chip);
+    }
+  }
+  if (selected && !v.crops.some(c => c.uuid === selected)) {
+    feed('f-def', `⚰ ${selected} is gone (harvested or deleted) — selection cleared`);
+    select(null);
+  }
+}
+
+function select(uuid) {
+  selected = uuid;
+  $('sel').textContent = uuid ? `${(view.crops.find(c => c.uuid === uuid) || {}).name ?? ''}  (${uuid})` : 'nothing selected';
+  $('selctl').style.display = uuid ? '' : 'none';
+  document.querySelectorAll('.card').forEach(el => el.classList.toggle('sel', el.querySelector('.id')?.textContent === uuid));
+}
+
+$('b-water').onclick = () => selected && tx([{ kind: 'setfield', target: selected, field: 'water', value: Number($('i-water').value) }]);
+$('b-claim').onclick = () => selected && tx([{ kind: 'claim', target: selected, ticks: Number($('i-claim').value) || 40 }]);
+$('b-harvest').onclick = () => selected && tx([{ kind: 'delete', target: selected }]);
+$('b-name').onclick = () => selected && $('i-name').value && tx([{ kind: 'setfield', target: selected, field: 'name', value: $('i-name').value }]);
+$('b-plant').onclick = () => tx([{ kind: 'createChild', type: 'crop', parent: view.zone, props: { name: $('i-plant').value || 'seed', water: 25, growth: 0 } }]);
+$('b-rule').onclick = async () => {
+  let src; const out = $('ruleout');
+  try { src = JSON.parse($('rulejson').value); } catch (e) { out.className = 'err'; out.textContent = 'not valid JSON: ' + e.message; return; }
+  const r = await post({ t: 'rule', source: src });
+  if (r.ok) { out.className = 'ok'; out.textContent = `✓ '${r.name}' validated and installed — it is now LIVE`; }
+  else { out.className = 'err'; out.textContent = 'REJECTED by the gate — world untouched:\n' + (r.errors ?? []).map(e => `  [${e.where}] ${e.code}: ${e.detail ?? ''}`).join('\n'); }
+};
+
+$('go').onclick = () => {
+  const name = $('name').value.trim();
+  if (!name) return;
+  const es = new EventSource(`/events?name=${encodeURIComponent(name)}`);
+  es.onerror = () => { if (!me) $('joinerr').textContent = 'could not connect (name taken? server down?)'; };
+  es.onmessage = (ev) => {
+    const m = JSON.parse(ev.data);
+    if (m.t === 'welcome') {
+      me = m.you; $('s-you').innerHTML = `you are <b>${me}</b>`;
+      $('join').style.display = 'none'; $('ui').style.display = '';
+      render(m.view);
+      feed('f-dim', `joined at tick ${m.view.tick}`);
+    } else if (m.t === 'tick') {
+      render({ ...view, tick: m.tick, tally: m.tally, crops: m.crops, claims: m.claims, rows: m.rows });
+      $('s-drops').textContent = m.drops ?? 0;
+      for (const y of m.yours) {
+        if (y.status === 'committed') feed('f-ok', `✓ t${m.tick} your action committed`);
+        else feed('f-rej', `✗ t${m.tick} ${y.reasons.join(' | ')}`);
+      }
+      for (const d of m.deferrals)
+        feed('f-def', `⚖ t${m.tick} ${d.field} of ${d.target} contested: ${d.competing.map(x => `${x.actor}=${JSON.stringify(x.value ?? x.parent)}`).join(' vs ')} — held, not auto-picked`);
+    } else if (m.t === 'event') feed('f-ev', `* ${m.msg}`);
+    else if (m.t === 'view') render(m.view);
+  };
+};
+$('name').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('go').click(); });
+</script>
+</body>
+</html>

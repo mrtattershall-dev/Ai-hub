@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/scenes/worldscene.js: * worldscene.js — shared base for any explorable area (hub + stages).

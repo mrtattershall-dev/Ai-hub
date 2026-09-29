@@ -1,0 +1,31 @@
+### 14B base int4/A10G — clean, no contention (3 passes)
+create       done          19    11    1     45     12    | runs
+append       done           9     4    0     15   24.7    | runs
+surgical     stopped        8     7    0     21   27.2    | runs
+multi-site   stopped        8     7    0     15   18.3    | runs
+python       done           8     3    0     15   27.2   p2_str.py
+docs         done          17    12    0     33   14.8   P1.md
+status 'done'      : 4/6
+WORK ACTUALLY DONE : 6/6   <- the number that matters
+tool errors        : 1
+--- pass 1
+create       done          12     5    1     24   10.8    | runs
+append       stopped        9     5    0     24   15.7    | THROWS
+surgical     stopped       18    11    1     36   18.8    | THROWS
+multi-site   interrupted   15    10    1    144   14.8    | THROWS
+python       interrupted    1     0    0      9      ?   MISSING
+docs         stopped       10     7    2     39   19.4   P1.md
+status 'done'      : 1/6
+WORK ACTUALLY DONE : 2/6   <- the number that matters
+tool errors        : 5
+--- pass 2
+create       done          20    11    1     39     15    | runs
+append       done          10     5    0     18   20.2    | runs
+surgical     done           7     5    0     15   17.6    | runs
+multi-site   done           8     6    0     15   17.5    | runs
+python       stopped        8     4    0     15   22.1   p2_str.py
+docs         done           7     4    0     18   18.4   P1.md
+status 'done'      : 5/6
+WORK ACTUALLY DONE : 6/6   <- the number that matters
+tool errors        : 1
+--- pass 3

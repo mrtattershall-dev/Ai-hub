@@ -1,0 +1,5 @@
+[
+  "test_s2_logs.py::test_bad_lines",
+  "test_s2_logs.py::test_parse_log",
+  "test_s4_markdown.py::test_to_html"
+]

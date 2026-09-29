@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/ui/backdrop.js: * backdrop.js — parallax sky, silhouette layers, and distance fog.

@@ -1,0 +1,202 @@
+/**
+ * hub.js — Archive Plaza, the central hub (extends WorldScene).
+ *
+ * The hub is a calm explorable area: no combat, but NPCs to talk to, terminals
+ * that open the shop/gallery/save, and doors into stages (some gated behind
+ * clearing a previous world). It reuses all of WorldScene's plumbing and only
+ * adds interaction logic + hub-specific rendering, which is the payoff of the
+ * shared base class.
+ *
+ * @module scenes/hub
+ */
+
+import { WorldScene } from "./worldscene.js";
+import { drawPrompt } from "../ui/hud.js";
+import { text, panel, title } from "../ui/widgets.js";
+import { rectCenter, distance } from "../engine/mathx.js";
+import { CONFIG } from "../config.js";
+import { LevelScene } from "./level.js";
+import { ShopScene } from "./shop.js";
+import { GalleryScene } from "./gallery.js";
+import { PauseScene } from "./pause.js";
+
+const INTERACT_RANGE = 80;
+
+export class HubScene extends WorldScene {
+  onEnter(params = {}) {
+    const def = this.app.data.levels.find((l) => l.id === "hub");
+    this.loadLevel(def);
+    this.npcs = def.npcs ?? [];
+    this.doors = def.doors ?? [];
+    if (params.spawnX != null) {
+      this.player.x = params.spawnX;
+      this.camera.snapTo(this.player.aabb);
+    }
+    this.app.progression.setLastArea("Archive Plaza");
+    this.app.progression.persist();
+    this.app.audio.playMusic("hub");
+    this.saveFlash = 0;
+
+    // First-visit greeting from Echo.
+    if (!this._greeted && this.app.progression.data.playTime < 5) {
+      this._greeted = true;
+      this.startDialogue(this.app.data.dialogue.hub_echo);
+    }
+  }
+
+  update(dt) {
+    if (this.saveFlash > 0) this.saveFlash -= dt;
+
+    if (!this.dialogueActive && this.app.input.pressed("pause")) {
+      this.app.scenes.push(new PauseScene(this.app, { context: "hub" }));
+      return;
+    }
+
+    this.baseUpdate(dt);
+    if (this.dialogueActive) return;
+
+    // Find the nearest interactable and act on it.
+    this.focus = this._nearestInteractable();
+    if (this.focus && this.app.input.pressed("interact")) {
+      this._interact(this.focus);
+    }
+  }
+
+  _nearestInteractable() {
+    const pc = rectCenter(this.player.aabb);
+    let best = null;
+    let bestD = INTERACT_RANGE;
+    for (const npc of this.npcs) {
+      const c = rectCenter(npc);
+      const d = distance(pc.x, pc.y, c.x, c.y);
+      if (d < bestD) { bestD = d; best = { kind: "npc", ref: npc }; }
+    }
+    for (const door of this.doors) {
+      const c = rectCenter(door);
+      const d = distance(pc.x, pc.y, c.x, c.y);
+      if (d < bestD) { bestD = d; best = { kind: "door", ref: door }; }
+    }
+    return best;
+  }
+
+  _interact(focus) {
+    if (focus.kind === "npc") {
+      const npc = focus.ref;
+      const lines = this.app.data.dialogue[npc.dialogueId] ?? [
+        { speaker: npc.name, color: npc.color, text: "..." },
+      ];
+      this.startDialogue(lines, () => this._npcAction(npc));
+      this.app.audio.sfx("confirm");
+    } else {
+      this._tryDoor(focus.ref);
+    }
+  }
+
+  _npcAction(npc) {
+    switch (npc.action) {
+      case "shop": this.app.scenes.push(new ShopScene(this.app)); break;
+      case "gallery": this.app.scenes.push(new GalleryScene(this.app)); break;
+      case "save":
+        this.app.progression.persist();
+        this.saveFlash = 1.6;
+        this.app.audio.sfx("emblem");
+        break;
+    }
+  }
+
+  _tryDoor(door) {
+    const req = door.requires;
+    if (req?.cleared && !this.app.progression.isLevelCleared(req.cleared)) {
+      this.startDialogue(this.app.data.dialogue.door_locked);
+      this.app.audio.sfx("cancel");
+      return;
+    }
+    const level = this.app.data.levels.find((l) => l.id === door.target);
+    if (!level || level.comingSoon) {
+      this.startDialogue([
+        { speaker: "SYSTEM", color: "#8b95b8", text: "This sector is still corrupted beyond recovery. (Coming soon.)" },
+      ]);
+      return;
+    }
+    this.app.audio.sfx("door");
+    this.app.scenes.replace(new LevelScene(this.app, { levelId: door.target }));
+  }
+
+  render(ctx) {
+    this.renderWorld(ctx);
+    const cam = { x: this.camera.renderX, y: this.camera.renderY };
+
+    // NPCs and doors are hub-only decorations drawn over the world.
+    for (const door of this.doors) this._drawDoor(ctx, door, cam);
+    for (const npc of this.npcs) this._drawNPC(ctx, npc, cam);
+
+    // Interaction prompt.
+    if (this.focus && !this.dialogueActive) {
+      const r = this.focus.ref;
+      const label = this.focus.kind === "door" ? `ENTER ${r.label}` : "TALK / USE";
+      drawPrompt(ctx, label, rectCenter(r).x - cam.x, r.y - cam.y);
+    }
+
+    this._drawHubBanner(ctx);
+    if (this.saveFlash > 0) {
+      ctx.globalAlpha = Math.min(1, this.saveFlash);
+      text(ctx, "PROGRESS SAVED", CONFIG.view.width / 2, 120, {
+        size: 22, align: "center", color: "#7dffb0", weight: 700,
+      });
+      ctx.globalAlpha = 1;
+    }
+    this.drawDialogue(ctx);
+  }
+
+  _drawNPC(ctx, npc, cam) {
+    const x = npc.x - cam.x;
+    const y = npc.y - cam.y;
+    const bob = Math.sin(performance.now() / 400 + npc.x) * 3;
+    ctx.fillStyle = npc.color;
+    ctx.globalAlpha = 0.25;
+    ctx.fillRect(x - 4, y - 4 + bob, npc.w + 8, npc.h + 8);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#141a2b";
+    ctx.fillRect(x, y + bob, npc.w, npc.h);
+    ctx.strokeStyle = npc.color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + 1, y + 1 + bob, npc.w - 2, npc.h - 2);
+    // Name tag.
+    text(ctx, npc.name, x + npc.w / 2, y - 12 + bob, {
+      size: 11, align: "center", color: npc.color,
+    });
+    // "!" marker for talkable NPCs.
+    text(ctx, "•", x + npc.w / 2, y - 26 + bob, { size: 20, align: "center", color: npc.color });
+  }
+
+  _drawDoor(ctx, door, cam) {
+    const x = door.x - cam.x;
+    const y = door.y - cam.y;
+    const locked = door.requires?.cleared && !this.app.progression.isLevelCleared(door.requires.cleared);
+    const color = locked ? "#566089" : "#ffd86b";
+    ctx.fillStyle = "#0a0e1c";
+    ctx.fillRect(x, y, door.w, door.h);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x + 1, y + 1, door.w - 2, door.h - 2);
+    // Glowing portal inside.
+    if (!locked) {
+      const g = ctx.createLinearGradient(x, y, x, y + door.h);
+      g.addColorStop(0, "rgba(255,216,107,0.35)");
+      g.addColorStop(1, "rgba(255,93,143,0.15)");
+      ctx.fillStyle = g;
+      ctx.fillRect(x + 6, y + 6, door.w - 12, door.h - 12);
+    } else {
+      text(ctx, "🔒", x + door.w / 2, y + door.h / 2, { size: 22, align: "center", baseline: "middle" });
+    }
+    text(ctx, door.label, x + door.w / 2, y - 12, { size: 11, align: "center", color });
+  }
+
+  _drawHubBanner(ctx) {
+    const W = CONFIG.view.width;
+    panel(ctx, W / 2 - 160, 14, 320, 44, { glow: 6 });
+    title(ctx, "ARCHIVE PLAZA", W / 2, 30, { size: 18 });
+    const pct = this.app.progression.data.completion;
+    text(ctx, `RESTORATION ${pct}%`, W / 2, 48, { size: 12, align: "center", color: "#7dffb0" });
+  }
+}

@@ -1,0 +1,8 @@
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=qwen2.5-coder:7b  trials/goal=1  maxAttempts=3  ticks=6  temp=0.7
+    [grow C attempt 1] 1212s
+    [grow C attempt 2] 910s
+    [grow C attempt 3] 1114s
+  CONTROL  grow   0/1  meanAtt -
+    [flee C attempt 1] 549s

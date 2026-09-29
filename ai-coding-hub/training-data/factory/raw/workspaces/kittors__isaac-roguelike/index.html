@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>以撒的结合 · 网页复刻版</title>
+<style>
+  :root { color-scheme: dark; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: #0a0605;
+    overflow: hidden;
+    font-family: "Courier New", monospace;
+  }
+
+  /* 地下室的氛围：中心微亮，四周沉入黑暗 */
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse at 50% 45%, #241612 0%, #120b09 45%, #060403 100%);
+  }
+
+  #stage {
+    position: relative;
+    line-height: 0;
+    filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.8));
+  }
+
+  #game {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    border: 2px solid #2b1a12;
+    background: #0a0605;
+  }
+
+  /* 扫描线，强化老式主机的质感 */
+  #stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.11) 3px,
+      rgba(0, 0, 0, 0.11) 4px
+    );
+    mix-blend-mode: multiply;
+  }
+
+  #hint {
+    position: fixed;
+    bottom: 10px;
+    left: 0; right: 0;
+    text-align: center;
+    color: #4a3a30;
+    font-size: 12px;
+    letter-spacing: 1px;
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="game"></canvas>
+  </div>
+  <div id="hint">WASD 移动 · 方向键射击 · 空格炸弹 · E 主动道具 · F 互动 · P 暂停 · M 音乐</div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

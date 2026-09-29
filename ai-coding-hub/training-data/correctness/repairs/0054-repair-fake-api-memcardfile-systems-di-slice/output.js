@@ -1,0 +1,79 @@
+/**
+ * dialogue.js — data-driven conversation runner with a typewriter effect.
+ *
+ * A conversation is a list of lines `{ speaker, color, text }` loaded from
+ * data/dialogue.json. The runner reveals characters over time (so text "types
+ * in" like a console RPG), lets the player skip-to-full on the first input and
+ * advance on the second, and reports when the conversation is finished. It owns
+ * no drawing — scenes render `visibleText()` however they like.
+ *
+ * @module systems/dialogue
+ */
+
+export class DialogueRunner {
+  constructor() {
+    this.lines = [];
+    this.index = 0;
+    this.charsShown = 0;
+    this.speed = 48;      // characters per second
+    this.active = false;
+    this.onComplete = null;
+  }
+
+  /**
+   * Begin a conversation.
+   * @param {Array<{speaker:string,color?:string,text:string}>} lines
+   * @param {() => void} [onComplete]
+   */
+  start(lines, onComplete = null) {
+    this.lines = lines ?? [];
+    this.index = 0;
+    this.charsShown = 0;
+    this.active = this.lines.length > 0;
+    this.onComplete = onComplete;
+  }
+
+  get line() {
+    return this.lines[this.index] ?? null;
+  }
+
+  /** True once the full text of the current line is on screen. */
+  get lineComplete() {
+    return this.line ? this.charsShown >= this.line.text.length : true;
+  }
+
+  update(dt) {
+    if (!this.active || this.lineComplete) return;
+    this.charsShown = Math.min(
+      this.line.text.length,
+      this.charsShown + this.speed * dt
+    );
+  }
+
+  /**
+   * Handle a confirm press. First press completes the typewriter; the next
+   * advances to the following line (or ends the conversation).
+   * @returns {"revealed"|"advanced"|"ended"}
+   */
+  advance() {
+    if (!this.active) return "ended";
+    if (!this.lineComplete) {
+      this.charsShown = this.line.text.length;
+      return "revealed";
+    }
+    this.index++;
+    this.charsShown = 0;
+    if (this.index >= this.lines.length) {
+      this.active = false;
+      this.onComplete?.();
+      return "ended";
+    }
+    return "advanced";
+  }
+
+  /** The portion of the current line that should currently be drawn. */
+  visibleText() {
+    if (!this.line) return "";
+    return this.line.text.slice(0, Math.floor(this.charsShown));
+  }
+}

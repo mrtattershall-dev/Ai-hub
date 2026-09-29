@@ -1,0 +1,271 @@
+:root {
+    --background-color: lightGray;
+
+    --btn-color: #fff;
+    --btn-background: #929292;
+    --btn-border: #777;
+
+    --btn-color-hover: #fff;
+    --btn-background-hover: #777;
+    --btn-border-hover: #777;
+
+    --btn-color-selected: #2f2f2f;
+    --btn-background-selected: #dcdcdc;
+    --btn-border-selected: #b0b0b0;
+
+    --panel-container: gray;
+    --panel-wrapper: white;
+}
+
+* {
+    font-family: monospace, 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background: var(--background-color);
+    text-align: center;
+}
+
+header {
+    margin: 10px;
+}
+
+.row {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+    overflow: hidden;
+}
+
+.col-0 {
+    flex: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.col-1 {
+    flex: 1;
+}
+
+#tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+
+.btn {
+    padding: 5px;
+    text-align: center;
+    font-size: 40px;
+
+    color: var(--btn-color);
+    background: var(--btn-background);
+    border: 1px solid var(--btn-border);
+    border-radius: 10px;
+
+    transition: 0.3s;
+}
+
+.btn:hover {
+    color: var(--btn-color-hover);
+    background: var(--btn-background-hover);
+    border: 1px solid var(--btn-border-hover);
+}
+
+.btn.selected {
+    color: var(--btn-color-selected);
+    background: var(--btn-background-selected);
+    border: 1px solid var(--btn-border-selected);
+}
+
+.color-picker {
+    width: 58px;
+    height: 62px;
+}
+
+.panel-container {
+    background: var(--panel-container);
+    border-radius: 5px;
+    height: 100%;
+    max-width: 680px;
+    max-height: 680px;
+    overflow: auto;
+}
+
+.panel-wrapper {
+    margin: 20px;
+    display: inline-block;
+    position: relative;
+    background: var(--panel-wrapper);
+    border-radius: 5px;
+}
+
+#panel2 {
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+
+canvas {
+    margin: 0;
+    padding: 0;
+}
+
+.modal {
+
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: calc(25vh - 75px);
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: #808080bd;
+
+}
+
+.modal-content {
+
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 300px;
+    border-radius: 10px;
+
+}
+
+.modal-header {
+
+    text-transform: uppercase;
+    font-size: 1.4rem;
+
+}
+
+.modal-header > h2 {
+    margin: 8px 0 0 0;
+}
+
+.dimensions-row {
+    display: flex;
+    flex-direction: row;
+    font-size: 2rem;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+}
+
+.dimensions {
+    width: 75px;
+    font-size: 2rem;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.modal-footer {
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid lightgray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-footer button {
+    font-size: 1.25rem;
+    margin-top: 10px;
+    padding: 10px 0;
+    width: 100px;
+}
+
+a {
+    margin: 10px;
+    font-size: 1.5rem;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: #f1f1f1;
+    border-radius: 5px;
+    min-width: 150px;
+
+    box-shadow: 8px 8px 16px 0px #00000033;
+    z-index: 1;
+
+    left: 100%;
+    bottom: 0;
+    margin-left: 7px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 600px) {
+
+    .row {
+        flex-direction: column;
+    }
+
+    .col-0 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #tools {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .dropdown-content {
+        position: absolute;
+        margin-top: 7px;
+        left: auto;
+        bottom: auto;
+        top: 100%;
+        right: 0;
+    }
+
+}

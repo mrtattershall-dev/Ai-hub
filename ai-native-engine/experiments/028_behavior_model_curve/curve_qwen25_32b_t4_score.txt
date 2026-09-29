@@ -1,0 +1,27 @@
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=Qwen/Qwen2.5-Coder-32B-Instruct  trials/goal=4  maxAttempts=3  ticks=6  temp=0.7
+    [score C a1] 3s
+    [score C a2] 4s
+    [score C a1] 2s
+    [score C a2] 3s
+    [score C a1] 4s
+    [score C a1] 2s
+  CONTROL  score  4/4  meanAtt 1.5
+    [score F a1] 2s
+    [score F a2] 2s
+    [score F a1] 2s
+    [score F a2] 2s
+    [score F a1] 2s
+    [score F a2] 2s
+    [score F a1] 2s
+  FEEDBACK score  4/4  meanAtt 1.8
+
+TOTAL: CONTROL 4/4   FEEDBACK 4/4   unsafe events: 0 (must be 0)
+
+--- STDERR ---
+      [score C a1] REJECTED malformed_json :: {"name":"update_score","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score C a1] REJECTED malformed_json :: {"name":"CountHarvestReadyCrops","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score F a1] REJECTED malformed_json :: {"name":"update_score","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score F a1] REJECTED malformed_json :: {"name":"CountHarvestReadyCrops","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}
+      [score F a1] REJECTED malformed_json :: {"name":"ScoreUpdate","match":{"type":"zone","uuid":"u0"},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp">=","value":100}}}}]}

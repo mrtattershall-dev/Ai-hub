@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+    <title>Test Buttons</title>
+    <link rel="stylesheet" href="s9_board.css">
+</head>
+<body>
+    <div id="s9-todo">
+        <h2>To Do</h2>
+        <ul>
+            <li class="s9-card">Test Card 1
+                <button class="s9-left">←</button>
+                <button class="s9-right">→</button>
+            </li>
+        </ul>
+    </div>
+    
+    <div id="s9-doing">
+        <h2>Doing</h2>
+        <ul></ul>
+    </div>
+    
+    <div id="s9-done">
+        <h2>Done</h2>
+        <ul></ul>
+    </div>
+    
+    <script>
+        // Simple test to verify button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const leftButton = document.querySelector('.s9-left');
+            const rightButton = document.querySelector('.s9-right');
+            
+            leftButton.addEventListener('click', function() {
+                console.log('Left button clicked');
+            });
+            
+            rightButton.addEventListener('click', function() {
+                console.log('Right button clicked');
+            });
+        });
+    </script>
+</body>
+</html>

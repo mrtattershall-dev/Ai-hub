@@ -1,0 +1,75 @@
+  REFUSAL GATE - classifier experiment, static checks only, no execution
+
+=== POSITIVE WITNESS (must ADMIT - if this refuses, the whole suite fails) ===
+  plan          ADMIT
+  snippets      7/7 admitted
+  goal 74 plan  ADMIT   snippets 3/3 admitted
+
+=== NEGATIVE WITNESSES (must REFUSE) ===
+  unreachable site (defect 6)     REFUSE   site3:site_unreachable
+  ambiguous anchor                REFUSE   anchor_ambiguous(2 occurrences)
+  out-of-scope identifier (codes) REFUSE   out_of_scope_identifier(codes is a local of another function)
+  duplicate accumulation (a a b b)REFUSE   duplicate_accumulation(current.append(line.strip()) (already runs in this loop))
+  instruction echo                ADMIT   flagged: instruction_echo   (non-fatal by design)
+
+=== ADVERSARIAL NEAR-MISS (same shape as the good plan; exactly one bad snippet) ===
+  plan-level shape                ADMIT  (identical to the good plan)
+  snippets refused                [5]   exactly site 5 - the gate is not just pattern-matching plan shape
+
+===== CLASSIFIER METRICS =====
+  known-good admitted    12/12
+  known-bad refused      4/5
+  false refusals         0
+  false admissions       1
+  coverage (admitted/total of all witnesses)  13/17
+  adversarial near-miss  isolated the bad site
+
+===== NON-VACUITY INVARIANT =====
+  holds: the gate admits the full known-good plan, so its refusals carry information.
+
+  ALL WITNESSES PASS
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:1.5b   goals [64,74]   seeds [41,42,43,44,45,46,47,48]   conditions [R,B]
+  A num_predict 1800   B num_predict 600   out C:/Users/tatte/AppData/Local/Temp/b4-run
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+--- B  goal 64 ---
+  [B g64 s41] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s42] sites 7/7          loads=true  old=true  delta=false DELTA: ordered lists not rendered: A False
+B False
+C False
+H False
+  [B g64 s43] sites 7/7          loads=true  old=true  delta=false DELTA: ordered lists not rendered: A False
+B False
+C False
+H False
+  [B g64 s44] sites 5/7          loads=null  old=null  delta=null  site 5 broke old behaviour: REGFAIL 'a\nb' -> '<p>a</p>\n<p>b</p>' wan
+  [B g64 s45] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s46] sites 4/7          loads=null  old=null  delta=null  site 5: anchor_ambiguous (2 occurrences)
+  [B g64 s47] sites 5/7          loads=null  old=null  delta=null  site 5 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g64 s48] sites 7/7          loads=true  old=true  delta=false DELTA: ordered lists not rendered: A False
+B False
+C False
+H False
+
+--- B  goal 74 ---
+  [B g74 s41] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: expected an inden
+  [B g74 s42] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: expected an inden
+  [B g74 s43] sites 3/3          loads=null  old=null  delta=null  site 3 broke old behaviour: REGFAIL 'a\nb' threw cannot access local v
+  [B g74 s44] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g74 s45] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted 
+  [B g74 s46] sites 1/3          loads=null  old=null  delta=null  site 2 does not load: load_error ["IndentationError: expected an inden
+  [B g74 s47] sites 2/3          loads=null  old=null  delta=null  site 2 broke old behaviour: REGFAIL 'a\nb' threw 'NoneType' object has
+  [B g74 s48] sites 3/3          loads=true  old=true  delta=false DELTA: fenced block not rendered, escaped, with line breaks kept: A Fa
+
+===== FEASIBILITY SUMMARY =====
+  goal 64  B_oracle_localized_insertion   loads 3/8   OLD KEPT 3/8   NEW DELTA 0/8   VERIFIED 0/8
+  goal 74  B_oracle_localized_insertion   loads 1/8   OLD KEPT 1/8   NEW DELTA 0/8   VERIFIED 0/8
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 16/16
+
+  RAW = C:/Users/tatte/AppData/Local/Temp/b4-run

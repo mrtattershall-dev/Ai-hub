@@ -1,0 +1,65 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-Epo8eUbasyhkzVtAIX0onT
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\034_homestea
+│   d_game\modal_homestead.py
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\034_homestea
+│   d_game
+├── 🔨 Created mount C:\Users\tatte\OneDrive\Documents\ai-native-engine\core
+└── 🔨 Created function run_homestead.
+
+[1ALoading checkpoint shards:   0%|          | 0/14 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   7%|▋         | 1/14 [00:02<00:37,  2.85s/it]
+[1ALoading checkpoint shards:  14%|█▍        | 2/14 [00:06<00:39,  3.33s/it]
+[1ALoading checkpoint shards:  21%|██▏       | 3/14 [00:09<00:33,  3.02s/it]
+[1ALoading checkpoint shards:  29%|██▊       | 4/14 [00:11<00:28,  2.86s/it]
+[1ALoading checkpoint shards:  36%|███▌      | 5/14 [00:16<00:30,  3.43s/it]
+[1ALoading checkpoint shards:  43%|████▎     | 6/14 [00:18<00:25,  3.15s/it]
+[1ALoading checkpoint shards:  50%|█████     | 7/14 [00:21<00:21,  3.06s/it]
+[1ALoading checkpoint shards:  57%|█████▋    | 8/14 [00:27<00:23,  3.89s/it]
+[1ALoading checkpoint shards:  64%|██████▍   | 9/14 [00:30<00:18,  3.64s/it]
+[1ALoading checkpoint shards:  71%|███████▏  | 10/14 [00:33<00:14,  3.59s/it]
+[1ALoading checkpoint shards:  79%|███████▊  | 11/14 [00:37<00:10,  3.56s/it]
+[1ALoading checkpoint shards:  86%|████████▌ | 12/14 [00:39<00:06,  3.25s/it]
+[1ALoading checkpoint shards:  93%|█████████▎| 13/14 [00:42<00:02,  2.99s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [00:44<00:00,  2.58s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [00:44<00:00,  3.14s/it]
+
+=== Qwen/Qwen2.5-Coder-32B-Instruct  (rc=0) ===
+=== B2-LIVE: Qwen/Qwen2.5-Coder-32B-Instruct authors HOMESTEAD through the editor (real gate + repair) ===
+sessions=3 maxAttempts=4
+
+  [s1] "watered crops gain 5 growth each tick..." -> installed 'WaterGrowthBoost' in 1
+  [s1] "every crop loses 1 water each tick..." -> installed 'water_loss' in 1
+  [s1] "crops that reach 100 growth are harveste..." -> installed 'HarvestCrops' in 2 (gate caught: malformed_json)
+  [s1] "the field zone scores the number of read..." -> installed 'score_ready_crops' in 2 (gate caught: malformed_json)
+  [s1] "the field plants a new crop every 3 tick..." -> installed 'PlantNewCrop' in 1
+  [s1] => installed 5/5, unsafe 0, lose (pop 9, score 1, clauses {"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false})
+
+  [s2] "watered crops gain 5 growth each tick..." -> installed 'water_growth_increase' in 1
+  [s2] "every crop loses 1 water each tick..." -> installed 'water_loss' in 1
+  [s2] "crops that reach 100 growth are harveste..." -> installed 'harvest' in 2 (gate caught: malformed_json)
+  [s2] "the field zone scores the number of read..." -> installed 'score_ready_crops' in 2 (gate caught: malformed_json)
+  [s2] "the field plants a new crop every 3 tick..." -> installed 'plant_new_crop' in 1
+  [s2] => installed 5/5, unsafe 0, lose (pop 14, score 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":false,"scored":false})
+
+  [s3] "watered crops gain 5 growth each tick..." -> installed 'water_growth' in 1
+  [s3] "every crop loses 1 water each tick..." -> installed 'water_loss' in 1
+  [s3] "crops that reach 100 growth are harveste..." -> installed 'HarvestCrops' in 2 (gate caught: malformed_json)
+  [s3] "the field zone scores the number of read..." -> installed 'ScoreReadyCrops' in 1
+  [s3] "the field plants a new crop every 3 tick..." -> installed 'PlantNewCrop' in 1
+  [s3] => installed 5/5, unsafe 0, lose (pop 14, score 0, clauses {"safe":true,"alive":true,"thriving":true,"productive":false,"scored":false})
+
+=== B2-LIVE SUMMARY ===
+  model: Qwen/Qwen2.5-Coder-32B-Instruct
+  games WON (all-needed rules authored + observable win): 0/3
+  per-rule authored: grow:3/3  drain:3/3  reap:3/3  score:3/3  reseed:3/3
+  TOTAL UNSAFE EVENTS across all sessions: 0  (must be 0 — the gate is unconditional)
+  verdict: SAFETY HELD under a live model; no full win this run (see per-rule)
+RESULT_JSON {"model":"Qwen/Qwen2.5-Coder-32B-Instruct","sessions":3,"wins":0,"totalUnsafe":0,"perRule":[{"installed":5,"win":false,"unsafe":0,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":true,"scored":false},"authored":[{"name":"WaterGrowthBoost","ok":true,"attempts":1,"firstReject":null},{"name":"water_loss","ok":true,"attempts":1,"firstReject":null},{"name":"HarvestCrops","ok":true,"attempts":2,"firstReject":"malformed_json"},{"name":"score_ready_crops","ok":true,"attempts":2,"firstReject":"malformed_json"},{"name":"PlantNewCrop","ok":true,"attempts":1,"firstReject":null}]},{"installed":5,"win":false,"unsafe":0,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":false,"scored":false},"authored":[{"name":"water_growth_increase","ok":true,"attempts":1,"firstReject":null},{"name":"water_loss","ok":true,"attempts":1,"firstReject":null},{"name":"harvest","ok":true,"attempts":2,"firstReject":"malformed_json"},{"name":"score_ready_crops","ok":true,"attempts":2,"firstReject":"malformed_json"},{"name":"plant_new_crop","ok":true,"attempts":1,"firstReject":null}]},{"installed":5,"win":false,"unsafe":0,"clauses":{"safe":true,"alive":true,"thriving":true,"productive":false,"scored":false},"authored":[{"name":"water_growth","ok":true,"attempts":1,"firstReject":null},{"name":"water_loss","ok":true,"attempts":1,"firstReject":null},{"name":"HarvestCrops","ok":true,"attempts":2,"firstReject":"malformed_json"},{"name":"ScoreReadyCrops","ok":true,"attempts":1,"firstReject":null},{"name":"PlantNewCrop","ok":true,"attempts":1,"firstReject":null}]}]}
+
+✓ App completed. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-Epo8eUbasyhkzVtAIX0onT

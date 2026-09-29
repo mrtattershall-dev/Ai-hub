@@ -1,0 +1,4 @@
+armed 16:55:34: stop coder14b-setf on ALL DONE or at 100 min
+18:23:23 ALL DONE -> node training-data/factory/stopApp.mjs coder14b-setf
+{"ok":true,"stopExit":0,"stopAttempts":1,"appIds":["ap-gVg8mI4YmBZxHrW8Jm6Ul6"],"stoppedAt":"2026-09-11 18:23:38-05:00","detail":"stopped, and confirmed by the app list"}
+18:23:42 stopApp exit 0

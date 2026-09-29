@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+chooseAction (from js/entities/player.js)

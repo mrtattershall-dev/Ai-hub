@@ -1,0 +1,137 @@
+/**
+ * save.js — persistent save slots backed by localStorage.
+ *
+ * Three numbered slots plus a "quick resume" slot, matching the GDD. A save is
+ * a plain JSON object (see `newSave`) so it serialises trivially and is easy to
+ * migrate: every save carries a `version`, and `_migrate` upgrades old shapes.
+ *
+ * The class only knows how to read/write blobs and summarise them for the save
+ * select screen. Interpreting the data (currency, upgrades, completion math)
+ * is the job of systems/progression.js — a deliberate split between storage
+ * and meaning.
+ *
+ * @module systems/save
+ */
+
+import { CONFIG } from "../config.js";
+
+const SCHEMA_VERSION = 1;
+
+export class SaveSystem {
+  constructor() {
+    this.prefix = CONFIG.save.storagePrefix;
+  }
+
+  _key(slot) {
+    return `${this.prefix}${slot}`;
+  }
+
+  /** A pristine save object for a brand-new game. */
+  newSave(slot, name = "VEX") {
+    const now = Date.now();
+    return {
+      version: SCHEMA_VERSION,
+      slot,
+      name,
+      createdAt: now,
+      updatedAt: now,
+      playTime: 0,            // seconds
+      difficulty: "original", // casual | original | hard
+      shards: 0,
+      maxHearts: 3,           // each heart = 1 health unit, scaled in progression
+      upgrades: [],           // purchased upgrade ids
+      unlocks: [],            // cheats / gallery / sound-test ids
+      emblems: [],            // collected archive emblem ids
+      echoLogs: [],           // collected lore ids
+      pickedUp: [],           // ids of one-time world pickups already taken (e.g. heart cells)
+      levelRanks: {},         // levelId -> { rank, time, kills, secrets, damage }
+      cheats: {},             // active cheat toggles (bigHead, lowGravity, ...)
+      lastArea: "hub",
+      completion: 0,          // 0..100, recomputed on save
+    };
+  }
+
+  /** @returns {object|null} the raw save, or null if the slot is empty/corrupt. */
+  load(slot) {
+    const raw = localStorage.getItem(this._key(slot));
+    if (!raw) return null;
+    try {
+      return this._migrate(JSON.parse(raw));
+    } catch (err) {
+      console.warn(`[Save] slot ${slot} is corrupt:`, err);
+      return null;
+    }
+  }
+
+  save(slot, data) {
+    data.slot = slot;
+    data.updatedAt = Date.now();
+    data.version = SCHEMA_VERSION;
+    localStorage.setItem(this._key(slot), JSON.stringify(data));
+    return data;
+  }
+
+  delete(slot) {
+    localStorage.removeItem(this._key(slot));
+  }
+
+  exists(slot) {
+    return localStorage.getItem(this._key(slot)) != null;
+  }
+
+  /**
+   * Compact per-slot summaries for the save-select screen. Always returns one
+   * entry per numbered slot (null `data` = empty slot).
+   */
+  listSlots() {
+    const slots = [];
+    for (let i = 1; i <= CONFIG.save.slots; i++) {
+      const data = this.load(i);
+      slots.push({
+        slot: i,
+        empty: !data,
+        data,
+        summary: data ? this._summarise(data) : null,
+      });
+    }
+    return slots;
+  }
+
+  _summarise(data) {
+    const ranks = Object.values(data.levelRanks);
+    return {
+      name: data.name,
+      playTime: this.formatTime(data.playTime),
+      completion: Math.round(data.completion),
+      lastArea: data.lastArea,
+      emblems: data.emblems.length,
+      avgRank: ranks.length ? this._avgRank(ranks) : "-",
+    };
+  }
+
+  _avgRank(ranks) {
+    const order = ["D", "C", "B", "A", "S", "SS"];
+    const avg = ranks.reduce((sum, r) => sum + order.indexOf(r.rank), 0) / ranks.length;
+    return order[Math.round(avg)] ?? "-";
+  }
+
+  /** Seconds -> "H:MM:SS" / "M:SS". */
+  formatTime(seconds) {
+    const s = Math.floor(seconds % 60);
+    const m = Math.floor((seconds / 60) % 60);
+    const h = Math.floor(seconds / 3600);
+    const pad = (n) => String(n).padStart(2, "0");
+    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  }
+
+  /** Forward-migrate an older save to the current schema. */
+  _migrate(data) {
+    if (!data.version || data.version < 1) {
+      data.cheats ??= {};
+      data.echoLogs ??= [];
+      data.pickedUp ??= [];
+      data.version = 1;
+    }
+    return data;
+  }
+}

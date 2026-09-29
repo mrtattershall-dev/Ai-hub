@@ -1,0 +1,195 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-PGKjDZrkrVSMOM9Glbxoiy
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\029_multirul
+│   e_session\modal_multirule.py
+├── 🔨 Created mount 
+│   C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\029_multirul
+│   e_session
+├── 🔨 Created mount C:\Users\tatte\OneDrive\Documents\ai-native-engine\core
+└── 🔨 Created function run_session.
+
+[1ALoading checkpoint shards:   0%|          | 0/14 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:   7%|▋         | 1/14 [00:02<00:33,  2.55s/it]
+[1ALoading checkpoint shards:  14%|█▍        | 2/14 [00:06<00:39,  3.26s/it]
+[1ALoading checkpoint shards:   0%|          | 0/16 [00:00<?, ?it/s]
+[1ALoading checkpoint shards:  21%|██▏       | 3/14 [00:18<01:20,  7.35s/it]
+[1ALoading checkpoint shards:   6%|▋         | 1/16 [00:13<03:24, 13.66s/it]
+[1ALoading checkpoint shards:  12%|█▎        | 2/16 [00:20<02:13,  9.56s/it]
+[1ALoading checkpoint shards:  29%|██▊       | 4/14 [00:28<01:23,  8.33s/it]
+[1ALoading checkpoint shards:  19%|█▉        | 3/16 [00:30<02:08,  9.89s/it]
+[1ALoading checkpoint shards:  36%|███▌      | 5/14 [00:38<01:20,  8.97s/it]
+[1ALoading checkpoint shards:  25%|██▌       | 4/16 [00:40<02:00, 10.07s/it]
+[1ALoading checkpoint shards:  43%|████▎     | 6/14 [00:51<01:22, 10.29s/it]
+[1ALoading checkpoint shards:  50%|█████     | 7/14 [00:56<01:00,  8.66s/it]
+[1ALoading checkpoint shards:  31%|███▏      | 5/16 [00:50<01:46,  9.72s/it]
+[1ALoading checkpoint shards:  57%|█████▋    | 8/14 [01:02<00:47,  7.90s/it]
+[1ALoading checkpoint shards:  38%|███▊      | 6/16 [01:01<01:41, 10.17s/it]
+[1ALoading checkpoint shards:  44%|████▍     | 7/16 [01:08<01:22,  9.19s/it]
+[1ALoading checkpoint shards:  64%|██████▍   | 9/14 [01:15<00:46,  9.38s/it]
+[1ALoading checkpoint shards:  50%|█████     | 8/16 [01:13<01:03,  7.99s/it]
+[1ALoading checkpoint shards:  71%|███████▏  | 10/14 [01:24<00:36,  9.16s/it]
+[1ALoading checkpoint shards:  56%|█████▋    | 9/16 [01:22<00:57,  8.19s/it]
+[1ALoading checkpoint shards:  79%|███████▊  | 11/14 [01:33<00:27,  9.28s/it]
+[1ALoading checkpoint shards:  86%|████████▌ | 12/14 [01:40<00:16,  8.46s/it]
+[1ALoading checkpoint shards:  62%|██████▎   | 10/16 [01:33<00:54,  9.12s/it]
+[1ALoading checkpoint shards:  93%|█████████▎| 13/14 [01:45<00:07,  7.56s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [01:48<00:00,  5.98s/it]
+[1ALoading checkpoint shards: 100%|██████████| 14/14 [01:48<00:00,  7.73s/it]
+
+[1ALoading checkpoint shards:  69%|██████▉   | 11/16 [01:42<00:44,  8.99s/it]
+[1ALoading checkpoint shards:  75%|███████▌  | 12/16 [01:49<00:34,  8.54s/it]
+[1ALoading checkpoint shards:  81%|████████▏ | 13/16 [01:56<00:24,  8.01s/it]
+[1ALoading checkpoint shards:  88%|████████▊ | 14/16 [02:03<00:15,  7.72s/it]
+[1ALoading checkpoint shards:  94%|█████████▍| 15/16 [02:17<00:09,  9.55s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [02:20<00:00,  7.71s/it]
+[1ALoading checkpoint shards: 100%|██████████| 16/16 [02:20<00:00,  8.80s/it]
+
+=== Qwen/Qwen2.5-Coder-32B-Instruct  fb=echo  (rc=0) ===
+=== RD-B5: live multi-rule authoring session (REAL model) ===
+
+model=Qwen/Qwen2.5-Coder-32B-Instruct  sessions/arm=4  maxAttempts=4  ticks=40  temp=0.7  fb=echo  tickBudget=off
+  CONTROL  session 1/4
+    [C a1] 15s
+      [C a1] rules=3 installed=3 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=linear unsafe=0
+    [C a2] 13s
+      [C a2] rules=3 installed=3 observable=fail reaps=3 spawns=4 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a3] 12s
+      [C a3] rules=3 installed=3 observable=PASS reaps=5 spawns=8 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 2/4
+    [C a1] 8s
+      [C a1] rules=5 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [C a2] 11s
+      [C a2] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [C a3] 15s
+      [C a3] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [C a4] 15s
+      [C a4] rules=4 installed=4 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 3/4
+    [C a1] 6s
+      [C a1] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [C a2] 6s
+      [C a2] rules=4 installed=3 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [C a3] 13s
+      [C a3] rules=3 installed=3 observable=PASS reaps=5 spawns=8 fold=0 rej=5 budget=0 ops=bounded unsafe=0
+  CONTROL  session 4/4
+    [C a1] 12s
+      [C a1] rules=4 installed=4 observable=PASS reaps=5 spawns=8 fold=0 rej=10 budget=0 ops=bounded unsafe=0
+  => CONTROL  3/4  meanAtt 2.3  unsafe 0  foldArb 0  rejTx 15  budgetTrips 0  opGrowth {"bounded":4}
+  FEEDBACK session 1/4
+    [F a1] 6s
+      [F a1] rules=4 installed=3 observable=fail reaps=0 spawns=4 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 6s
+      [F a2] rules=4 installed=4 observable=fail reaps=4 spawns=4 fold=2 rej=8 budget=0 ops=linear unsafe=0
+    [F a3] 7s
+      [F a3] rules=5 installed=5 observable=PASS reaps=5 spawns=8 fold=2 rej=15 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 2/4
+    [F a1] 7s
+      [F a1] rules=5 installed=4 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [F a2] 8s
+      [F a2] rules=5 installed=5 observable=fail reaps=3 spawns=4 fold=0 rej=3 budget=0 ops=bounded unsafe=0
+    [F a3] 8s
+      [F a3] rules=5 installed=5 observable=fail reaps=3 spawns=4 fold=0 rej=3 budget=0 ops=bounded unsafe=0
+    [F a4] 8s
+      [F a4] rules=5 installed=5 observable=fail reaps=3 spawns=4 fold=0 rej=3 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 3/4
+    [F a1] 7s
+      [F a1] rules=5 installed=5 observable=fail reaps=4 spawns=4 fold=0 rej=8 budget=0 ops=linear unsafe=0
+    [F a2] 8s
+      [F a2] rules=5 installed=5 observable=PASS reaps=5 spawns=8 fold=0 rej=10 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 4/4
+    [F a1] 7s
+      [F a1] rules=4 installed=3 observable=fail reaps=4 spawns=4 fold=0 rej=4 budget=0 ops=bounded unsafe=0
+    [F a2] 7s
+      [F a2] rules=4 installed=4 observable=PASS reaps=5 spawns=8 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  => FEEDBACK 3/4  meanAtt 2.3  unsafe 0  foldArb 2  rejTx 28  budgetTrips 0  opGrowth {"bounded":4}
+
+TOTAL: CONTROL 3/4  FEEDBACK 3/4  unsafe 0 (must be 0)
+
+
+=== Qwen/Qwen3-Coder-30B-A3B-Instruct  fb=errors  (rc=0) ===
+=== RD-B5: live multi-rule authoring session (REAL model) ===
+
+model=Qwen/Qwen3-Coder-30B-A3B-Instruct  sessions/arm=4  maxAttempts=4  ticks=40  temp=0.7  fb=errors  tickBudget=off
+  CONTROL  session 1/4
+    [C a1] 42s
+      [C a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 49s
+      [C a2] rules=4 installed=2 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a3] 51s
+      [C a3] rules=4 installed=2 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 43s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 2/4
+    [C a1] 43s
+      [C a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 54s
+      [C a2] rules=4 installed=4 observable=fail reaps=1 spawns=0 fold=0 rej=1 budget=0 ops=bounded unsafe=0
+    [C a3] 45s
+      [C a3] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 40s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 3/4
+    [C a1] 43s
+      [C a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 40s
+      [C a2] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a3] 41s
+      [C a3] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 38s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  CONTROL  session 4/4
+    [C a1] 38s
+      [C a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a2] 48s
+      [C a2] rules=4 installed=4 observable=fail reaps=1 spawns=0 fold=0 rej=1 budget=0 ops=bounded unsafe=0
+    [C a3] 38s
+      [C a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [C a4] 38s
+      [C a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  => CONTROL  0/4  meanAtt -  unsafe 0  foldArb 0  rejTx 0  budgetTrips 0  opGrowth {"bounded":4}
+  FEEDBACK session 1/4
+    [F a1] 41s
+      [F a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 44s
+      [F a2] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 38s
+      [F a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 38s
+      [F a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 2/4
+    [F a1] 38s
+      [F a1] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 38s
+      [F a2] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 38s
+      [F a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 40s
+      [F a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 3/4
+    [F a1] 42s
+      [F a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 44s
+      [F a2] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 46s
+      [F a3] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 45s
+      [F a4] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  FEEDBACK session 4/4
+    [F a1] 41s
+      [F a1] rules=4 installed=1 observable=fail reaps=0 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a2] 44s
+      [F a2] rules=4 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a3] 39s
+      [F a3] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+    [F a4] 38s
+      [F a4] rules=3 installed=3 observable=fail reaps=1 spawns=0 fold=0 rej=0 budget=0 ops=bounded unsafe=0
+  => FEEDBACK 0/4  meanAtt -  unsafe 0  foldArb 0  rejTx 0  budgetTrips 0  opGrowth {"bounded":4}
+
+TOTAL: CONTROL 0/4  FEEDBACK 0/4  unsafe 0 (must be 0)
+
+Runner terminated.
+✓ App completed. View run at 
+https://modal.com/apps/mr-tattershall/main/ap-PGKjDZrkrVSMOM9Glbxoiy

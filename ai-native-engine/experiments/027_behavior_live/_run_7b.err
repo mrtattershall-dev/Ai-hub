@@ -1,0 +1,12 @@
+C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior_live\behavior_live.js:190
+    if (!r.ok) throw new Error(`Ollama HTTP ${r.status}`);
+                     ^
+
+Error: Ollama HTTP 500
+    at a (C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior_live\behavior_live.js:190:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async runBehaviorTrial (C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior_live\behavior_live.js:99:17)
+    at async runArm (C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior_live\behavior_live.js:118:17)
+    at async C:\Users\tatte\OneDrive\Documents\ai-native-engine\experiments\027_behavior_live\behavior_live.js:221:19
+
+Node.js v24.15.0

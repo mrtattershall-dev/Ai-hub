@@ -1,0 +1,39 @@
+coder14b-base set B start 23:08:35
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+20 goals, sequential: coder14b-base-setB
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-VKPqZP\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  stopped       10     5   2   0    33  u1_queue.js:runs
+   2  stopped       15     7   0   0    21  u1_queue.js:runs
+   3  done          10     4   0   0    18  u2_anagram.py:runs
+   4  done          11     4   0   0    21  u3_cart.js:runs
+   5  done           9     4   0   0    15  u3_cart.js:runs
+   6  done           7     4   0   0    15  U_NOTES.md:ok u3_cart.js:runs
+   7  done          10     4   0   0    21  u4_flatten.js:runs
+   8  stopped       11     7   2   0    24  u4_flatten.js:runs U_FLATTEN.md:ok
+   9  stopped       10     7   0   0    27  u5_page.html:ok u5_page.js:parses
+  10  done           9     5   0   0    24  u5_page.js:parses
+  11  stopped       14     7   0   0    45  u6_wrap.py:THROWS
+  12  stopped       13     6   0   0    51  u7_semver.js:runs
+  13  stopped       11     6   0   0    63  u7_semver.js:runs
+  14  done          13     8   0   0    51  u8_game.html:ok u8_game.js:parses
+  15  stopped        8     5   2   0    33  u8_game.js:parses
+  16  stopped        9     5   0   0    21  u9_deep.py:THROWS
+  17  done          11     4   0   0    24  u10_retry.js:runs
+  18  stopped       16    10   0   0    42  u11_check.js:THROWS u1_queue.js:runs u4_flatten.js:runs
+  19  done          11     4   0   0    24  u12_luhn.js:runs
+  20  stopped       13     9   0   0    24  U_INDEX.md:MISSING
+
+--- summary ---
+goals run           : 20
+status 'done'       : 9/20
+WORK ACTUALLY DONE  : 16/20   <- the number that matters
+tool errors         : 6
+guard refusals      : 0   (the system working)
+total model calls   : 115
+wall clock          : 10.0 min
+files: ESCALATIONS.md, node_modules, package-lock.json, package.json, TASKS.md, u10_retry.js, u11_check.js, u12_luhn.js, u1_queue.js, u2_anagram.py, u3_cart.js, u4_flatten.js, u5_page.html, u5_page.js, u6_wrap.py, u7_semver.js, u8_game.html, u8_game.js, u9_deep.py, U_FLATTEN.md, U_NOTES.md, __pycache__
+tok/s: min 19.2 max 49.9
+harness exit 0 at 23:18:38

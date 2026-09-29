@@ -1,0 +1,23 @@
+{
+  "name": "pinportrait",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Turn your webcam into a live 3D pixel portrait built from thousands of pins.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "serve . --listen 5173",
+    "start": "npm run dev",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^9.14.0",
+    "serve": "^14.2.4"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ]
+}

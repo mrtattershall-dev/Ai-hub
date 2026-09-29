@@ -1,0 +1,213 @@
+[2026-09-25T13:54:05Z] STAGE2 start; HEAD 717ed8b
+MECH-1 START 2026-09-25T13:54:05.719Z hub 717ed8b
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+arms (identical seed + guidance in every arm): CONTROL = nothing delivered | NOTIFY = the Hub runs the graded cases and delivers ONLY the counts (attempted/passed/failed) - no case, input, expected or actual value | AUTODIAG_ARM = the Hub runs the graded cases and delivers the full result (counts plus up to 6 failing cases, expected vs actual)
+seeds: 101,202   order: arm order for task index ti in replicate r starts at (ti + r - 1) mod 3
+queue: 15 tasks x 3 arms x 2 replicate(s) = 90 units
+limits: 300s/task, 12600s total, no retries
+
+measuring seed baselines (no model involved):
+  baseline ext-bucketsort: 1/7 graded cases pass on the seed
+  baseline ext-find_in_sorted: 5/7 graded cases pass on the seed
+  baseline ext-flatten: 1/7 graded cases pass on the seed
+  baseline ext-gcd: 1/6 graded cases pass on the seed
+  baseline ext-get_factors: 1/11 graded cases pass on the seed
+  baseline ext-is_valid_parenthesization: 2/3 graded cases pass on the seed
+  baseline ext-kheapsort: 1/4 graded cases pass on the seed
+  baseline ext-kth: 3/7 graded cases pass on the seed
+  baseline ext-lcs_length: 1/9 graded cases pass on the seed
+  baseline ext-lis: 8/12 graded cases pass on the seed
+  baseline ext-longest_common_subsequence: 6/10 graded cases pass on the seed
+  baseline ext-max_sublist_sum: 2/6 graded cases pass on the seed
+  baseline ext-mergesort: 1/14 graded cases pass on the seed
+  baseline ext-next_palindrome: 4/5 graded cases pass on the seed
+  baseline ext-pascal: 1/5 graded cases pass on the seed
+  1. [CONTROL] ext-bucketsort ENDED req=FAIL prot=PASS cases 1->1/7 edits=3 PRESERVE_INCOMPLETE
+  2. [NOTIFY] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=0
+  3. [AUTODIAG_ARM] ext-bucketsort ENDED req=FAIL prot=PASS cases 1->1/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12
+  4. [NOTIFY] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 edits=28 RESTORED delivered=true msgs=26 caseLines=0
+  5. [AUTODIAG_ARM] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 edits=4 RESTORED delivered=true msgs=3 caseLines=2
+  6. [CONTROL] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=3 PRESERVE_INCOMPLETE
+  7. [AUTODIAG_ARM] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12
+  8. [CONTROL] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=1 RETAIN
+  9. [NOTIFY] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=4 PRESERVE_INCOMPLETE delivered=true msgs=3 caseLines=0
+ 10. [CONTROL] ext-gcd ENDED req=FAIL prot=PASS cases 1->1/6 edits=0 PRESERVE_INCOMPLETE
+ 11. [NOTIFY] ext-gcd ENDED req=FAIL prot=PASS cases 1->1/6 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 12. [AUTODIAG_ARM] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=1 RETAIN delivered=true msgs=2 caseLines=5
+ 13. [NOTIFY] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=0
+ 14. [AUTODIAG_ARM] ext-get_factors ENDED req=PASS prot=PASS cases 1->11/11 +[2,3,4,5,6,7,8,9,10,11] edits=3 RETAIN delivered=true msgs=2 caseLines=6
+ 15. [CONTROL] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE
+ 16. [AUTODIAG_ARM] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=2 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=1
+ 17. [CONTROL] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=0 PRESERVE_INCOMPLETE
+ 18. [NOTIFY] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 19. [CONTROL] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE
+ 20. [NOTIFY] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 21. [AUTODIAG_ARM] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=3
+ 22. [NOTIFY] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 23. [AUTODIAG_ARM] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=0 PRESERVE_INCOMPLETE delivered=false msgs=0 caseLines=0
+ 24. [CONTROL] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=0 PRESERVE_INCOMPLETE
+ 25. [AUTODIAG_ARM] ext-lcs_length ENDED req=PASS prot=PASS cases 1->9/9 +[1,2,4,5,6,7,8,9] edits=3 RETAIN delivered=true msgs=3 caseLines=6
+ 26. [CONTROL] ext-lcs_length ENDED req=FAIL prot=FAIL cases 1->0/9 -[3] edits=3 RESTORED
+ 27. [NOTIFY] ext-lcs_length ENDED req=FAIL prot=FAIL cases 1->0/9 -[3] edits=4 RESTORED delivered=true msgs=3 caseLines=0
+ 28. [CONTROL] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE
+ 29. [NOTIFY] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 30. [AUTODIAG_ARM] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=4
+ 31. [NOTIFY] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=0
+ 32. [AUTODIAG_ARM] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 33. [CONTROL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS cases 6->6/10 edits=0 PRESERVE_INCOMPLETE
+ 34. [AUTODIAG_ARM] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=5 RESTORED delivered=true msgs=4 caseLines=4
+ 35. [CONTROL] ext-max_sublist_sum ENDED req=FAIL prot=PASS cases 2->2/6 edits=0 PRESERVE_INCOMPLETE
+ 36. [NOTIFY] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=4 RESTORED delivered=true msgs=2 caseLines=0
+ 37. [CONTROL] ext-mergesort ENDED req=PASS prot=PASS cases 1->14/14 +[2,3,4,5,6,7,8,9,10,11,12,13,14] edits=1 RETAIN
+ 38. [NOTIFY] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 39. [AUTODIAG_ARM] ext-mergesort ENDED req=FAIL prot=FAIL cases 1->0/14 edits=4 RESTORED delivered=true msgs=2 caseLines=6
+ 40. [NOTIFY] ext-next_palindrome ENDED req=PASS prot=PASS cases 4->5/5 +[5] edits=1 RETAIN delivered=true msgs=2 caseLines=0
+ 41. [AUTODIAG_ARM] ext-next_palindrome ENDED req=PASS prot=PASS cases 4->5/5 +[5] edits=1 RETAIN delivered=true msgs=2 caseLines=1
+ 42. [CONTROL] ext-next_palindrome ENDED req=FAIL prot=PASS cases 4->4/5 edits=0 PRESERVE_INCOMPLETE
+ 43. [AUTODIAG_ARM] ext-pascal ENDED req=FAIL prot=FAIL cases 1->0/5 -[1] edits=5 RESTORED delivered=true msgs=4 caseLines=19
+ 44. [CONTROL] ext-pascal ENDED req=FAIL prot=PASS cases 1->1/5 edits=0 PRESERVE_INCOMPLETE
+ 45. [NOTIFY] ext-pascal ENDED req=FAIL prot=PASS cases 1->1/5 edits=1 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=0
+ 46. [NOTIFY] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=0
+ 47. [AUTODIAG_ARM] ext-bucketsort ENDED req=FAIL prot=PASS cases 1->1/7 edits=7 PRESERVE_INCOMPLETE delivered=true msgs=6 caseLines=12
+ 48. [CONTROL] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=4 RETAIN
+ 49. [AUTODIAG_ARM] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 edits=7 RESTORED delivered=true msgs=6 caseLines=2
+ 50. [CONTROL] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=1 PRESERVE_INCOMPLETE
+ 51. [NOTIFY] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 52. [CONTROL] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=3 PRESERVE_INCOMPLETE
+ 53. [NOTIFY] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 54. [AUTODIAG_ARM] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=6
+ 55. [NOTIFY] ext-gcd ENDED req=FAIL prot=PASS cases 1->1/6 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 56. [AUTODIAG_ARM] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=2 RETAIN delivered=true msgs=2 caseLines=5
+ 57. [CONTROL] ext-gcd ENDED req=FAIL prot=PASS cases 1->1/6 edits=0 PRESERVE_INCOMPLETE
+ 58. [AUTODIAG_ARM] ext-get_factors ENDED req=PASS prot=PASS cases 1->11/11 +[2,3,4,5,6,7,8,9,10,11] edits=1 RETAIN delivered=true msgs=2 caseLines=6
+ 59. [CONTROL] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE
+ 60. [NOTIFY] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 61. [CONTROL] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=0 PRESERVE_INCOMPLETE
+ 62. [NOTIFY] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 63. [AUTODIAG_ARM] ext-is_valid_parenthesization ENDED req=PASS prot=PASS cases 2->3/3 +[3] edits=2 RETAIN delivered=true msgs=3 caseLines=3
+ 64. [NOTIFY] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE delivered=false msgs=0 caseLines=0
+ 65. [AUTODIAG_ARM] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=3
+ 66. [CONTROL] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE
+ 67. [AUTODIAG_ARM] ext-kth ENDED req=PASS prot=PASS cases 3->7/7 +[1,2,6,7] edits=2 RETAIN delivered=true msgs=2 caseLines=4
+ 68. [CONTROL] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=5 PRESERVE_INCOMPLETE
+ 69. [NOTIFY] ext-kth ENDED req=FAIL prot=FAIL cases 3->0/7 edits=3 RESTORED delivered=true msgs=2 caseLines=0
+ 70. [CONTROL] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->1/9 edits=0 PRESERVE_INCOMPLETE
+ 71. [NOTIFY] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->5/9 +[2,4,6,7] edits=20 PRESERVE_INCOMPLETE delivered=true msgs=19 caseLines=0
+ 72. [AUTODIAG_ARM] ext-lcs_length ENDED req=FAIL prot=FAIL cases 1->0/9 edits=20 RESTORED delivered=true msgs=19 caseLines=18
+ 73. [NOTIFY] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 74. [AUTODIAG_ARM] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=4
+ 75. [CONTROL] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE
+ 76. [AUTODIAG_ARM] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 77. [CONTROL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS cases 6->6/10 edits=0 PRESERVE_INCOMPLETE
+ 78. [NOTIFY] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=0
+ 79. [CONTROL] ext-max_sublist_sum ENDED req=PASS prot=PASS cases 2->6/6 +[1,2,4,6] edits=3 RETAIN
+ 80. [NOTIFY] ext-max_sublist_sum ENDED req=FAIL prot=PASS cases 2->2/6 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 81. [AUTODIAG_ARM] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=4 RESTORED delivered=true msgs=2 caseLines=4
+ 82. [NOTIFY] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 83. [AUTODIAG_ARM] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12
+ 84. [CONTROL] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=0 PRESERVE_INCOMPLETE
+ 85. [AUTODIAG_ARM] ext-next_palindrome ENDED req=PASS prot=PASS cases 4->5/5 +[5] edits=2 RETAIN delivered=true msgs=3 caseLines=2
+ 86. [CONTROL] ext-next_palindrome ENDED req=FAIL prot=PASS cases 4->4/5 edits=0 PRESERVE_INCOMPLETE
+ 87. [NOTIFY] ext-next_palindrome ENDED req=FAIL prot=PASS cases 4->4/5 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=0
+ 88. [CONTROL] ext-pascal ENDED req=FAIL prot=PASS cases 1->1/5 edits=2 PRESERVE_INCOMPLETE
+ 89. [NOTIFY] ext-pascal ENDED req=FAIL prot=PASS cases 1->1/5 edits=1 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=0
+ 90. [AUTODIAG_ARM] ext-pascal ENDED req=PASS prot=PASS cases 1->5/5 +[2,3,4,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+report written 2026-09-25T16:07:00.831Z: C:\Users\tatte\AppData\Local\Temp\autodiag1-QV4C55\MECH-1_REPORT.json
+
+=== MECH-1 RESULT ===
+elapsed 132m 55s of 210m
+stopped cleanly: YES
+integrity true  reconciliation true
+status {"COMPLETED":90,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":0,"OTHER":0,"UNACCOUNTED":0,"total":90,"planned":90}
+
+LABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.
+
+CONTROL       {
+ "runs": 30,
+ "verifiedRepairs": 4,
+ "dispositions": {
+  "PRESERVE_INCOMPLETE": 25,
+  "RETAIN": 4,
+  "RESTORED": 1
+ },
+ "regressionsProduced": 1,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 4,
+ "runsWithNewlyFailing": 1,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 4,
+ "caseMeasurementErrors": 0,
+ "editsOnTarget": 29,
+ "runsThatEdited": 11,
+ "sawFailingTest": 7,
+ "editAfterFailure": 5,
+ "runsWithDiagnosticDelivered": 0,
+ "diagnosticsDelivered": 0,
+ "diagnosticsSkippedForBudget": 0,
+ "diagnosticsUnavailable": 0
+}
+
+NOTIFY        {
+ "runs": 30,
+ "verifiedRepairs": 5,
+ "dispositions": {
+  "RETAIN": 5,
+  "RESTORED": 4,
+  "PRESERVE_INCOMPLETE": 21
+ },
+ "regressionsProduced": 4,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 6,
+ "runsWithNewlyFailing": 1,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 5,
+ "caseMeasurementErrors": 3,
+ "editsOnTarget": 76,
+ "runsThatEdited": 15,
+ "sawFailingTest": 6,
+ "editAfterFailure": 5,
+ "runsWithDiagnosticDelivered": 29,
+ "diagnosticsDelivered": 87,
+ "diagnosticsSkippedForBudget": 5,
+ "diagnosticsUnavailable": 0
+}
+
+AUTODIAG_ARM  {
+ "runs": 30,
+ "verifiedRepairs": 13,
+ "dispositions": {
+  "PRESERVE_INCOMPLETE": 10,
+  "RESTORED": 7,
+  "RETAIN": 13
+ },
+ "regressionsProduced": 7,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 13,
+ "runsWithNewlyFailing": 1,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 13,
+ "caseMeasurementErrors": 6,
+ "editsOnTarget": 88,
+ "runsThatEdited": 25,
+ "sawFailingTest": 4,
+ "editAfterFailure": 3,
+ "runsWithDiagnosticDelivered": 29,
+ "diagnosticsDelivered": 88,
+ "diagnosticsSkippedForBudget": 2,
+ "diagnosticsUnavailable": 0
+}
+
+isolation: held in every recorded unit
+
+summary: C:\Users\tatte\AppData\Local\Temp\autodiag1-QV4C55\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\autodiag1-QV4C55\MECH-1_REPORT.json
+MECH-1 COMPLETE 2026-09-25T16:07:00.840Z
+MECH-1 EXIT 2026-09-25T16:12:00.773Z code 0
+[2026-09-25T16:12:00Z] campaign process exited 0
+[2026-09-25T16:12:00Z] app state now:
+    "description": "legasus-7b",
+    "state": "stopped",
+    "tasks": "0",
+    "created_at": "2026-09-25 08:51:48-05:00",
+stage2 exit 0

@@ -1,0 +1,14 @@
+The following JavaScript throws "TypeError: ....getById is not a function" when run. Find the bug and return the complete corrected, runnable code.
+
+```js
+function addMsg(role, text) {
+  const container = document.getById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg';
+  div.innerHTML = `
+    <div class="msg-avatar ${role}">${role === 'ai' ? '🤖' : '👤'}</div>
+    <div class="msg-bubble ${role}">${text}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+```

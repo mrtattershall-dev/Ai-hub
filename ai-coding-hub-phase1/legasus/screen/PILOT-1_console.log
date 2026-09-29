@@ -1,0 +1,104 @@
+[2026-09-25T19:35:59Z] STAGE2 start; HEAD ac765d1
+[2026-09-25T19:35:59Z] experiment PILOT-1 arms RECOVERY_ARM,AUTODIAG_ARM reps 1 seeds 505 total 2400s per-task 240s tasks all max-steps 25 policy {"maxAttempts":2,"maxRepeats":2,"maxProvisional":3}
+PILOT-1 START 2026-09-25T19:36:00.067Z hub ac765d1
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+arms (identical seed + guidance in every arm): RECOVERY_ARM = full diagnostic (opening + after every edit) PLUS the recovery controller: verified checkpoint, exact rollback of rejected edits, repeat refusal, attempt/provisional bounds | AUTODIAG_ARM = the Hub runs the graded cases and delivers the full result (counts plus up to 6 failing cases, expected vs actual)
+seeds: 505   order: arm order for task index ti in replicate r starts at (ti + r - 1) mod 2
+queue: 7 tasks x 2 arms x 1 replicate(s) = 14 units
+limits: 240s/task, 2400s total, no retries
+
+measuring seed baselines (no model involved):
+  baseline ext-possible_change: 1/10 graded cases pass on the seed
+  baseline ext-powerset: 1/5 graded cases pass on the seed
+  baseline ext-quicksort: 12/13 graded cases pass on the seed
+  baseline ext-shunting_yard: 2/6 graded cases pass on the seed
+  baseline ext-sieve: 1/6 graded cases pass on the seed
+  baseline ext-subsequences: 2/12 graded cases pass on the seed
+  baseline ext-to_base: 3/10 graded cases pass on the seed
+  1. [RECOVERY_ARM] ext-possible_change ENDED req=PASS prot=PASS cases 1->10/10 +[2,3,4,5,6,7,8,9,10] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+  2. [AUTODIAG_ARM] ext-possible_change ENDED req=PASS prot=PASS cases 1->10/10 +[2,3,4,5,6,7,8,9,10] edits=1 RETAIN delivered=true msgs=2 caseLines=6
+  3. [AUTODIAG_ARM] ext-powerset ENDED req=PASS prot=PASS cases 1->5/5 +[1,2,3,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+  4. [RECOVERY_ARM] ext-powerset ENDED req=PASS prot=PASS cases 1->5/5 +[1,2,3,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+  5. [RECOVERY_ARM] ext-quicksort ENDED req=FAIL prot=PASS cases 12->12/13 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=STOPPED DISCARD>REPEAT>REPEAT restores=3/3
+  6. [AUTODIAG_ARM] ext-quicksort ENDED req=FAIL prot=PASS cases 12->12/13 edits=20 PRESERVE_INCOMPLETE delivered=true msgs=19 caseLines=19
+  7. [AUTODIAG_ARM] ext-shunting_yard ENDED req=FAIL prot=FAIL cases 2->0/6 edits=25 RESTORED delivered=true msgs=25 caseLines=4
+  8. [RECOVERY_ARM] ext-shunting_yard ENDED req=FAIL prot=PASS cases 2->2/6 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=8 ctl=STOPPED DISCARD>REPEAT>REPEAT restores=3/3
+  9. [RECOVERY_ARM] ext-sieve ENDED req=FAIL prot=PASS cases 1->1/6 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=10 ctl=ACTIVE DISCARD restores=1/1
+ 10. [AUTODIAG_ARM] ext-sieve ENDED req=FAIL prot=PASS cases 1->1/6 edits=4 PRESERVE_INCOMPLETE delivered=true msgs=3 caseLines=10
+ 11. [AUTODIAG_ARM] ext-subsequences ENDED req=FAIL prot=PASS cases 2->2/12 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12
+ 12. [RECOVERY_ARM] ext-subsequences ENDED req=FAIL prot=PASS cases 2->2/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=6 ctl=ACTIVE - restores=0/0
+ 13. [RECOVERY_ARM] ext-to_base ENDED req=PASS prot=PASS cases 3->10/10 +[4,5,6,7,8,9,10] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+ 14. [AUTODIAG_ARM] ext-to_base ENDED req=PASS prot=PASS cases 3->10/10 +[4,5,6,7,8,9,10] edits=14 RETAIN delivered=true msgs=9 caseLines=6
+report written 2026-09-25T19:58:13.245Z: C:\Users\tatte\AppData\Local\Temp\autodiag1-8jxGIY\PILOT-1_REPORT.json
+
+=== PILOT-1 RESULT ===
+elapsed 22m 13s of 40m
+stopped cleanly: YES
+integrity true  reconciliation true
+status {"COMPLETED":14,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":0,"OTHER":0,"UNACCOUNTED":0,"total":14,"planned":14}
+
+LABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.
+
+RECOVERY_ARM  {
+ "runs": 7,
+ "verifiedRepairs": 3,
+ "dispositions": {
+  "RETAIN": 3,
+  "PRESERVE_INCOMPLETE": 4
+ },
+ "regressionsProduced": 0,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 3,
+ "runsWithNewlyFailing": 0,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 3,
+ "caseMeasurementErrors": 0,
+ "editsOnTarget": 12,
+ "runsThatEdited": 6,
+ "sawFailingTest": 0,
+ "editAfterFailure": 0,
+ "runsWithDiagnosticDelivered": 7,
+ "diagnosticsDelivered": 13,
+ "diagnosticsSkippedForBudget": 0,
+ "diagnosticsUnavailable": 0
+}
+
+AUTODIAG_ARM  {
+ "runs": 7,
+ "verifiedRepairs": 3,
+ "dispositions": {
+  "RETAIN": 3,
+  "PRESERVE_INCOMPLETE": 3,
+  "RESTORED": 1
+ },
+ "regressionsProduced": 1,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 3,
+ "runsWithNewlyFailing": 0,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 3,
+ "caseMeasurementErrors": 1,
+ "editsOnTarget": 68,
+ "runsThatEdited": 7,
+ "sawFailingTest": 0,
+ "editAfterFailure": 0,
+ "runsWithDiagnosticDelivered": 7,
+ "diagnosticsDelivered": 62,
+ "diagnosticsSkippedForBudget": 4,
+ "diagnosticsUnavailable": 0
+}
+
+isolation: held in every recorded unit
+
+summary: C:\Users\tatte\AppData\Local\Temp\autodiag1-8jxGIY\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\autodiag1-8jxGIY\PILOT-1_REPORT.json
+PILOT-1 COMPLETE 2026-09-25T19:58:13.255Z
+PILOT-1 EXIT 2026-09-25T19:58:13.265Z code 0
+[2026-09-25T19:58:13Z] campaign process exited 0
+[2026-09-25T19:58:13Z] app state now:
+    "description": "legasus-7b",
+    "state": "deployed",
+    "tasks": "1",
+    "created_at": "2026-09-25 14:33:40-05:00",
+stage2 exit 0

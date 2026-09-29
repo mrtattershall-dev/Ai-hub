@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+drawFatal (from js/main.js)

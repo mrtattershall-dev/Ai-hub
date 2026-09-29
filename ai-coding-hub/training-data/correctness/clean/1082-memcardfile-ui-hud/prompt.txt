@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/ui/hud.js: * hud.js — the in-stage heads-up display.

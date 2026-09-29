@@ -1,0 +1,194 @@
+[2026-09-25T20:07:23Z] STAGE2 start; HEAD 3abcef2
+[2026-09-25T20:07:24Z] experiment OVERNIGHT-1 arms RECOVERY_ARM,AUTODIAG_ARM reps 2 seeds 606,707 total 7800s per-task 240s tasks all max-steps 25 policy {"maxAttempts":2,"maxRepeats":2,"maxProvisional":3}
+OVERNIGHT-1 START 2026-09-25T20:07:24.868Z hub 3abcef2
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+arms (identical seed + guidance in every arm): RECOVERY_ARM = full diagnostic (opening + after every edit) PLUS the recovery controller: verified checkpoint, exact rollback of rejected edits, repeat refusal, attempt/provisional bounds | AUTODIAG_ARM = the Hub runs the graded cases and delivers the full result (counts plus up to 6 failing cases, expected vs actual)
+seeds: 606,707   order: arm order for task index ti in replicate r starts at (ti + r - 1) mod 2
+queue: 22 tasks x 2 arms x 2 replicate(s) = 88 units
+limits: 240s/task, 7800s total, no retries
+
+measuring seed baselines (no model involved):
+  baseline ext-bucketsort: 1/7 graded cases pass on the seed
+  baseline ext-find_in_sorted: 5/7 graded cases pass on the seed
+  baseline ext-flatten: 1/7 graded cases pass on the seed
+  baseline ext-gcd: 1/6 graded cases pass on the seed
+  baseline ext-get_factors: 1/11 graded cases pass on the seed
+  baseline ext-is_valid_parenthesization: 2/3 graded cases pass on the seed
+  baseline ext-kheapsort: 1/4 graded cases pass on the seed
+  baseline ext-kth: 3/7 graded cases pass on the seed
+  baseline ext-lcs_length: 1/9 graded cases pass on the seed
+  baseline ext-lis: 8/12 graded cases pass on the seed
+  baseline ext-longest_common_subsequence: 6/10 graded cases pass on the seed
+  baseline ext-max_sublist_sum: 2/6 graded cases pass on the seed
+  baseline ext-mergesort: 1/14 graded cases pass on the seed
+  baseline ext-next_palindrome: 4/5 graded cases pass on the seed
+  baseline ext-pascal: 1/5 graded cases pass on the seed
+  baseline ext-possible_change: 1/10 graded cases pass on the seed
+  baseline ext-powerset: 1/5 graded cases pass on the seed
+  baseline ext-quicksort: 12/13 graded cases pass on the seed
+  baseline ext-shunting_yard: 2/6 graded cases pass on the seed
+  baseline ext-sieve: 1/6 graded cases pass on the seed
+  baseline ext-subsequences: 2/12 graded cases pass on the seed
+  baseline ext-to_base: 3/10 graded cases pass on the seed
+  1. [RECOVERY_ARM] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+  2. [AUTODIAG_ARM] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=3 RETAIN delivered=true msgs=2 caseLines=6
+  3. [AUTODIAG_ARM] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 edits=20 RESTORED delivered=true msgs=18 caseLines=2
+  4. [RECOVERY_ARM] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+  5. [RECOVERY_ARM] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+  6. [AUTODIAG_ARM] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12
+  7. [AUTODIAG_ARM] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=2 RETAIN delivered=true msgs=3 caseLines=5
+  8. [RECOVERY_ARM] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=1 RETAIN delivered=true msgs=2 caseLines=5 ctl=ACCEPTED ACCEPT restores=0/0
+  9. [RECOVERY_ARM] ext-get_factors ENDED req=PASS prot=PASS cases 1->11/11 +[2,3,4,5,6,7,8,9,10,11] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+ 10. [AUTODIAG_ARM] ext-get_factors ENDED req=FAIL prot=PASS cases 1->6/11 +[3,5,6,7,10] edits=4 PRESERVE_INCOMPLETE delivered=true msgs=3 caseLines=17
+ 11. [AUTODIAG_ARM] ext-is_valid_parenthesization ENDED req=FAIL prot=FAIL cases 2->2/3 +[3] -[2] edits=17 RESTORED delivered=true msgs=16 caseLines=16
+ 12. [RECOVERY_ARM] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 13. [RECOVERY_ARM] ext-kheapsort ENDED req=PASS prot=PASS cases 1->4/4 +[2,3,4] edits=1 RETAIN delivered=true msgs=2 caseLines=3 ctl=ACCEPTED ACCEPT restores=0/0
+ 14. [AUTODIAG_ARM] ext-kheapsort ENDED req=PASS prot=PASS cases 1->4/4 +[2,3,4] edits=1 RETAIN delivered=true msgs=2 caseLines=3
+ 15. [AUTODIAG_ARM] ext-kth ENDED req=PASS prot=PASS cases 3->7/7 +[1,2,6,7] edits=2 RETAIN delivered=true msgs=3 caseLines=7
+ 16. [RECOVERY_ARM] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=8 ctl=STOPPED DISCARD>REPEAT>REPEAT restores=3/3
+ 17. [RECOVERY_ARM] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->1/9 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=6 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 18. [AUTODIAG_ARM] ext-lcs_length ENDED req=PASS prot=PASS cases 1->9/9 +[1,2,4,5,6,7,8,9] edits=1 RETAIN delivered=true msgs=2 caseLines=6
+ 19. [AUTODIAG_ARM] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=4
+ 20. [RECOVERY_ARM] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=4 ctl=ACTIVE - restores=0/0
+ 21. [RECOVERY_ARM] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+ 22. [AUTODIAG_ARM] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 23. [AUTODIAG_ARM] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=3 RESTORED delivered=true msgs=2 caseLines=4
+ 24. [RECOVERY_ARM] ext-max_sublist_sum ENDED req=FAIL prot=PASS cases 2->2/6 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=4 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 25. [RECOVERY_ARM] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=6 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 26. [AUTODIAG_ARM] ext-mergesort ENDED req=FAIL prot=FAIL cases 1->0/14 edits=4 RESTORED delivered=true msgs=3 caseLines=6
+ 27. [AUTODIAG_ARM] ext-next_palindrome ENDED req=PASS prot=PASS cases 4->5/5 +[5] edits=1 RETAIN delivered=true msgs=2 caseLines=1
+ 28. [RECOVERY_ARM] ext-next_palindrome ENDED req=PASS prot=PASS cases 4->5/5 +[5] edits=1 RETAIN delivered=true msgs=2 caseLines=1 ctl=ACCEPTED ACCEPT restores=0/0
+ 29. [RECOVERY_ARM] ext-pascal ENDED req=PASS prot=PASS cases 1->5/5 +[2,3,4,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+   !! unit hit the hard wall at 1194s - taken apart by the runner
+   !! unit ran 909s past its bound
+ 30. [AUTODIAG_ARM] ext-pascal TIMEOUT req=PASS prot=PASS cases 1->5/5 +[2,3,4,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 31. [AUTODIAG_ARM] ext-possible_change ENDED req=PASS prot=PASS cases 1->10/10 +[2,3,4,5,6,7,8,9,10] edits=2 RETAIN delivered=true msgs=2 caseLines=6
+ 32. [RECOVERY_ARM] ext-possible_change ENDED req=FAIL prot=PASS cases 1->1/10 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=6 ctl=STOPPED RESTORE>RESTORE restores=2/2
+ 33. [RECOVERY_ARM] ext-powerset ENDED req=PASS prot=PASS cases 1->5/5 +[1,2,3,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+ 34. [AUTODIAG_ARM] ext-powerset ENDED req=PASS prot=PASS cases 1->5/5 +[1,2,3,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 35. [AUTODIAG_ARM] ext-quicksort ENDED req=FAIL prot=PASS cases 12->12/13 edits=24 PRESERVE_INCOMPLETE delivered=true msgs=23 caseLines=23
+ 36. [RECOVERY_ARM] ext-quicksort ENDED req=FAIL prot=PASS cases 12->12/13 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=STOPPED DISCARD>REPEAT>REPEAT restores=3/3
+ 37. [RECOVERY_ARM] ext-shunting_yard ENDED req=FAIL prot=PASS cases 2->2/6 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=8 ctl=STOPPED DISCARD>REPEAT>REPEAT restores=3/3
+ 38. [AUTODIAG_ARM] ext-shunting_yard ENDED req=FAIL prot=PASS cases 2->2/6 edits=25 PRESERVE_INCOMPLETE delivered=true msgs=24 caseLines=96
+ 39. [AUTODIAG_ARM] ext-sieve ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=1 RETAIN delivered=true msgs=2 caseLines=5
+ 40. [RECOVERY_ARM] ext-sieve ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=1 RETAIN delivered=true msgs=2 caseLines=5 ctl=ACCEPTED ACCEPT restores=0/0
+ 41. [RECOVERY_ARM] ext-subsequences ENDED req=PASS prot=PASS cases 2->12/12 +[1,4,5,6,7,8,9,10,11,12] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+ 42. [AUTODIAG_ARM] ext-subsequences ENDED req=PASS prot=PASS cases 2->12/12 +[1,4,5,6,7,8,9,10,11,12] edits=1 RETAIN delivered=true msgs=2 caseLines=6
+ 43. [AUTODIAG_ARM] ext-to_base ENDED req=PASS prot=PASS cases 3->10/10 +[4,5,6,7,8,9,10] edits=23 RETAIN delivered=true msgs=21 caseLines=6
+ 44. [RECOVERY_ARM] ext-to_base ENDED req=PASS prot=PASS cases 3->10/10 +[4,5,6,7,8,9,10] edits=25 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+ 45. [AUTODIAG_ARM] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=7 RETAIN delivered=true msgs=3 caseLines=6
+ 46. [RECOVERY_ARM] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=1 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+ 47. [RECOVERY_ARM] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 48. [AUTODIAG_ARM] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 edits=4 RESTORED delivered=true msgs=2 caseLines=2
+ 49. [AUTODIAG_ARM] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12
+ 50. [RECOVERY_ARM] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=1 RETAIN delivered=true msgs=2 caseLines=6 ctl=ACCEPTED ACCEPT restores=0/0
+ 51. [RECOVERY_ARM] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=1 RETAIN delivered=true msgs=2 caseLines=5 ctl=ACCEPTED ACCEPT restores=0/0
+ 52. [AUTODIAG_ARM] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=2 RETAIN delivered=true msgs=3 caseLines=5
+ 53. [AUTODIAG_ARM] ext-get_factors ENDED req=PASS prot=PASS cases 1->11/11 +[2,3,4,5,6,7,8,9,10,11] edits=4 RETAIN delivered=true msgs=2 caseLines=6
+ 54. [RECOVERY_ARM] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=12 ctl=STOPPED DISCARD>REPEAT>REPEAT restores=3/3
+ 55. [RECOVERY_ARM] ext-is_valid_parenthesization ENDED req=PASS prot=PASS cases 2->3/3 +[3] edits=1 RETAIN delivered=true msgs=2 caseLines=1 ctl=ACCEPTED ACCEPT restores=0/0
+ 56. [AUTODIAG_ARM] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=25 PRESERVE_INCOMPLETE delivered=true msgs=25 caseLines=25
+ 57. [AUTODIAG_ARM] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=3
+ 58. [RECOVERY_ARM] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=3 ctl=ACTIVE - restores=0/0
+ 59. [RECOVERY_ARM] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=4 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 60. [AUTODIAG_ARM] ext-kth ENDED req=FAIL prot=FAIL cases 3->0/7 edits=4 RESTORED delivered=true msgs=3 caseLines=4
+ 61. [AUTODIAG_ARM] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->1/9 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=6
+ 62. [RECOVERY_ARM] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->1/9 edits=4 PRESERVE_INCOMPLETE delivered=true msgs=3 caseLines=14 ctl=STOPPED PROVISIONAL>DISCARD>DISCARD restores=2/2
+ 63. [RECOVERY_ARM] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=4 ctl=ACTIVE - restores=0/0
+ 64. [AUTODIAG_ARM] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE delivered=true msgs=1 caseLines=4
+ 65. [AUTODIAG_ARM] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 66. [RECOVERY_ARM] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+ 67. [RECOVERY_ARM] ext-max_sublist_sum ENDED req=FAIL prot=PASS cases 2->2/6 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=4 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 68. [AUTODIAG_ARM] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=3 RESTORED delivered=true msgs=2 caseLines=4
+ 69. [AUTODIAG_ARM] ext-mergesort ENDED req=FAIL prot=FAIL cases 1->0/14 edits=3 RESTORED delivered=true msgs=2 caseLines=6
+ 70. [RECOVERY_ARM] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=6 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 71. [RECOVERY_ARM] ext-next_palindrome ENDED req=FAIL prot=PASS cases 4->4/5 edits=5 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=ACTIVE DISCARD restores=1/1
+ 72. [AUTODIAG_ARM] ext-next_palindrome ENDED req=FAIL prot=FAIL cases 4->0/5 -[1,2,3,4] edits=6 RESTORED delivered=true msgs=5 caseLines=13
+ 73. [AUTODIAG_ARM] ext-pascal ENDED req=PASS prot=PASS cases 1->5/5 +[2,3,4,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4
+ 74. [RECOVERY_ARM] ext-pascal ENDED req=PASS prot=PASS cases 1->5/5 +[2,3,4,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+ 75. [RECOVERY_ARM] ext-possible_change ENDED req=FAIL prot=PASS cases 1->1/10 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=6 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 76. [AUTODIAG_ARM] ext-possible_change ENDED req=FAIL prot=FAIL cases 1->0/10 edits=4 RESTORED delivered=true msgs=3 caseLines=6
+ 77. [AUTODIAG_ARM] ext-powerset ENDED req=FAIL prot=PASS cases 1->1/5 edits=4 PRESERVE_INCOMPLETE delivered=true msgs=3 caseLines=11
+ 78. [RECOVERY_ARM] ext-powerset ENDED req=PASS prot=PASS cases 1->5/5 +[1,2,3,5] edits=1 RETAIN delivered=true msgs=2 caseLines=4 ctl=ACCEPTED ACCEPT restores=0/0
+ 79. [RECOVERY_ARM] ext-quicksort ENDED req=FAIL prot=PASS cases 12->12/13 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=2 ctl=STOPPED DISCARD>DISCARD restores=2/2
+ 80. [AUTODIAG_ARM] ext-quicksort ENDED req=FAIL prot=PASS cases 12->12/13 edits=4 PRESERVE_INCOMPLETE delivered=true msgs=3 caseLines=8
+ 81. [AUTODIAG_ARM] ext-shunting_yard ENDED req=FAIL prot=FAIL cases 2->0/6 edits=25 RESTORED delivered=true msgs=24 caseLines=4
+ 82. [RECOVERY_ARM] ext-shunting_yard ENDED req=FAIL prot=PASS cases 2->2/6 edits=3 PRESERVE_INCOMPLETE delivered=true msgs=2 caseLines=4 ctl=STOPPED RESTORE>REPEAT>REPEAT restores=3/3
+ 83. [RECOVERY_ARM] ext-sieve ENDED req=FAIL prot=PASS cases 1->1/6 edits=1 PRESERVE_INCOMPLETE delivered=false msgs=0 caseLines=0 ctl=null - restores=0/0
+
+5 planned unit(s) never started - each recorded as UNATTEMPTED with its reason
+report written 2026-09-25T22:14:30.322Z: C:\Users\tatte\AppData\Local\Temp\autodiag1-FVZVJG\OVERNIGHT-1_REPORT.json
+
+=== OVERNIGHT-1 RESULT ===
+elapsed 127m 5s of 130m
+stopped cleanly: YES
+integrity true  reconciliation true
+status {"COMPLETED":83,"INTERRUPTED":0,"UNATTEMPTED":5,"BLOCKED":0,"OTHER":0,"UNACCOUNTED":0,"total":88,"planned":88}
+
+LABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.
+
+RECOVERY_ARM  {
+ "runs": 44,
+ "verifiedRepairs": 19,
+ "dispositions": {
+  "RETAIN": 19,
+  "PRESERVE_INCOMPLETE": 23,
+  "UNATTEMPTED": 2
+ },
+ "regressionsProduced": 0,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 19,
+ "runsWithNewlyFailing": 0,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 19,
+ "caseMeasurementErrors": 0,
+ "editsOnTarget": 104,
+ "runsThatEdited": 39,
+ "sawFailingTest": 2,
+ "editAfterFailure": 0,
+ "runsWithDiagnosticDelivered": 41,
+ "diagnosticsDelivered": 83,
+ "diagnosticsSkippedForBudget": 2,
+ "diagnosticsUnavailable": 0
+}
+
+AUTODIAG_ARM  {
+ "runs": 44,
+ "verifiedRepairs": 18,
+ "dispositions": {
+  "RETAIN": 18,
+  "RESTORED": 11,
+  "PRESERVE_INCOMPLETE": 12,
+  "UNATTEMPTED": 3
+ },
+ "regressionsProduced": 11,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 20,
+ "runsWithNewlyFailing": 2,
+ "runsWithBoth": 1,
+ "runsAllCasesPassing": 18,
+ "caseMeasurementErrors": 9,
+ "editsOnTarget": 240,
+ "runsThatEdited": 37,
+ "sawFailingTest": 4,
+ "editAfterFailure": 3,
+ "runsWithDiagnosticDelivered": 41,
+ "diagnosticsDelivered": 228,
+ "diagnosticsSkippedForBudget": 12,
+ "diagnosticsUnavailable": 0
+}
+
+isolation: held in every recorded unit
+
+summary: C:\Users\tatte\AppData\Local\Temp\autodiag1-FVZVJG\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\autodiag1-FVZVJG\OVERNIGHT-1_REPORT.json
+OVERNIGHT-1 COMPLETE 2026-09-25T22:14:30.326Z
+OVERNIGHT-1 EXIT 2026-09-25T22:14:30.334Z code 0
+[2026-09-25T22:14:30Z] campaign process exited 0
+[2026-09-25T22:14:30Z] app state now:
+    "description": "legasus-7b",
+    "state": "deployed",
+    "tasks": "1",
+    "created_at": "2026-09-25 15:01:33-05:00",
+stage2 exit 0

@@ -1,0 +1,73 @@
+##### e1-books
+  load errors 0   registrations: DOMContentLoaded@document, input@input#filter
+  surfaces: 1 input(s), 0 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.input      type into #filter and look for an observable effect
+    browser.input      CONFIRMED_BEHAVIOUR    2 performed, 1 produced a change
+  SELECTED: browser.input
+  OUTCOME:  CONFIRMED_BEHAVIOUR
+    unresolved: this application uses handler mechanisms the registration capture does not see: 5 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any "no change observed" here is correspondingly weaker.
+
+##### e2-cities
+  load errors 0   registrations: DOMContentLoaded@document, input@input#filter
+  surfaces: 1 input(s), 0 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.input      type into #filter and look for an observable effect
+    browser.input      CONFIRMED_BEHAVIOUR    2 performed, 2 produced a change
+  SELECTED: browser.input
+  OUTCOME:  CONFIRMED_BEHAVIOUR
+
+##### e3-tools
+  load errors 0   registrations: DOMContentLoaded@document, input@input#filter
+  surfaces: 1 input(s), 0 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.input      type into #filter and look for an observable effect
+    browser.input      CONFIRMED_BEHAVIOUR    2 performed, 2 produced a change
+  SELECTED: browser.input
+  OUTCOME:  CONFIRMED_BEHAVIOUR
+
+##### e4-fruits
+  load errors 0   registrations: DOMContentLoaded@document, input@input#filter
+  surfaces: 1 input(s), 0 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.input      type into #filter and look for an observable effect
+    browser.input      CONFIRMED_BEHAVIOUR    2 performed, 2 produced a change
+  SELECTED: browser.input
+  OUTCOME:  CONFIRMED_BEHAVIOUR
+
+##### e5-notes
+  load errors 0   registrations: DOMContentLoaded@document, click@button#toggle
+  surfaces: 0 input(s), 1 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.click      click each clickable control and look for an observable effect
+    browser.click      NO_CHANGE_OBSERVED     1 performed, 0 produced a change
+  SELECTED: none
+  OUTCOME:  NO_CHANGE_OBSERVED
+    unresolved: no probed interaction changed the seam, the DOM or the canvas. THIS IS NOT A FINDING THAT THE APPLICATION HAS NO BEHAVIOUR: 1 plan(s) were tried within a budget of 60 interactions, and any interaction outside them is uncovered.
+    unresolved: interaction kinds this layer does not support at all: drag, hover, scroll, select-option, file-upload, timer-driven updates
+
+##### e6-files
+  load errors 0   registrations: DOMContentLoaded@document, click@button#toggle
+  surfaces: 0 input(s), 1 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.click      click each clickable control and look for an observable effect
+    browser.click      NO_CHANGE_OBSERVED     1 performed, 0 produced a change
+  SELECTED: none
+  OUTCOME:  NO_CHANGE_OBSERVED
+    unresolved: no probed interaction changed the seam, the DOM or the canvas. THIS IS NOT A FINDING THAT THE APPLICATION HAS NO BEHAVIOUR: 1 plan(s) were tried within a budget of 60 interactions, and any interaction outside them is uncovered.
+    unresolved: interaction kinds this layer does not support at all: drag, hover, scroll, select-option, file-upload, timer-driven updates
+
+##### e7-orders
+  load errors 0   registrations: DOMContentLoaded@document, click@button#toggle
+  surfaces: 0 input(s), 1 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.click      click each clickable control and look for an observable effect
+    browser.click      NO_CHANGE_OBSERVED     1 performed, 0 produced a change
+  SELECTED: none
+  OUTCOME:  NO_CHANGE_OBSERVED
+    unresolved: no probed interaction changed the seam, the DOM or the canvas. THIS IS NOT A FINDING THAT THE APPLICATION HAS NO BEHAVIOUR: 1 plan(s) were tried within a budget of 60 interactions, and any interaction outside them is uncovered.
+    unresolved: interaction kinds this layer does not support at all: drag, hover, scroll, select-option, file-upload, timer-driven updates
+
+##### e8-users
+  load errors 0   registrations: DOMContentLoaded@document, click@button#toggle
+  surfaces: 0 input(s), 1 clickable(s), 0 form(s), 0 canvas(es), seam false
+    browser.click      click each clickable control and look for an observable effect
+    browser.click      NO_CHANGE_OBSERVED     1 performed, 0 produced a change
+  SELECTED: none
+  OUTCOME:  NO_CHANGE_OBSERVED
+    unresolved: no probed interaction changed the seam, the DOM or the canvas. THIS IS NOT A FINDING THAT THE APPLICATION HAS NO BEHAVIOUR: 1 plan(s) were tried within a budget of 60 interactions, and any interaction outside them is uncovered.
+    unresolved: interaction kinds this layer does not support at all: drag, hover, scroll, select-option, file-upload, timer-driven updates
+

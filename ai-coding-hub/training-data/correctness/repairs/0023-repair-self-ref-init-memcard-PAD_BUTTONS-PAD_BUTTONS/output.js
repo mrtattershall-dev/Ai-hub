@@ -1,0 +1,11 @@
+const PAD_BUTTONS = {
+  0: "jump",     // A / Cross
+  1: "dodge",    // B / Circle  (also cancel)
+  2: "light",    // X / Square  (also confirm)
+  3: "heavy",    // Y / Triangle
+  4: "lockon",   // LB / L1
+  5: "ability",  // RB / R1
+  9: "pause",    // Start
+  8: "interact", // Select
+  12: "up", 13: "down", 14: "left", 15: "right", // d-pad
+};

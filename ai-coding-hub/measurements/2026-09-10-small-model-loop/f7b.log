@@ -1,0 +1,37 @@
+### 7B int4/A10G — SAME fixes as the 14B run (3 passes)
+ENDPOINT  {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-7B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+create       stopped       15     7    0     21   25.4    | runs
+append       stopped        7     3    0     12   49.5    | runs
+surgical     stopped       10     6    0     15   48.1    | runs
+multi-site   stopped       12     7    0     12   28.5    | runs
+python       stopped       13     8    6     15   32.3   MISSING
+docs         stopped       12     7    0     15   28.4   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 6
+guard refusals     : 0   <- these are the system WORKING, not failures
+--- pass 1
+ENDPOINT  {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-7B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+create       stopped       12     6    0     15     26    | runs
+append       stopped       13     7    0     12   35.6    | runs
+surgical     stopped       12     7    0     12   33.9    | runs
+multi-site   stopped       12     7    0     12   33.1    | runs
+python       stopped       12     7    0     12   33.9   MISSING
+docs         stopped       12     7    0     12   41.6   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+guard refusals     : 1   <- these are the system WORKING, not failures
+--- pass 2
+ENDPOINT  {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-7B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+create       stopped        9     4    0     12   26.5    | runs
+append       stopped       13     7    0     12   32.6    | runs
+surgical     stopped       12     7    0     15   46.9    | runs
+multi-site   stopped       12     7    0     12   28.1    | runs
+python       stopped       12     7    0     12   22.3   MISSING
+docs         stopped       12     7    0     12     40   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+guard refusals     : 0   <- these are the system WORKING, not failures
+--- pass 3

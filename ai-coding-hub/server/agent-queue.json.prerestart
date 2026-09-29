@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "ea9003f4",
+      "goal": "chaintest-mtve5ey6 step 5",
+      "priority": 0,
+      "source": "human",
+      "after": "1f31b9b8",
+      "generation": 0,
+      "repairOf": null,
+      "createdAt": 1789036517089,
+      "status": "queued"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/scenes/saveSelect.js: * saveSelect.js — three save slots with summaries (play time, %, rank, area).

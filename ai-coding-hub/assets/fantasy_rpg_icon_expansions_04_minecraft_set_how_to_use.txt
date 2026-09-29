@@ -1,0 +1,9 @@
+In Minecraft, open Options, Resource Packs, Open Pack Folder.
+Drop the "franuka-minecraft-iconset.zip" in (no need to unzip) and activate it.
+The replaced textures show as soon as the pack is active.
+---
+Icon art by me (Franuka)
+Texture set compiled using Minecraft Maps custom item texture maker (https://www.minecraftmaps.com/tools/custom-item-texture-maker)
+
+This set replaces a lot of icons, but not all (yet).
+You can tweak or complete the set using that awesome tool!

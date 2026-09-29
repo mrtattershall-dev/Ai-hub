@@ -1,0 +1,94 @@
+=== RD-B3: live behavior authoring (REAL model) ===
+
+model=Qwen/Qwen3-Coder-30B-A3B-Instruct  trials/goal=4  maxAttempts=3  ticks=6  temp=0.7
+    [grow C a1] 8s
+    [grow C a2] 6s
+    [grow C a3] 12s
+    [grow C a1] 12s
+    [grow C a1] 7s
+    [grow C a2] 6s
+    [grow C a3] 12s
+    [grow C a1] 6s
+    [grow C a2] 6s
+    [grow C a3] 6s
+  CONTROL  grow   3/4  meanAtt 2.3
+    [flee C a1] 5s
+    [flee C a1] 5s
+    [flee C a1] 5s
+    [flee C a1] 5s
+  CONTROL  flee   4/4  meanAtt 1.0
+    [score C a1] 7s
+    [score C a2] 7s
+    [score C a3] 13s
+    [score C a1] 14s
+    [score C a2] 12s
+    [score C a3] 7s
+    [score C a1] 7s
+    [score C a2] 13s
+    [score C a3] 7s
+    [score C a1] 7s
+    [score C a2] 7s
+    [score C a3] 13s
+  CONTROL  score  0/4  meanAtt -
+    [wilt C a1] 12s
+    [wilt C a1] 6s
+    [wilt C a2] 6s
+    [wilt C a3] 6s
+    [wilt C a1] 12s
+    [wilt C a1] 12s
+  CONTROL  wilt   3/4  meanAtt 1.0
+    [grow F a1] 6s
+    [grow F a2] 6s
+    [grow F a3] 6s
+    [grow F a1] 6s
+    [grow F a2] 6s
+    [grow F a3] 6s
+    [grow F a1] 12s
+    [grow F a1] 6s
+    [grow F a2] 6s
+    [grow F a3] 6s
+  FEEDBACK grow   1/4  meanAtt 1.0
+    [flee F a1] 5s
+    [flee F a1] 5s
+    [flee F a1] 5s
+    [flee F a1] 5s
+  FEEDBACK flee   4/4  meanAtt 1.0
+    [score F a1] 12s
+    [score F a2] 7s
+    [score F a3] 7s
+    [score F a1] 7s
+    [score F a2] 7s
+    [score F a3] 7s
+    [score F a1] 7s
+    [score F a2] 7s
+    [score F a3] 7s
+    [score F a1] 7s
+    [score F a2] 7s
+    [score F a3] 7s
+  FEEDBACK score  0/4  meanAtt -
+    [wilt F a1] 6s
+    [wilt F a2] 6s
+    [wilt F a3] 6s
+    [wilt F a1] 6s
+    [wilt F a2] 6s
+    [wilt F a3] 6s
+    [wilt F a1] 12s
+    [wilt F a1] 12s
+  FEEDBACK wilt   2/4  meanAtt 1.0
+
+TOTAL: CONTROL 10/16   FEEDBACK 7/16   unsafe events: 0 (must be 0)
+
+--- STDERR ---
+ects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a1] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a2] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"name","cmp":"==","value":"field"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a3] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"root","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a1] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"id","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a2] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"name","cmp":"==","value":"field"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [score F a3] REJECTED unknown_field :: {"name":"update_zone_score","match":{"type":"zone","where":{"field":"root","cmp":"==","value":"u0"}},"effects":[{"set":"tally","to":{"count":{"type":"crop","where":{"field":"growth","cmp":">=","value":100}}}}]}
+      [wilt F a1] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a2] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a3] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a1] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a2] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}
+      [wilt F a3] REJECTED malformed_json :: {"name":"wilt_unwatered_crops","match":{"type":"crop","where":{"field":"water","cmp":"==","value":0}},"effects":[{"set":"growth","to":{"max":[{"sub":[{"field":"growth"},2]},0]}]}]}

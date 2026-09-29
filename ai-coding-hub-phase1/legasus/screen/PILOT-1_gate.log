@@ -1,0 +1,2 @@
+GATE PILOT-1 stage1 2026-09-25T19:33:29Z: accrued $0.00 of the pilot's $5; stage max ~$2.5 conservative (3000s watchdog + retries + scaledown) -> OK
+GATE PILOT-1 stage2 2026-09-25T19:35:59Z: accrued ~$0.05; campaign max ~$2.5 conservative; pilot cap $5 -> OK; seed probe identical=true

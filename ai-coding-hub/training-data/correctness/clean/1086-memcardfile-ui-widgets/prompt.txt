@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/ui/widgets.js: * widgets.js — shared canvas drawing helpers for menus and HUD.

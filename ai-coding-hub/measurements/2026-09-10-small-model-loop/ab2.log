@@ -1,0 +1,7 @@
+### WITHOUT the no-repeat rule (3 passes, control)
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+WORK ACTUALLY DONE : 5/6   <- the number that matters
+tool errors        : 0
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
