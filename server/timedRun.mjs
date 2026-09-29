@@ -31,15 +31,13 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { createHash } from 'node:crypto';
 import { blankRecord, validateTimingRecord } from './timingContract.mjs';
-import { resolveDecoding, decodingRecord } from './lockedDecoding.mjs';
 
 const NL = String.fromCharCode(10);
-const { observeBaseline } = await import('./behaviorModel.mjs');
-const { derive, verify } = await import('./featureGraph.mjs');
-const { playCheck } = await import('./playCheck.js');
-const { topLevelFunctions, referencedElsewhere } = await import('./editPlanner.mjs');
+// THE SHARED HALF IS IMPORTED, NOT COPIED. This file used to hold its own generate/extract/verify.
+// Two copies make 'both arms verify identically' true on the day it is written and quietly false
+// three commits later, with nothing to announce it.
+import { observeAndDerive, buildPrompt, generate, extractWholePage, verifyCandidate, sha, nowMs } from './sharedRun.mjs';
 
 const opt = (name, dflt) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -53,46 +51,18 @@ const OUT = opt('out', 'legasus/records/timing');
 const RUN_ID = opt('run-id', `timing-${ARM}-${Date.now()}`);
 if (ARM !== 'direct') { console.error(`arm ${ARM} is not implemented yet - the direct baseline is collected first, by design`); process.exit(2); }
 
-const sha = (t) => createHash('sha256').update(t).digest('hex');
-const now = () => Number(process.hrtime.bigint() / 1000000n);
-
-// ══ GENERATION ════════════════════════════════════════════════════════════════════════════════════
-async function generate(prompt, options) {
-  const t0 = now();
-  let r;
-  try {
-    r = await fetch('http://127.0.0.1:11434/api/generate', {
-      method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ model: MODEL, prompt, stream: false, options }),
-    });
-  } catch (e) { return { ok: false, ms: now() - t0, why: String(e.message || e) }; }
-  if (!r.ok) return { ok: false, ms: now() - t0, why: `HTTP ${r.status}` };
-  const j = await r.json();
-  return {
-    ok: true, ms: now() - t0, text: String(j.response || ''),
-    promptTokens: j.prompt_eval_count ?? null, outputTokens: j.eval_count ?? null, doneReason: j.done_reason,
-  };
-}
-
-/** The whole-page extractor, kept deliberately strict: a generous one would credit the model for my parser. */
-function extractWholePage(text, baseline) {
-  let t = String(text || '');
-  const fence = t.match(/```(?:html)?\s*([\s\S]*?)```/i);
-  if (fence) t = fence[1];
-  const start = t.search(/<!DOCTYPE html|<html\b/i);
-  const end = t.toLowerCase().lastIndexOf('</html>');
-  if (start === -1 || end === -1 || end < start) return { ok: false, reason: 'NO_EXTRACTABLE_CHANGE' };
-  const page = t.slice(start, end + '</html>'.length);
-  if (page.trim() === baseline.trim()) return { ok: false, reason: 'ECHOED_THE_INPUT' };
-  return { ok: true, page };
-}
+const now = nowMs;
 
 // ══ THE SHARED HALF — identical for both arms, and that is the point ══════════════════════════════
 async function verifyAndDecide({ candidate, task, spec, graph, workspace, entry, baseline }) {
-  const tV = now();
-  const result = await verify(candidate, { task, spec, graph, deps: { playCheck } });
-  const verificationMs = now() - tV;
+  const result = await verifyCandidate({ candidate, task, spec, graph });
+  const verificationMs = result.verificationMs;
 
+  // A VERIFIER THAT COULD NOT RUN IS NOT A REJECTION. Without this the run would write the
+  // baseline back and record RESTORED - blaming the model for a missing browser.
+  if (result.ran === false) {
+    return { verificationMs, effectMs: 0, restorationMs: null, terminal: 'NOT_EVALUATED', result };
+  }
   const complete = result.complete;
   let terminal, restorationMs = null;
   const tE = now();
@@ -119,17 +89,6 @@ async function runOne(pageDir, pageName) {
   const spec = task.diagnostic.spec;
   const entry = spec.entry || 'index.html';
 
-  // THE WELD. Both arms, always. `ignored` is carried into the record rather than dropped.
-  const resolved = resolveDecoding(PROFILE);
-  const dec = decodingRecord(resolved);
-
-  const rec = blankRecord({
-    arm: ARM, runId: RUN_ID, at: new Date().toISOString(), task: task.id, page: pageName,
-    baselineSha: sha(baseline), model: MODEL,
-    decodingProfile: dec.profile,
-    decoding: { temperature: dec.temperature, num_predict: dec.num_predict, seed: dec.seed },
-    decodingOverridesRefused: dec.overridesRefused,
-  });
 
   const workspace = mkdtempSync(join(tmpdir(), 'timed-'));
   try {
@@ -137,22 +96,22 @@ async function runOne(pageDir, pageName) {
 
     // SHARED: observe the baseline and derive the graph. Timed on its own, because it happens once per
     // task before any candidate exists and folding it into verification would inflate it.
-    const tD = now();
-    const observation = await observeBaseline(baseline, task, { playCheck });
-    const graph = derive(baseline, task, { topLevelFunctions, referencedElsewhere, observation });
-    rec.clocks.derivationMs = now() - tD;
+    const { graph, derivationMs } = await observeAndDerive(baseline, task);
+
+    // The prompt AND the weld both come from the shared half, so the two arms cannot drift apart in
+    // what they ask or what they ask it under.
+    const gen = await generate({ prompt: buildPrompt(baseline, task), profile: PROFILE, model: MODEL });
+
+    const rec = blankRecord({
+      arm: ARM, runId: RUN_ID, at: new Date().toISOString(), task: task.id, page: pageName,
+      baselineSha: sha(baseline), model: MODEL,
+      decodingProfile: gen.decoding.profile,
+      decoding: { temperature: gen.decoding.temperature, num_predict: gen.decoding.num_predict, seed: gen.decoding.seed },
+      decodingOverridesRefused: gen.decoding.overridesRefused,
+    });
+    rec.clocks.derivationMs = derivationMs;
     rec.counts.nodesCovered = 0;
     rec.counts.nodesMissing = graph.nodes.length;
-
-    const r = task.requirement;
-    const prompt = [
-      'Here is a web page.', '', baseline, '',
-      `A user wants this change: Add a control ${r.trigger.selector}. Clicking it: ${(r.effects || []).join('; ')}. ${(r.invariants || []).join('. ')}.`,
-      'Everything the page already does must keep working.', '',
-      'Give the complete updated page.',
-    ].join(NL);
-
-    const gen = await generate(prompt, resolved.options);
     rec.clocks.generationMs = gen.ms;
     rec.counts.calls = 1;
     if (!gen.ok) {

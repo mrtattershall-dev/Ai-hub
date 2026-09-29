@@ -118,9 +118,14 @@ function gitDirtyIn(root) {
 /** The modules and exports the governed runner depends on. Named here so a drift is loud. */
 export const AUTHORITY_CONTRACT = Object.freeze({
   'legasus/runtime/epistemic-admission/governed-edit.mjs':
-    ['governedEdit', 'editAction', 'revisionOf', 'OUTCOME', 'DISPOSITION', 'EDIT_FIXTURE'],
+    ['governedEdit', 'editAction', 'revisionOf', 'OUTCOME', 'DISPOSITION', 'EDIT_FIXTURE', 'EDIT_FIXTURE_EVIDENCED'],
   'legasus/runtime/governedWorkspace/workspace.mjs':
     ['createWorkspace', 'fileScope', 'EVENT', 'PACKET', 'EFFECT_OUTCOME'],
+  // The evidence half. A governed promotion mints an EPISTEMIC token about the target at the observed
+  // revision, so these are as load-bearing as the executor and are named here for the same reason: a
+  // drift in what they export should fail the bind rather than surface as a confusing refusal later.
+  'legasus/legaknow/calculus.mjs': ['delegate', 'observe', 'isAuthority'],
+  'legasus/legaknow/observation.mjs': ['observation', 'OBSERVABILITY'],
 });
 
 /**

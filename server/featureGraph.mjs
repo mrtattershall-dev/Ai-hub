@@ -227,8 +227,15 @@ export function derive(page, task, { topLevelFunctions, referencedElsewhere, obs
 export async function verify(candidate, { task, spec, graph, deps }) {
   const ws = mkdtempSync(join(tmpdir(), 'fgraph-'));
   const entry = spec.entry || 'index.html';
+  // A VERIFIER THAT COULD NOT RUN MUST NOT PRODUCE A VERDICT. playCheck reports status UNAVAILABLE
+  // with EMPTY passing/failing sets when no browser can be found or launched, and nothing used to
+  // read that status - so every node came back unsatisfied and the candidate was REJECTED. That is
+  // fail-closed on safety and still wrong: it blames the model for an apparatus failure, and a whole
+  // paid run could be recorded as model failures that were really a missing browser.
+  let unavailable = null;
   const run = async (steps) => {
     const r = await deps.playCheck(ws, { ...spec, contract: 'feature-graph coverage', steps });
+    if (r && r.status === 'UNAVAILABLE' && !unavailable) unavailable = r.reason || 'the verifier could not run';
     return { passing: [...(r.passing || [])], failing: [...(r.failing || [])] };
   };
   try {
@@ -254,6 +261,9 @@ export async function verify(candidate, { task, spec, graph, deps }) {
 
     const covered = graph.nodes.filter((n) => satisfied[n.id]).map((n) => n.id);
     const missing = graph.nodes.filter((n) => !satisfied[n.id]).map((n) => n.id);
-    return { satisfied, covered, missing, complete: missing.length === 0 };
+    // `ran: false` is NOT a rejection. A caller must treat it as NOT_EVALUATED, and `complete` is
+    // forced false so a caller that ignores `ran` still cannot read an accidental pass out of it.
+    if (unavailable) return { satisfied, covered, missing, complete: false, ran: false, why: unavailable };
+    return { satisfied, covered, missing, complete: missing.length === 0, ran: true };
   } finally { if (existsSync(ws)) { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } } }
 }
