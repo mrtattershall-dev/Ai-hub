@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><body><h2>g1</h2>
+<input id="q" type="text">
+<button id="clear-filter">Clear</button>
+<ul id="rows"><li class="item">alpha</li><li class="item">alto</li><li class="item">bravo</li><li class="item">cedar</li><li class="item">delta</li></ul>
+<script>
+const field = document.getElementById("q");
+const rows = Array.from(document.querySelectorAll("#rows .item"));
+function refresh() { const t = field.value.toLowerCase(); rows.forEach(function (el) { el.style.display = el.textContent.toLowerCase().indexOf(t) === -1 ? "none" : ""; }); }
+field.addEventListener("input", refresh);
+
+const b = document.createElement('button');
+b.id = 'reset-filter'; b.textContent = 'Reset';
+document.body.appendChild(b);
+b.addEventListener('click', function () { const intended = ''; });
+</script></body></html>

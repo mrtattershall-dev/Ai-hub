@@ -71,7 +71,7 @@ for (const [label, code] of [['works', WORKS], ['inert', INERT]]) {
 
   // ── TASK: what was asked. Owned by the emitter, and a FACT - it was received, not inferred.
   const eTask = append(rec, { section: 'TASK', body: {
-    what: task.goal.slice(0, 120), taskSha: sha(JSON.stringify(task.requirement)),
+    what: task.goal.slice(0, 120), taskSha: sha(JSON.stringify(task)),
     requirement: task.requirement, steps: spec.steps.map((s) => ({ n: s.n, name: s.name })),
     additionSteps: task.provenance.additionSteps, carriedSteps: task.provenance.carriedSteps,
   } });
@@ -134,7 +134,14 @@ for (const [label, code] of [['works', WORKS], ['inert', INERT]]) {
 
 // ── Preserve them. A record that only exists in a terminal is not a record.
 const dir = join('legasus/records', `dualwrite-${which}`);
-mkdirSync(dir, { recursive: true });
+const blobs = join(dir, 'blobs');
+mkdirSync(blobs, { recursive: true });
+// CONTENT-ADDRESSED ARTIFACTS. Digests alone make a record ATTRIBUTABLE but not REPLAYABLE: an outside
+// checker cannot recompute a decision from a hash. Every sha the record cites resolves to bytes here,
+// and changeRecordRecompute.mjs verifies the bytes against the sha before using them.
+writeFileSync(join(blobs, sha(page)), page, 'utf8');
+writeFileSync(join(blobs, sha(JSON.stringify(task))), JSON.stringify(task), 'utf8');
+for (const [label, code] of [['works', WORKS], ['inert', INERT]]) writeFileSync(join(blobs, sha(splice(code))), splice(code), 'utf8');
 for (const { label, rec } of out) writeFileSync(join(dir, `${label}.json`), JSON.stringify(rec, null, 2), 'utf8');
 
 const works = replay(out[0].rec); const inert = replay(out[1].rec);

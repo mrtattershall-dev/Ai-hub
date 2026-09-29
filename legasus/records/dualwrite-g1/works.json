@@ -2,11 +2,11 @@
   "schema": "1.0.0",
   "runId": "dualwrite-g1",
   "changeId": "g1-works",
-  "opened": "2026-09-29T08:48:03.523Z",
+  "opened": "2026-09-29T08:51:06.092Z",
   "tool": "changeRecordDualWrite",
   "events": [
     {
-      "id": "g1-works:0:b997ef0a515d",
+      "id": "g1-works:0:7eda20610ba1",
       "seq": 0,
       "section": "TASK",
       "class": "FACT",
@@ -16,7 +16,7 @@
       "uncertainty": null,
       "body": {
         "what": "Continue the page already in index.html. Add a control #reset-filter that clears the filter: clicking it empties #q and ",
-        "taskSha": "9325ce3c2b7847cbc6594c971dc475bc19d9ec0827763ec3d14f3324afc5c79a",
+        "taskSha": "9634d07fa3e5a4d19bf43ad92494680caf51acdc5bbdd71a06fb63ac71c58469",
         "requirement": {
           "trigger": {
             "kind": "click",
@@ -75,13 +75,13 @@
       "prev": null
     },
     {
-      "id": "g1-works:1:d682afc30ab4",
+      "id": "g1-works:1:c5214a0aab74",
       "seq": 1,
       "section": "BASELINE",
       "class": "FACT",
       "by": "observer",
       "cites": [
-        "g1-works:0:b997ef0a515d"
+        "g1-works:0:7eda20610ba1"
       ],
       "authority": null,
       "uncertainty": null,
@@ -121,17 +121,17 @@
           }
         ]
       },
-      "prev": "g1-works:0:b997ef0a515d"
+      "prev": "g1-works:0:7eda20610ba1"
     },
     {
-      "id": "g1-works:2:927f0521f54b",
+      "id": "g1-works:2:58eb76eb98ad",
       "seq": 2,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74"
       ],
       "authority": null,
       "uncertainty": null,
@@ -152,18 +152,18 @@
           "#reset-filter exists and can be clicked"
         ]
       },
-      "prev": "g1-works:1:d682afc30ab4"
+      "prev": "g1-works:1:c5214a0aab74"
     },
     {
-      "id": "g1-works:3:fbcf3958746b",
+      "id": "g1-works:3:6d3d003d3f04",
       "seq": 3,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4",
-        "g1-works:2:927f0521f54b"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74",
+        "g1-works:2:58eb76eb98ad"
       ],
       "authority": null,
       "uncertainty": null,
@@ -191,18 +191,18 @@
           "clicking changes observable state"
         ]
       },
-      "prev": "g1-works:2:927f0521f54b"
+      "prev": "g1-works:2:58eb76eb98ad"
     },
     {
-      "id": "g1-works:4:6da5f45062f1",
+      "id": "g1-works:4:d6cdf174076d",
       "seq": 4,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4",
-        "g1-works:3:fbcf3958746b"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74",
+        "g1-works:3:6d3d003d3f04"
       ],
       "authority": null,
       "uncertainty": null,
@@ -218,18 +218,18 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g1-works:3:fbcf3958746b"
+      "prev": "g1-works:3:6d3d003d3f04"
     },
     {
-      "id": "g1-works:5:6a5ddf9042d1",
+      "id": "g1-works:5:f6c68d65e2b5",
       "seq": 5,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4",
-        "g1-works:3:fbcf3958746b"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74",
+        "g1-works:3:6d3d003d3f04"
       ],
       "authority": null,
       "uncertainty": null,
@@ -245,19 +245,19 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g1-works:4:6da5f45062f1"
+      "prev": "g1-works:4:d6cdf174076d"
     },
     {
-      "id": "g1-works:6:ea64b8658871",
+      "id": "g1-works:6:0bf47e9a4031",
       "seq": 6,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4",
-        "g1-works:3:fbcf3958746b",
-        "g1-works:4:6da5f45062f1"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74",
+        "g1-works:3:6d3d003d3f04",
+        "g1-works:4:d6cdf174076d"
       ],
       "authority": null,
       "uncertainty": null,
@@ -273,17 +273,17 @@
         "distinguishing": "OBSERVED",
         "derivedSequence": null
       },
-      "prev": "g1-works:5:6a5ddf9042d1"
+      "prev": "g1-works:5:f6c68d65e2b5"
     },
     {
-      "id": "g1-works:7:42694d9c3d5f",
+      "id": "g1-works:7:f023828a70bf",
       "seq": 7,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74"
       ],
       "authority": null,
       "uncertainty": null,
@@ -299,19 +299,19 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g1-works:6:ea64b8658871"
+      "prev": "g1-works:6:0bf47e9a4031"
     },
     {
-      "id": "g1-works:8:8b32b7b45ed8",
+      "id": "g1-works:8:2a6ad3207bff",
       "seq": 8,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-works:0:b997ef0a515d",
-        "g1-works:1:d682afc30ab4",
-        "g1-works:7:42694d9c3d5f",
-        "g1-works:4:6da5f45062f1"
+        "g1-works:0:7eda20610ba1",
+        "g1-works:1:c5214a0aab74",
+        "g1-works:7:f023828a70bf",
+        "g1-works:4:d6cdf174076d"
       ],
       "authority": null,
       "uncertainty": null,
@@ -327,16 +327,16 @@
         "distinguishing": "CONDITIONAL",
         "derivedSequence": null
       },
-      "prev": "g1-works:7:42694d9c3d5f"
+      "prev": "g1-works:7:f023828a70bf"
     },
     {
-      "id": "g1-works:9:09b0d0d672c7",
+      "id": "g1-works:9:23a197033599",
       "seq": 9,
       "section": "PROPOSAL",
       "class": "FACT",
       "by": "model",
       "cites": [
-        "g1-works:0:b997ef0a515d"
+        "g1-works:0:7eda20610ba1"
       ],
       "authority": null,
       "uncertainty": null,
@@ -346,17 +346,17 @@
         "insertedBytes": 196,
         "source": "hand-written control"
       },
-      "prev": "g1-works:8:8b32b7b45ed8"
+      "prev": "g1-works:8:2a6ad3207bff"
     },
     {
-      "id": "g1-works:10:5530a4a1a311",
+      "id": "g1-works:10:2a522b6ceb2b",
       "seq": 10,
       "section": "VERIFICATION",
       "class": "FACT",
       "by": "checker",
       "cites": [
-        "g1-works:9:09b0d0d672c7",
-        "g1-works:1:d682afc30ab4"
+        "g1-works:9:23a197033599",
+        "g1-works:1:c5214a0aab74"
       ],
       "authority": null,
       "uncertainty": null,
@@ -373,23 +373,23 @@
         },
         "errors": []
       },
-      "prev": "g1-works:9:09b0d0d672c7"
+      "prev": "g1-works:9:23a197033599"
     },
     {
-      "id": "g1-works:11:5bc5ac1a69c7",
+      "id": "g1-works:11:7f38c68e181a",
       "seq": 11,
       "section": "DIAGNOSIS",
       "class": "CLAIM",
       "by": "checker",
       "cites": [
-        "g1-works:10:5530a4a1a311",
-        "g1-works:2:927f0521f54b",
-        "g1-works:3:fbcf3958746b",
-        "g1-works:4:6da5f45062f1",
-        "g1-works:5:6a5ddf9042d1",
-        "g1-works:6:ea64b8658871",
-        "g1-works:7:42694d9c3d5f",
-        "g1-works:8:8b32b7b45ed8"
+        "g1-works:10:2a522b6ceb2b",
+        "g1-works:2:58eb76eb98ad",
+        "g1-works:3:6d3d003d3f04",
+        "g1-works:4:d6cdf174076d",
+        "g1-works:5:f6c68d65e2b5",
+        "g1-works:6:0bf47e9a4031",
+        "g1-works:7:f023828a70bf",
+        "g1-works:8:2a6ad3207bff"
       ],
       "authority": null,
       "uncertainty": null,
@@ -406,16 +406,16 @@
         ],
         "missing": []
       },
-      "prev": "g1-works:10:5530a4a1a311"
+      "prev": "g1-works:10:2a522b6ceb2b"
     },
     {
-      "id": "g1-works:12:c44f78715fee",
+      "id": "g1-works:12:1594184bfd13",
       "seq": 12,
       "section": "DECISION",
       "class": "CLAIM",
       "by": "policy",
       "cites": [
-        "g1-works:11:5bc5ac1a69c7"
+        "g1-works:11:7f38c68e181a"
       ],
       "authority": null,
       "uncertainty": null,
@@ -423,7 +423,7 @@
         "outcome": "ACCEPT",
         "why": "every derived node was satisfied by observation"
       },
-      "prev": "g1-works:11:5bc5ac1a69c7"
+      "prev": "g1-works:11:7f38c68e181a"
     }
   ]
 }

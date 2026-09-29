@@ -2,11 +2,11 @@
   "schema": "1.0.0",
   "runId": "dualwrite-g1",
   "changeId": "g1-inert",
-  "opened": "2026-09-29T08:48:09.655Z",
+  "opened": "2026-09-29T08:51:14.186Z",
   "tool": "changeRecordDualWrite",
   "events": [
     {
-      "id": "g1-inert:0:b997ef0a515d",
+      "id": "g1-inert:0:7eda20610ba1",
       "seq": 0,
       "section": "TASK",
       "class": "FACT",
@@ -16,7 +16,7 @@
       "uncertainty": null,
       "body": {
         "what": "Continue the page already in index.html. Add a control #reset-filter that clears the filter: clicking it empties #q and ",
-        "taskSha": "9325ce3c2b7847cbc6594c971dc475bc19d9ec0827763ec3d14f3324afc5c79a",
+        "taskSha": "9634d07fa3e5a4d19bf43ad92494680caf51acdc5bbdd71a06fb63ac71c58469",
         "requirement": {
           "trigger": {
             "kind": "click",
@@ -75,13 +75,13 @@
       "prev": null
     },
     {
-      "id": "g1-inert:1:084e02c05c42",
+      "id": "g1-inert:1:fdf89a7dc23f",
       "seq": 1,
       "section": "BASELINE",
       "class": "FACT",
       "by": "observer",
       "cites": [
-        "g1-inert:0:b997ef0a515d"
+        "g1-inert:0:7eda20610ba1"
       ],
       "authority": null,
       "uncertainty": null,
@@ -121,17 +121,17 @@
           }
         ]
       },
-      "prev": "g1-inert:0:b997ef0a515d"
+      "prev": "g1-inert:0:7eda20610ba1"
     },
     {
-      "id": "g1-inert:2:82f1f5114fe7",
+      "id": "g1-inert:2:1348f5dc62ba",
       "seq": 2,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f"
       ],
       "authority": null,
       "uncertainty": null,
@@ -152,18 +152,18 @@
           "#reset-filter exists and can be clicked"
         ]
       },
-      "prev": "g1-inert:1:084e02c05c42"
+      "prev": "g1-inert:1:fdf89a7dc23f"
     },
     {
-      "id": "g1-inert:3:fe171d6b6fc6",
+      "id": "g1-inert:3:0cbe4b806012",
       "seq": 3,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42",
-        "g1-inert:2:82f1f5114fe7"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f",
+        "g1-inert:2:1348f5dc62ba"
       ],
       "authority": null,
       "uncertainty": null,
@@ -191,18 +191,18 @@
           "clicking changes observable state"
         ]
       },
-      "prev": "g1-inert:2:82f1f5114fe7"
+      "prev": "g1-inert:2:1348f5dc62ba"
     },
     {
-      "id": "g1-inert:4:cdd8f7ebdb32",
+      "id": "g1-inert:4:88b1c0ab4848",
       "seq": 4,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42",
-        "g1-inert:3:fe171d6b6fc6"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f",
+        "g1-inert:3:0cbe4b806012"
       ],
       "authority": null,
       "uncertainty": null,
@@ -218,18 +218,18 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g1-inert:3:fe171d6b6fc6"
+      "prev": "g1-inert:3:0cbe4b806012"
     },
     {
-      "id": "g1-inert:5:10f4d10b3237",
+      "id": "g1-inert:5:f7727665c29f",
       "seq": 5,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42",
-        "g1-inert:3:fe171d6b6fc6"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f",
+        "g1-inert:3:0cbe4b806012"
       ],
       "authority": null,
       "uncertainty": null,
@@ -245,19 +245,19 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g1-inert:4:cdd8f7ebdb32"
+      "prev": "g1-inert:4:88b1c0ab4848"
     },
     {
-      "id": "g1-inert:6:7ee2328d19fe",
+      "id": "g1-inert:6:ac0ed4c4270d",
       "seq": 6,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42",
-        "g1-inert:3:fe171d6b6fc6",
-        "g1-inert:4:cdd8f7ebdb32"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f",
+        "g1-inert:3:0cbe4b806012",
+        "g1-inert:4:88b1c0ab4848"
       ],
       "authority": null,
       "uncertainty": null,
@@ -273,17 +273,17 @@
         "distinguishing": "OBSERVED",
         "derivedSequence": null
       },
-      "prev": "g1-inert:5:10f4d10b3237"
+      "prev": "g1-inert:5:f7727665c29f"
     },
     {
-      "id": "g1-inert:7:91dc22de9a52",
+      "id": "g1-inert:7:59a18142aa85",
       "seq": 7,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f"
       ],
       "authority": null,
       "uncertainty": null,
@@ -299,19 +299,19 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g1-inert:6:7ee2328d19fe"
+      "prev": "g1-inert:6:ac0ed4c4270d"
     },
     {
-      "id": "g1-inert:8:8d2a3c4bd026",
+      "id": "g1-inert:8:e5281c6ddd63",
       "seq": 8,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g1-inert:0:b997ef0a515d",
-        "g1-inert:1:084e02c05c42",
-        "g1-inert:7:91dc22de9a52",
-        "g1-inert:4:cdd8f7ebdb32"
+        "g1-inert:0:7eda20610ba1",
+        "g1-inert:1:fdf89a7dc23f",
+        "g1-inert:7:59a18142aa85",
+        "g1-inert:4:88b1c0ab4848"
       ],
       "authority": null,
       "uncertainty": null,
@@ -327,16 +327,16 @@
         "distinguishing": "CONDITIONAL",
         "derivedSequence": null
       },
-      "prev": "g1-inert:7:91dc22de9a52"
+      "prev": "g1-inert:7:59a18142aa85"
     },
     {
-      "id": "g1-inert:9:20bf91c3b911",
+      "id": "g1-inert:9:adf36f2073ed",
       "seq": 9,
       "section": "PROPOSAL",
       "class": "FACT",
       "by": "model",
       "cites": [
-        "g1-inert:0:b997ef0a515d"
+        "g1-inert:0:7eda20610ba1"
       ],
       "authority": null,
       "uncertainty": null,
@@ -346,17 +346,17 @@
         "insertedBytes": 188,
         "source": "hand-written control"
       },
-      "prev": "g1-inert:8:8d2a3c4bd026"
+      "prev": "g1-inert:8:e5281c6ddd63"
     },
     {
-      "id": "g1-inert:10:99b6dec67986",
+      "id": "g1-inert:10:b2752e905a26",
       "seq": 10,
       "section": "VERIFICATION",
       "class": "FACT",
       "by": "checker",
       "cites": [
-        "g1-inert:9:20bf91c3b911",
-        "g1-inert:1:084e02c05c42"
+        "g1-inert:9:adf36f2073ed",
+        "g1-inert:1:fdf89a7dc23f"
       ],
       "authority": null,
       "uncertainty": null,
@@ -373,23 +373,23 @@
         },
         "errors": []
       },
-      "prev": "g1-inert:9:20bf91c3b911"
+      "prev": "g1-inert:9:adf36f2073ed"
     },
     {
-      "id": "g1-inert:11:fe72c7b0def4",
+      "id": "g1-inert:11:9420382ed266",
       "seq": 11,
       "section": "DIAGNOSIS",
       "class": "CLAIM",
       "by": "checker",
       "cites": [
-        "g1-inert:10:99b6dec67986",
-        "g1-inert:2:82f1f5114fe7",
-        "g1-inert:3:fe171d6b6fc6",
-        "g1-inert:4:cdd8f7ebdb32",
-        "g1-inert:5:10f4d10b3237",
-        "g1-inert:6:7ee2328d19fe",
-        "g1-inert:7:91dc22de9a52",
-        "g1-inert:8:8d2a3c4bd026"
+        "g1-inert:10:b2752e905a26",
+        "g1-inert:2:1348f5dc62ba",
+        "g1-inert:3:0cbe4b806012",
+        "g1-inert:4:88b1c0ab4848",
+        "g1-inert:5:f7727665c29f",
+        "g1-inert:6:ac0ed4c4270d",
+        "g1-inert:7:59a18142aa85",
+        "g1-inert:8:e5281c6ddd63"
       ],
       "authority": null,
       "uncertainty": null,
@@ -407,16 +407,16 @@
           "E3"
         ]
       },
-      "prev": "g1-inert:10:99b6dec67986"
+      "prev": "g1-inert:10:b2752e905a26"
     },
     {
-      "id": "g1-inert:12:4e7e03131fc8",
+      "id": "g1-inert:12:d7b1564b3674",
       "seq": 12,
       "section": "DECISION",
       "class": "CLAIM",
       "by": "policy",
       "cites": [
-        "g1-inert:11:fe72c7b0def4"
+        "g1-inert:11:9420382ed266"
       ],
       "authority": null,
       "uncertainty": null,
@@ -424,7 +424,7 @@
         "outcome": "REJECT",
         "why": "W,E1,E2,E3 not satisfied; the control exists but does not do what the requirement names"
       },
-      "prev": "g1-inert:11:fe72c7b0def4"
+      "prev": "g1-inert:11:9420382ed266"
     }
   ]
 }
