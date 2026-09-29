@@ -91,6 +91,42 @@ console.log('\nchanging any reachable file changes the manifest digest');
   } finally { rmSync(base, { recursive: true, force: true }); }
 }
 
+// ══ THE ENFORCED LIMIT ════════════════════════════════════════════════════════════════════════════
+// A computed dynamic import cannot be resolved without executing it, so it would be ABSENT from the
+// manifest and the record would understate what ran. Declaring that in a comment would leave the hole
+// open; the walk refuses instead. These two tests are what make that a boundary rather than a note.
+console.log('\na computed dynamic import is refused, and a literal one is followed');
+{
+  const base = mkdtempSync(join(tmpdir(), 'authbind4-'));
+  const mk = (body) => {
+    const root = join(base, `r${Math.random().toString(36).slice(2, 8)}`);
+    mkdirSync(join(root, 'legasus/runtime/epistemic-admission'), { recursive: true });
+    mkdirSync(join(root, 'legasus/runtime/governedWorkspace'), { recursive: true });
+    writeFileSync(join(root, 'legasus/runtime/epistemic-admission/governed-edit.mjs'), body);
+    writeFileSync(join(root, 'legasus/runtime/governedWorkspace/workspace.mjs'), 'export const B = 1;\n');
+    return root;
+  };
+  const contract = {
+    'legasus/runtime/epistemic-admission/governed-edit.mjs': ['A'],
+    'legasus/runtime/governedWorkspace/workspace.mjs': ['B'],
+  };
+  try {
+    const computed = mk('const n = "dep";\nexport const A = () => import(n);\n');
+    await rejects(() => bindAuthority({ root: computed, contract }),
+      'a dynamic import with a computed specifier fails the bind');
+
+    const templated = mk('const n = "dep";\nexport const A = () => import(`./${n}.mjs`);\n');
+    await rejects(() => bindAuthority({ root: templated, contract }),
+      'and so does a template specifier with a substitution');
+
+    const literal = mk("export const A = () => import('./side.mjs');\n");
+    writeFileSync(join(literal, 'legasus/runtime/epistemic-admission/side.mjs'), 'export const S = 1;\n');
+    const bound = await bindAuthority({ root: literal, contract });
+    say(bound.manifest.some((m) => m.url.endsWith('side.mjs')),
+      'while a LITERAL dynamic import resolves and is followed into the manifest - the refusal is narrow');
+  } finally { rmSync(base, { recursive: true, force: true }); }
+}
+
 console.log('\nfail closed, never degrade to running anyway');
 {
   await rejects(() => bindAuthority({ root: null }), 'no --authority-root at all');
