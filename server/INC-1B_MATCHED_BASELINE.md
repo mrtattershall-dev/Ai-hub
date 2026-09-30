@@ -3,10 +3,19 @@
 **Frozen 2026-09-30, before any run.** Runner `server/inc1bRun.mjs`. Fixture `server/inc1Fixture.js` (same
 as INC-1, validated 19/19).
 
-## Spend authorization: PENDING
+## Spend authorization: GRANTED 2026-09-30, recorded before deploy
 
-INC-1's $10 cap was set for INC-1. Micheal's instruction: use the remaining cap for this baseline **only if
-it is explicitly extended to it.** No deploy and no spend until that extension is recorded here.
+INC-1's $10 cap was set for INC-1. Micheal's instruction was to use the remaining cap for this baseline
+**only if explicitly extended to it**. Two messages proposing the wording were suggestions from another
+voice and were NOT treated as authorization. Micheal then wrote, in his own words:
+
+> "I authorize"
+
+in direct reply to the proposed wording: *"Remaining INC-1 budget authorized for INC-1B matched baseline,
+cap stays within the original $10 total."* Recorded as exactly that. INC-1 spent roughly $1 of the $10
+(~40 min warm A10G), so INC-1B may spend the remainder and the two together stay under **$10 total**.
+Runner hard budget 180 min wall; Modal scale-to-zero; explicit `modal app stop --yes` at the end. SIM-2
+gets its own separate cap.
 
 ## The question
 
