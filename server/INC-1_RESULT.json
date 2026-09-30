@@ -1,0 +1,312 @@
+{
+  "pinned": {
+    "endpoint": "https://mr-tattershall--hub-coder-serve.modal.run",
+    "model": "qwen2.5-coder:14b",
+    "digestPrefix": "9ec8897f747e",
+    "perIncrementMin": 10,
+    "hardBudgetMin": 150
+  },
+  "remoteDigest": "9ec8897f747e246e970",
+  "results": [
+    {
+      "replicate": 1,
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\inc1-r1-SkGLVl",
+      "increments": [
+        {
+          "k": 1,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 0.2,
+          "runId": "9496a7a8-1533-4fb6-82bb-2c53ed69dd22",
+          "runStatus": "stopped",
+          "modelCalls": 7,
+          "wallMin": 1,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 3,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 2,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 1.2,
+          "runId": "ed2b9ee6-936e-4710-b997-ae5a5a8b548f",
+          "runStatus": "stopped",
+          "modelCalls": 8,
+          "wallMin": 1.1,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 5,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 3,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 2.4,
+          "runId": "c6e53ca0-baa0-424b-8db4-a40c5a060b48",
+          "runStatus": "done",
+          "modelCalls": 7,
+          "wallMin": 1,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 1,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS",
+            "inc2": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 4,
+          "attempt": 1,
+          "writeScope": [
+            "report.js"
+          ],
+          "startedMin": 3.5,
+          "runId": "15a484bd-1f02-4c41-aa2a-2ab8f8687881",
+          "runStatus": "done",
+          "modelCalls": 5,
+          "wallMin": 0.4,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 0,
+          "changed": [
+            "report.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS",
+            "inc2": "PASS",
+            "inc3": "PASS"
+          },
+          "outcome": "RETAINED"
+        }
+      ],
+      "depth": 4
+    },
+    {
+      "replicate": 2,
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\inc1-r2-EQsbDN",
+      "increments": [
+        {
+          "k": 1,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 4,
+          "runId": "24045414-0a1f-48ad-8da1-95f7aa0acf00",
+          "runStatus": "stopped",
+          "modelCalls": 7,
+          "wallMin": 1,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 3,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 2,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 5,
+          "runId": "d8e253fc-8496-4794-a8bc-ef49ff77799c",
+          "runStatus": "stopped",
+          "modelCalls": 9,
+          "wallMin": 2,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 5,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 3,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 7.1,
+          "runId": "d177a236-f440-4468-aea8-b9ff77897fd9",
+          "runStatus": "stopped",
+          "modelCalls": 5,
+          "wallMin": 0.8,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 3,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS",
+            "inc2": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 4,
+          "attempt": 1,
+          "writeScope": [
+            "report.js"
+          ],
+          "startedMin": 8,
+          "runId": "7df3af84-3009-47e7-815a-e1961cfd397a",
+          "runStatus": "stopped",
+          "modelCalls": 5,
+          "wallMin": 0.6,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 1,
+          "changed": [
+            "report.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS",
+            "inc2": "PASS",
+            "inc3": "PASS"
+          },
+          "outcome": "RETAINED"
+        }
+      ],
+      "depth": 4
+    },
+    {
+      "replicate": 3,
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\inc1-r3-F5Yb5N",
+      "increments": [
+        {
+          "k": 1,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 8.7,
+          "runId": "73b45303-d098-4e0e-bbba-68f420ea656a",
+          "runStatus": "stopped",
+          "modelCalls": 6,
+          "wallMin": 0.8,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 3,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 2,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 9.5,
+          "runId": "74887403-0580-47cc-a7be-fc699e301405",
+          "runStatus": "stopped",
+          "modelCalls": 6,
+          "wallMin": 0.5,
+          "disposition": "RETAIN",
+          "acceptanceText": "Behavioral acceptance applied: RETAIN (candidate requested=PASS protected=PASS; surviving protected=PASS).",
+          "scopeRefusals": 1,
+          "changed": [
+            "inventory.js"
+          ],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "PASS",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS"
+          },
+          "outcome": "RETAINED"
+        },
+        {
+          "k": 3,
+          "attempt": 1,
+          "writeScope": [
+            "inventory.js"
+          ],
+          "startedMin": 10.1,
+          "runId": "684550c4-210a-4bf7-a427-4e6a6c116175",
+          "runStatus": "stopped",
+          "modelCalls": 7,
+          "wallMin": 0.7,
+          "disposition": "RESTORED",
+          "acceptanceText": "Behavioral acceptance applied: RESTORED (candidate requested=FAIL protected=FAIL; surviving protected=PASS).",
+          "scopeRefusals": 0,
+          "changed": [],
+          "outOfScopeChanged": [],
+          "requestedOnDisk": "FAIL",
+          "priorOnDisk": {
+            "seed": "PASS",
+            "inc1": "PASS",
+            "inc2": "PASS"
+          },
+          "outcome": "HUB_RESTORED"
+        }
+      ],
+      "depth": 2,
+      "stoppedBy": "HUB_RESTORED"
+    }
+  ],
+  "elapsedMin": 10.9
+}

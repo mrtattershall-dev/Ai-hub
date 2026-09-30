@@ -1,5 +1,9 @@
 # TEST-(-1) Leg B on Modal — RESULT: PASS
 
+> **Claim, in the words agreed for the record:** On the pinned Qwen 2.5 Coder 14B Modal endpoint, one real
+> model edit passed through scoped governedEdit, passed independent requested/protected checks, was
+> retained, and its governed status reconstructed after hub restart.
+
 **Frozen 2026-09-30.** Definition + authorization: `TEST-MINUS-1-LEGB-MODAL_FROZEN.md` @ a79a6ba4.
 
 ## The crossing is made
