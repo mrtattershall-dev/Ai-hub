@@ -1,0 +1,92 @@
+{
+  "model": "qwen/qwen3.8-27b:free",
+  "when": "2026-09-30T04:31:49.795Z",
+  "results": [
+    {
+      "label": "t1-repair-node-average#1",
+      "task": "t1-repair-node-average",
+      "attempt": 1,
+      "model": "qwen/qwen3.8-27b:free",
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\qh1run-k2OcPX",
+      "started": "2026-09-30T04:19:12.285Z",
+      "runId": "02b1a945-ec5f-473e-b3be-6ada00b23814",
+      "runStatus": "interrupted",
+      "steps": 3,
+      "modelCalls": 1,
+      "changedFiles": [],
+      "requested": "FAIL",
+      "protected": "PASS",
+      "requestedReason": "average([2,4,6]) = 3 expected 4\n",
+      "protectedReason": "total ok\n",
+      "classification": "RESTORED_OR_FAILED",
+      "corrected": "PROVIDER_ERROR_RATE_LIMIT",
+      "throttleEvidence": "Run paused at step 1 — openrouter is throttling this key. Nothing is misconfigured — wait "
+    },
+    {
+      "label": "t1-repair-node-average#2",
+      "task": "t1-repair-node-average",
+      "attempt": 2,
+      "model": "qwen/qwen3.8-27b:free",
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\qh1run-62I690",
+      "started": "2026-09-30T04:19:31.320Z",
+      "runId": "e1de4603-8707-4d39-bced-48facb3a43d3",
+      "runStatus": "awaiting_approval",
+      "steps": 6,
+      "modelCalls": 2,
+      "changedFiles": [
+        "stats.js"
+      ],
+      "requested": "PASS",
+      "protected": "PASS",
+      "requestedReason": "average ok\n",
+      "protectedReason": "total ok\n",
+      "classification": "RETAINED",
+      "corrected": "RETAINED",
+      "throttleEvidence": null
+    },
+    {
+      "label": "t3-add-node-median#1",
+      "task": "t3-add-node-median",
+      "attempt": 1,
+      "model": "qwen/qwen3.8-27b:free",
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\qh1run-d5DVPS",
+      "started": "2026-09-30T04:25:35.399Z",
+      "runId": "159bbb63-fe94-404c-919e-6d9f542c0b1a",
+      "runStatus": "interrupted",
+      "steps": 1,
+      "modelCalls": 0,
+      "changedFiles": [],
+      "requested": "FAIL",
+      "protected": "PASS",
+      "requestedReason": "median is not exported\n",
+      "protectedReason": "sum and max ok\n",
+      "classification": "RESTORED_OR_FAILED",
+      "corrected": "PROVIDER_ERROR_RATE_LIMIT",
+      "throttleEvidence": "Run paused during planning — openrouter is throttling this key. Nothing is misconfigured —"
+    },
+    {
+      "label": "t3-add-node-median#2",
+      "task": "t3-add-node-median",
+      "attempt": 2,
+      "model": "qwen/qwen3.8-27b:free",
+      "dir": "C:\\Users\\tatte\\AppData\\Local\\Temp\\qh1run-96mCC9",
+      "started": "2026-09-30T04:25:46.105Z",
+      "runId": "6ca73c0b-e198-4725-9023-fe82e15dd1da",
+      "runStatus": "awaiting_approval",
+      "steps": 7,
+      "modelCalls": 3,
+      "changedFiles": [
+        "numbers.js"
+      ],
+      "requested": "PASS",
+      "protected": "PASS",
+      "requestedReason": "median ok\n",
+      "protectedReason": "sum and max ok\n",
+      "classification": "RETAINED",
+      "corrected": "RETAINED",
+      "throttleEvidence": null
+    }
+  ],
+  "corrected_at": "2026-09-30T04:33:49.901Z",
+  "note": "Reclassified from run records. My harness marked throttle-paused runs RESTORED_OR_FAILED; the hub records name them as openrouter throttling. A run whose model never acted is PROVIDER_ERROR, not a model outcome."
+}
