@@ -1,0 +1,166 @@
+{
+ "sim": "SIM-1",
+ "env": {
+  "python": "3.14.7",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-musl1",
+  "gridSha256": "b2d4e71c35e38513"
+ },
+ "pass": true,
+ "mutants": [
+  {
+   "id": "M1",
+   "name": "generation frozen",
+   "applied": true,
+   "designated": [
+    "I-GEN"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-GEN": 1600
+   },
+   "firstFired": {
+    "I-GEN": "soup 8x8 plane B3/S23 seed=11 tick=1"
+   }
+  },
+  {
+   "id": "M2",
+   "name": "population double-counts",
+   "applied": true,
+   "designated": [
+    "I-POP"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-POP": 1449
+   },
+   "firstFired": {
+    "I-POP": "soup 8x8 plane B3/S23 seed=11 tick=1"
+   }
+  },
+  {
+   "id": "M3",
+   "name": "clear keeps generation",
+   "applied": true,
+   "designated": [
+    "I-RESET"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-RESET": 63
+   },
+   "firstFired": {
+    "I-RESET": "api 8x8 seed=11 op#2=clear"
+   }
+  },
+  {
+   "id": "M4",
+   "name": "torus wrap broken",
+   "applied": true,
+   "designated": [
+    "I-TRANS",
+    "I-KNOWN"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-TRANS": 258,
+    "I-KNOWN": 27
+   },
+   "firstFired": {
+    "I-TRANS": "soup 8x8 torus B3/S23 seed=11 tick=1",
+    "I-KNOWN": "known blinker 8x8 offset=(7,6)"
+   }
+  },
+  {
+   "id": "M5",
+   "name": "load_pattern stops wrapping",
+   "applied": true,
+   "designated": [
+    "I-PATTERN"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-PATTERN": 136
+   },
+   "firstFired": {
+    "I-PATTERN": "pattern acorn 8x8 offset=(7,7)"
+   }
+  },
+  {
+   "id": "M6",
+   "name": "hash ignores position",
+   "applied": true,
+   "designated": [
+    "I-HASHPAIR"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-HASHFN": 449,
+    "I-HASHPAIR": 40
+   },
+   "firstFired": {
+    "I-HASHFN": "soup 8x8 plane B3/S23 seed=11 tick=3",
+    "I-HASHPAIR": "hashpair #0 9x14 k=3 equal-population/different-positions"
+   }
+  },
+  {
+   "id": "M7",
+   "name": "ages frozen",
+   "applied": true,
+   "designated": [
+    "I-TRANS"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-TRANS": 1311
+   },
+   "firstFired": {
+    "I-TRANS": "soup 8x8 plane B3/S23 seed=11 tick=1"
+   }
+  },
+  {
+   "id": "M8",
+   "name": "set_dead leaks population",
+   "applied": true,
+   "designated": [
+    "I-POP"
+   ],
+   "caughtByDesignated": true,
+   "fired": {
+    "I-POP": 97
+   },
+   "firstFired": {
+    "I-POP": "api 8x8 seed=11 op#22=toggle"
+   }
+  }
+ ],
+ "invariantKilledBy": {
+  "I-GEN": [
+   "M1"
+  ],
+  "I-POP": [
+   "M2",
+   "M8"
+  ],
+  "I-TRANS": [
+   "M4",
+   "M7"
+  ],
+  "I-RESET": [
+   "M3"
+  ],
+  "I-PATTERN": [
+   "M5"
+  ],
+  "I-HASHFN": [
+   "M6"
+  ],
+  "I-HASHPAIR": [
+   "M6"
+  ],
+  "I-KNOWN": [
+   "M4"
+  ]
+ },
+ "invariantsNeverFired": [],
+ "seconds": 3.5
+}

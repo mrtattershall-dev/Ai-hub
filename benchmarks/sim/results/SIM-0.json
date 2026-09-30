@@ -1,0 +1,182 @@
+{
+ "sim": "SIM-0",
+ "env": {
+  "python": "3.14.7",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-musl1",
+  "gridSha256": "b2d4e71c35e38513"
+ },
+ "pass": true,
+ "alarms": 0,
+ "alarmsByInvariant": {
+  "I-GEN": 0,
+  "I-POP": 0,
+  "I-TRANS": 0,
+  "I-RESET": 0,
+  "I-PATTERN": 0,
+  "I-HASHFN": 0,
+  "I-HASHPAIR": 0,
+  "I-KNOWN": 0,
+  "CRASH": 0
+ },
+ "alarmSample": [],
+ "evaluations": {
+  "I-GEN": 21600,
+  "I-POP": 25380,
+  "I-TRANS": 21600,
+  "I-RESET": 372,
+  "I-PATTERN": 273,
+  "I-HASHFN": 21600,
+  "I-HASHPAIR": 80,
+  "I-KNOWN": 42
+ },
+ "unevaluated": [],
+ "projectiveReadingMatched": {
+  "A": 346,
+  "B": 0,
+  "both": 3974
+ },
+ "telemetrySample": [
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 1,
+   "generation": 1,
+   "population": 18,
+   "stateHash": "e76e75a7f504",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 2,
+   "generation": 2,
+   "population": 11,
+   "stateHash": "eaed4e9136fb",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 3,
+   "generation": 3,
+   "population": 11,
+   "stateHash": "9b7582438d5b",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 4,
+   "generation": 4,
+   "population": 10,
+   "stateHash": "dfdc3a880c37",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 5,
+   "generation": 5,
+   "population": 6,
+   "stateHash": "51beddd6f9fc",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 6,
+   "generation": 6,
+   "population": 4,
+   "stateHash": "ecb36d915897",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 7,
+   "generation": 7,
+   "population": 0,
+   "stateHash": "d41d8cd98f00",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 8,
+   "generation": 8,
+   "population": 0,
+   "stateHash": "d41d8cd98f00",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 9,
+   "generation": 9,
+   "population": 0,
+   "stateHash": "d41d8cd98f00",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  },
+  {
+   "mode": "grid",
+   "topology": "plane",
+   "rule": "B3/S23",
+   "tick": 10,
+   "generation": 10,
+   "population": 0,
+   "stateHash": "d41d8cd98f00",
+   "invariants": {
+    "generationIncrements": true,
+    "populationMatchesCells": true,
+    "transitionMatchesRule": true
+   }
+  }
+ ],
+ "edits": 0,
+ "seconds": 8.2
+}
