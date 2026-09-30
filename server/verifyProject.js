@@ -119,6 +119,61 @@ export function detectKind(workspace) {
   return { kind: 'unknown', files };
 }
 
+/**
+ * LOAD-check every JS module, not just the entry point. This is the cheapest-obvious-fix control
+ * that INC-1B's result demanded, and it targets the exact failure class that result found.
+ *
+ * WHAT IT CATCHES, and why syntaxSweep cannot. All three surviving INC-1B baseline breakages were
+ * the same bug: `module.exports` naming a function that was never defined (`total`, `remove`,
+ * `restock`). That file passes `node --check` - the reference is legal syntax - and throws the
+ * moment anything requires it. The finish gate ran the ENTRY point and nothing else, so a broken
+ * non-entry module was reported as "all N source file(s) pass a syntax check" and the run finished
+ * verified. Set G's six regressions were three files whose module-level code throws at require().
+ * Same class, third sighting.
+ *
+ * AT THE FINISH BOUNDARY, NOT PER WRITE - and that placement is a recorded negative result, not a
+ * preference. e0ca8ef tested strict per-write load-refusal against the reconstructed Set G
+ * workspace: 52% of intermediate states were unloadable, 5 of 8 breaking transitions were repaired
+ * by the model itself inside the run, and s10_desk.js was 100% unloadable only because
+ * s1_library.js was broken. Refusing each write would fight the model's own repair loop and blame
+ * files for other files' breakage. Judging the state the run intends to LEAVE avoids both.
+ *
+ * A TIMEOUT IS NOT A FAILURE. A module that starts a server or opens a listener legitimately never
+ * returns from import(). Counting that as broken would refuse correct work, and a verifier that
+ * invents a requirement is worse than one that misses it. Timeouts are reported as `unknown` and
+ * never become problems.
+ *
+ * import() in a CHILD, reusing EXPORT_PROBE's mechanism, because the workspace - not this process -
+ * decides whether a .js file is CommonJS or ESM.
+ */
+const LOAD_PROBE = `
+const { pathToFileURL } = require("node:url");
+const { resolve } = require("node:path");
+import(pathToFileURL(resolve(process.cwd(), process.argv[1])).href)
+  .then(() => process.exit(0))
+  .catch((e) => { console.error(String((e && e.message) || e)); process.exit(4); });
+`;
+
+async function loadSweep(workspace, files) {
+  const notes = [];
+  let checked = 0, broken = 0, unknown = 0;
+  for (const f of files.slice(0, 80)) {
+    if (!/\.(c|m)?js$/i.test(f)) continue;           // python is covered by py_compile + its own run
+    const r = await sh('node', ['-e', LOAD_PROBE, f], workspace, 15_000);
+    checked++;
+    if (r.ok) continue;
+    // Exit 4 is the probe's own "could not load" channel. Anything else - a timeout, a signal, a
+    // spawn failure - is NOT evidence the module is broken, and must not be reported as if it were.
+    if (r.code === 4) {
+      broken++;
+      notes.push(`${f}: ${(r.err || 'threw on load').split('\n').slice(0, 2).join(' ').slice(0, 200)}`);
+    } else {
+      unknown++;
+    }
+  }
+  return { checked, broken, unknown, notes };
+}
+
 /** Compile-check every source file. Free, and catches the dumbest failures. */
 async function syntaxSweep(workspace, files) {
   const notes = [];
@@ -220,6 +275,23 @@ export async function verify(workspace, { entry, goal } = {}) {
       problems.push(`${syn.broken} of ${syn.checked} source file(s) do not compile:\n    ` + syn.notes.join('\n    '));
     } else {
       evidence.push(`all ${syn.checked} source file(s) pass a syntax check`);
+    }
+  }
+
+  // THE LOAD SWEEP. Deliberately AFTER the syntax sweep and reported separately: "parses" and
+  // "loads" are different facts, and merging them is how the weaker one came to stand for both.
+  // Only run when syntax is clean - a file that does not parse cannot load either, and reporting
+  // both would name one defect twice and bury the root cause.
+  if (kind === 'node' && syn.checked && !syn.broken) {
+    const load = await loadSweep(workspace, files);
+    if (load.broken) {
+      problems.push(`${load.broken} of ${load.checked} module(s) PARSE but THROW when loaded:\n    `
+        + load.notes.join('\n    ')
+        + `\n    A file can pass a syntax check and still crash everything that requires it -`
+        + ` typically by exporting a name that was never defined.`);
+    } else if (load.checked) {
+      evidence.push(`all ${load.checked} module(s) load without throwing`
+        + (load.unknown ? ` (${load.unknown} did not finish loading and were not judged)` : ''));
     }
   }
 
