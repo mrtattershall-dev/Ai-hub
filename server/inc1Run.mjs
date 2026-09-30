@@ -45,6 +45,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const TERMINAL = ['done', 'error', 'stopped', 'interrupted'];
 const T0 = Date.now(); const elapsedMin = () => (Date.now() - T0) / 60000;
 const log = (...a) => { const s = a.join(' '); console.log(s); try { writeFileSync(join(OUT, 'progress.log'), s + '\n', { flag: 'a' }); } catch {} };
+// A SILENT EXIT IS NOT ALLOWED. The first INC-1 attempt exited ~2 min in with no outcome and no error;
+// an await left pending with nothing holding the event loop exits node quietly with code 0. Every exit
+// and every unhandled rejection is now written to progress.log with its code.
+process.on('exit', (code) => { try { writeFileSync(join(OUT, 'progress.log'), `EXIT code=${code} at ${elapsedMin().toFixed(1)}min\n`, { flag: 'a' }); } catch {} });
+process.on('unhandledRejection', (e) => { log('UNHANDLED REJECTION:', String(e && (e.stack || e)).slice(0, 400)); process.exitCode = 9; });
 
 // ── PREFLIGHTS (both mandatory) ─────────────────────────────────────────────────────────────────────
 const pf = await preflight([{ task: { id: 'inc1-k1', requested: INCREMENTS[0].requested, protected: protectedFor(1) }, seed: SEED, reference: INCREMENTS[0].reference }]);
@@ -73,8 +78,13 @@ async function oneIncrement(dir, ws, k, attempt) {
   const inc = INCREMENTS[k - 1];
   const rec = { k, attempt, writeScope: inc.writeScope, startedMin: +elapsedMin().toFixed(1) };
   const before = snapshotFiles(ws);
+  // AGENT_APPROVAL_MODE=build is what EVERY campaign runner in this repo uses (pilot, bench1, autodiag1,
+  // protocol1/2, testcmd1, governedRun.test). The default is 'strict', which parks the run at
+  // awaiting_approval for a human; the first INC-1 attempt omitted this and every run stalled there, so
+  // the hub's acceptance never ran. With AGENT_WORKER_EXEC=1 commands execute in the Docker worker.
   const hub = await startHub(dir, { env: { AGENT_PROVIDER: 'ollama', AGENT_WORKSPACE: ws, HUB_DB: join(dir, 'hub.json'),
-    AGENT_GOVERNED_WRITES: '1', AGENT_WORKER_EXEC: '1', AGENT_BOUND_ROUTES: '1' }, waitMs: 60000 });
+    AGENT_GOVERNED_WRITES: '1', AGENT_WORKER_EXEC: '1', AGENT_BOUND_ROUTES: '1',
+    AGENT_APPROVAL_MODE: 'build', AGENT_SUPERVISOR: '0' }, waitMs: 60000 });
   let view = null;
   try {
     const body = { goal: inc.goal + '\n\n' + TESTING_GUIDANCE, writeScope: inc.writeScope,
