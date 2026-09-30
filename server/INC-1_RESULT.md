@@ -5,7 +5,14 @@ apparatus defect, fixed before this run). Run: 3 replicates × 4 increments, nod
 
 ## Headline
 
-On the pinned `qwen2.5-coder:14b` Modal endpoint, through the governed `/agent/start` path with a fresh hub
+> **Claim, in the words agreed for the record:** On one four-stage inventory task, across three runs,
+> Legasus retained ten verified increments and restored one damaging candidate, with no earlier behavior
+> left broken under the declared checks.
+>
+> Not yet shown: the added benefit over a matched baseline without governance, and activation through the
+> ordinary UI (which does not send `writeScope` yet).
+
+Detail — on the pinned `qwen2.5-coder:14b` Modal endpoint, through the governed `/agent/start` path with a fresh hub
 process for every increment:
 
 - **Two of three replicates built all four increments**, each one retained by the hub's own acceptance,
