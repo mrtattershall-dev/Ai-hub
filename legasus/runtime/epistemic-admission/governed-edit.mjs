@@ -27,9 +27,9 @@
 // refusing a traversing path does NOT establish filesystem containment through SYMLINKS or WINDOWS
 // JUNCTIONS. `resolve()` does not dereference them, so an in-root name aliasing an out-of-root target is
 // UNTESTED and outside the demonstrated coverage.
-import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync, realpathSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { resolve, relative, sep } from 'node:path';
+import { resolve, relative, sep, dirname } from 'node:path';
 import { commit, isAuthority, KIND } from '../../legaknow/calculus.mjs';
 
 export const OUTCOME = {
@@ -125,6 +125,58 @@ export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE,
   if (targetWithinRoot.startsWith('..' + sep) || targetWithinRoot === '..' || !targetWithinRoot) {
     return deny(OUTCOME.ACTION_DENIED_TARGET_ESCAPES_ROOT,
       'the resolved target leaves the declared root', { resolvedTarget });
+  }
+
+  // ---- PHYSICAL CONTAINMENT (E10). The lexical check above is necessary and NOT sufficient, and
+  // B-COMP-1 (153c4d7f) demonstrated the difference by consequence: a junction named `escape/` is
+  // lexically inside, so `relative()` does not begin with `..`, the guard passed, this module
+  // reported ACTION_PERMITTED, wrote, and read back successfully - and the bytes landed outside.
+  //
+  // THE PROPERTY, which is what this restores: a governed effect must occur inside the PHYSICAL
+  // OBJECT denoted by the granted root. Not "the text must not traverse". The check above and the
+  // write AGREED with each other because both used the same lexical resolution, so no consistency
+  // requirement between components could ever have caught it.
+  //
+  // WHY THE DEEPEST EXISTING ANCESTOR, and not the target. The target legitimately may not exist -
+  // creating a new in-root file has to keep working (E10 P4). A path component that does not exist
+  // cannot be a reparse point, so resolving the deepest ancestor that DOES exist is sufficient:
+  // everything below it is plain names. When the target itself exists this resolves the target,
+  // which is what catches a symlinked leaf.
+  //
+  // This NARROWS the check-then-change race; it does not close it. A reparse point created between
+  // this comparison and the write still escapes, for the same reason recorded at the top of this
+  // file. E10 R5 covers "created before the call", not true TOCTOU.
+  {
+    const physical = (p) => { try { return realpathSync(p); } catch { return null; } };
+    const realRoot = physical(resolvedRoot);
+    if (!realRoot) {
+      return deny(OUTCOME.ACTION_DENIED_TARGET_ESCAPES_ROOT,
+        'the declared root could not be physically resolved, so containment cannot be established',
+        { resolvedRoot });
+    }
+    let probe = resolvedTarget;
+    let realProbe = physical(probe);
+    while (!realProbe) {
+      const up = dirname(probe);
+      if (up === probe) break;                 // reached a filesystem root without finding anything
+      probe = up;
+      realProbe = physical(probe);
+    }
+    if (!realProbe) {
+      return deny(OUTCOME.ACTION_DENIED_TARGET_ESCAPES_ROOT,
+        'no existing ancestor of the target could be physically resolved', { resolvedTarget });
+    }
+    // Case-insensitive on win32 only, matching how the platform actually compares paths.
+    const norm = (s) => (process.platform === 'win32' ? s.toLowerCase() : s);
+    const inside = norm(realProbe) === norm(realRoot)
+      || norm(realProbe).startsWith(norm(realRoot + sep));
+    if (!inside) {
+      return deny(OUTCOME.ACTION_DENIED_TARGET_ESCAPES_ROOT,
+        'the target is lexically inside the declared root but PHYSICALLY resolves outside it'
+        + ' (its nearest existing ancestor is "' + realProbe + '", and the root is "' + realRoot
+        + '"). A path that merely reads as contained is not contained.',
+        { resolvedTarget, physicalTarget: realProbe, physicalRoot: realRoot });
+    }
   }
 
   // ---- TARGET BINDING. The gap G3 measured: the authority's context pins a target and commit() never
