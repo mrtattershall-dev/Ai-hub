@@ -173,6 +173,59 @@ function headOf(seg) {
   return t.replace(/\.(exe|cmd|bat)$/i, '').toLowerCase();
 }
 
+/**
+ * Is an INSPECTION head made impure by its ARGUMENTS? Returns a reason, or null when genuinely
+ * read-only.
+ *
+ * The inspection allowlist names heads, and several of those heads write files or run programs
+ * when given the right argument. So membership in INSPECT is necessary and not sufficient: the
+ * question is whether THIS SEGMENT can execute or modify, not whether its first word usually
+ * cannot.
+ *
+ * Deliberately conservative: anything unrecognised returns null and the head stays allowed. A
+ * verifier that INVENTS a restriction blocks correct work and teaches the model to fight the
+ * gate, and strict mode exists precisely so read-only inspection runs unattended.
+ */
+function inspectionImpurity(seg, head) {
+  // Redirection writes a file whatever the head is, so it is never read-only. `2>&1` is not a
+  // write, so `>&` is excluded, and a digit before `>` means a file-descriptor redirect.
+  if (/(^|[^0-9>])>>?(?!&)/.test(seg)) return 'redirects its output into a file';
+
+  if (head === 'find') {
+    // -delete removes; -exec/-execdir/-ok/-okdir run a command; -fprint/-fprintf/-fls WRITE a
+    // file and are easy to miss because they are not named like mutations.
+    if (/(^|\s)-(delete|exec|execdir|ok|okdir|fprint|fprintf|fls)\b/i.test(seg)) {
+      return 'uses a find predicate that deletes, executes or writes a file';
+    }
+    return null;
+  }
+
+  if (head === 'env') {
+    // Bare `env` prints the environment. `env X=1 cmd` and `env cmd` RUN cmd, which is how an
+    // allowlisted head became arbitrary execution.
+    const rest = seg.replace(/^\S+\s*/, '').trim();
+    if (!rest) return null;
+    const runsProgram = rest.split(/\s+/).some((t) => !t.startsWith('-') && !/^[A-Za-z_]\w*=/.test(t));
+    return runsProgram ? 'runs the program named after any assignments' : null;
+  }
+
+  if (head === 'sort') {
+    if (/(^|\s)-o(\s|=|$)|(^|\s)--output(=|\s|$)/i.test(seg)) {
+      return 'writes its output to a file with -o/--output';
+    }
+    return null;
+  }
+
+  if (head === 'uniq') {
+    // uniq's SECOND positional argument is an output file.
+    const positional = seg.split(/\s+/).slice(1).filter((a) => !a.startsWith('-'));
+    if (positional.length > 1) return 'names a second positional argument, which uniq writes to';
+    return null;
+  }
+
+  return null;
+}
+
 /** Classify ONE segment. */
 function classifySegment(seg, mode) {
   const bare = seg.replace(/^["']|["']$/g, '').trim();
@@ -185,7 +238,20 @@ function classifySegment(seg, mode) {
   const head = headOf(seg);
   if (!head) return { decision: 'ask', reason: 'the command could not be parsed' };
 
-  if (INSPECT.has(head)) return { decision: 'allow', reason: 'read-only inspection' };
+  // ---- THE ALLOWLIST IS ABOUT THE SEGMENT, NOT THE HEAD (A-REPAIR-1).
+  //
+  // This was `if (INSPECT.has(head)) return allow`, sitting BEFORE the strict gate, so the FIRST
+  // WORD decided. Measured unrepaired: 14 mutating or executing forms auto-allowed under strict,
+  // and `find . -delete` auto-allowed in BUILD mode too - so it was never strict-specific.
+  //
+  // An inspection head carrying a mutating argument now falls through to ASK rather than being
+  // allowed. It is not DENIED: the operator may still want it, and denying would be a stronger
+  // claim than "this is not unattended read-only work".
+  if (INSPECT.has(head)) {
+    const impure = inspectionImpurity(bare, head);
+    if (!impure) return { decision: 'allow', reason: 'read-only inspection' };
+    return { decision: 'ask', reason: `"${head}" is auto-run only while read-only, and this ${impure}` };
+  }
   if (mode === 'strict') {
     return { decision: 'ask', reason: `strict mode only auto-runs inspection commands, and "${head}" can execute or modify things` };
   }
