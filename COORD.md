@@ -11586,3 +11586,14 @@ Claim released 2026-10-01 — COMMIT-1 K8 repair committed. server/acceptance.js
 One file, 39 insertions. Frozen probe reversed T1 unchanged; regression 5/5 -> 10/0; T5g re-measured
 HOLDS; consumers unchanged. T5b still UNMEASURABLE. T2/T3/T4 end-to-end regression and T5b
 instrumentation are each a NEW claim.
+
+## CLAIM 2026-10-01 — candidate-0 — COMMIT-2 (the three COMMIT-1 follow-ons, one claim: they share two modules)
+
+    CLAIMED   server/batch.js, server/governance.js, server/commitChain.test.mjs,
+              legasus/screen/COMMIT-2_PREREG.md, legasus/screen/COMMIT-2_RESULT.md
+    SCOPE     (a) a falsifiability seam so drift can be INJECTED between verdict and commit through
+                  the REAL runBatch and concludeGoverned - T2/T3/T4 measured, not inferred
+              (b) a cid1 of START in the batch path, so T5b stops being UNMEASURABLE
+              (c) the IDENTITY_DRIFT chain policy: no halt, loud journal event. Frozen in the prereg.
+    NOT       acceptance.js (COMMIT-1's repair stands), evaluator.js, cid1.mjs
+Checked before writing. Do not edit the claimed files until this claim is released.
