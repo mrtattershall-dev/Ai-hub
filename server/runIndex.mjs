@@ -59,8 +59,11 @@ const peakTok = (r) => {
 // Imported, not defined here, so the training-corpus builder can filter on the SAME vocabulary this reports on without
 // importing THIS file - which is a script: it reads the index at top level and exits when there is none, so importing
 // it would have terminated the builder before it wrote a row. See finishVerdicts.mjs.
-import { UNVERIFIED } from './finishVerdicts.mjs';
-const verdictOf = (r) => (r.finishKind ? (UNVERIFIED.has(r.finishKind) ? r.finishKind : 'ok') : '?');
+import { UNVERIFIED, KNOWN } from './finishVerdicts.mjs';
+// FG-5 RECEIPT: a reader may not strengthen the writer's verdict. This used to render any kind outside
+// UNVERIFIED as 'ok' - so an unrecognised kind, including FG-3's unverified-no-work, read as clean
+// (EH1 2d82b379). Now: a known kind is shown as itself; an unknown one is shown as 'unknown' and counted.
+const verdictOf = (r) => (r.finishKind ? (KNOWN.has(r.finishKind) ? r.finishKind : 'unknown') : '?');
 
 const sum = (rs, f) => rs.reduce((a, r) => a + (f(r) || 0), 0);
 const pct = (a, b) => (b ? (a / b * 100).toFixed(1) + '%' : '—');
@@ -79,6 +82,8 @@ const agg = (rs) => {
     // rather than assumed clean - see finishVerdict() in agent.js.
     unverified: rs.filter((r) => UNVERIFIED.has(r.finishKind)).length,
     noVerdict: rs.filter((r) => r.status === 'done' && !r.finishKind).length,
+    // A kind this reader does not know is reported, not absorbed into either column (FG-5 RECEIPT).
+    unknown: rs.filter((r) => r.finishKind && !KNOWN.has(r.finishKind)).length,
     // callsOf, not r.calls: one record missing the field sorts NaN into the middle of the
     // list and the median silently becomes NaN for the whole half.
     medCalls: rs.length ? [...rs].map(callsOf).sort((a, b) => a - b)[Math.floor(rs.length / 2)] : 0,
@@ -130,6 +135,7 @@ if (flag('trend')) {
   // lines together or the trend is a lie.
   row('of those, unverified', a.unverified, b.unverified);
   row('  (no verdict recorded)', a.noVerdict, b.noVerdict);
+  row('  (verdict not recognised)', a.unknown, b.unknown);   // FG-5: visible, never absorbed as clean
   row('error rate (of calls)', a.errRate, b.errRate);
   row('median calls per run', a.medCalls, b.medCalls);
   row('avg peak tok/s', a.tok ?? '—', b.tok ?? '—');

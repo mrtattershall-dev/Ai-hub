@@ -21,4 +21,13 @@
  * - unknown, not verified. Both consumers must keep that distinction: counting old rows as clean is how a blind spot
  * turns into a claim.
  */
-export const UNVERIFIED = new Set(['forced', 'auto_clean_tests', 'unverified']);
+// FG-5 RECEIPT (legasus/screen/FG-5-RECEIPT_PREREG.md, Amendment 1). Two additions, no other change:
+//   unverified-no-work   route 3 (FG-3 ADMISSION): the gate refused once for zero landed writes and the second
+//                        finish was allowed to END the run, recorded UNVERIFIED - never Verified. It was absent
+//                        here, so runIndex rendered it 'ok' (EH1 2d82b379, R1a/R6): a downstream reader
+//                        strengthening what the gate had explicitly refused to assert.
+//   KNOWN                every value finishVerdict() can write. A reader that meets a value outside KNOWN must say
+//                        so ('unknown'), never default to clean - the comment above already promised that; the
+//                        reader did not keep it.
+export const UNVERIFIED = new Set(['forced', 'auto_clean_tests', 'unverified', 'unverified-no-work']);
+export const KNOWN = new Set(['verified', 'screen_checked', 'not_finished', ...UNVERIFIED]);
