@@ -22,12 +22,20 @@ import { openRun, EVIDENCE_CLASS } from './evidenceRun.mjs';
 import { evaluate } from './evaluator.js';
 import { runBatch } from './batch.js';
 import { WORKER_IMAGE } from './worker.js';
+import { cid1 } from './cid1.mjs';
 
 const REPO = process.cwd();
+// DID1_IDENTITY=head (default, the original run 53222095) or cid1 (Amendment 2, a69aaddd).
+// In cid1 mode ONLY the identity rows change what they measure. M17/M18/M19 still run through the
+// shipped, unrepaired paths - they belong to D-COPY / D-CONS / D-BIND and must stay red.
+const MODE = process.env.DID1_IDENTITY || 'head';
+if (!['head', 'cid1'].includes(MODE)) throw new Error(`DID1_IDENTITY must be head or cid1, not ${MODE}`);
 const run = openRun({
-  root: process.env.DID1_RUNS || join(REPO, 'legasus', 'evidence-runs'), label: 'D-ID-1-REGRESSION',
-  command: 'node server/did1.regression.mjs', repo: REPO, evidenceClass: EVIDENCE_CLASS.ORIGINAL,
-  note: 'D-ID-1 metamorphic suite vs the UNREPAIRED HEAD^{tree} identity. Prereg 1c3a2b1c + A1 3e14f827. cid1 not written.',
+  root: process.env.DID1_RUNS || join(REPO, 'legasus', 'evidence-runs'), label: MODE === 'cid1' ? 'D-ID-1-CID1' : 'D-ID-1-REGRESSION',
+  command: `DID1_IDENTITY=${MODE} node server/did1.regression.mjs`, repo: REPO, evidenceClass: EVIDENCE_CLASS.ORIGINAL,
+  note: MODE === 'cid1'
+    ? 'D-ID-1 suite, identity rows measured on cid1 directly; M17-M19 on the unrepaired shipped paths. Prereg 1c3a2b1c + A1 3e14f827 + A2 a69aaddd.'
+    : 'D-ID-1 metamorphic suite vs the UNREPAIRED HEAD^{tree} identity. Prereg 1c3a2b1c + A1 3e14f827. cid1 not written.',
 });
 const log = [];
 const say = (s) => { console.log(s); log.push(s); };
@@ -76,7 +84,10 @@ function parent(tag, content) {
   return p;
 }
 const TRIVIAL = { id: 'did1', requested: { script: 'true' }, protected: { script: 'true' } };
-async function identity(dir) { const v = await evaluate(dir, TRIVIAL); return v.candidateTree || null; }
+async function identity(dir) {
+  if (MODE === 'cid1') { const r = cid1(dir); return r.ok ? r.id : null; }
+  const v = await evaluate(dir, TRIVIAL); return v.candidateTree || null;
+}
 const enclosingTree = (dir) => { const t = git(join(dir, '..'), ['rev-parse', 'HEAD^{tree}']); return t.startsWith('ERR:') ? null : t; };
 
 // ── rows ───────────────────────────────────────────────────────────────────────────────────────
@@ -118,7 +129,9 @@ async function fidelity(row, shape, dir, mutate, { commitAfter = false } = {}) {
 // ── run ────────────────────────────────────────────────────────────────────────────────────────
 const result = { prereg: ['1c3a2b1c', '3e14f827'], image: WORKER_IMAGE, controls: {}, rows };
 try {
-  say('D-ID-1 regression suite vs the UNREPAIRED identity (evaluate().candidateTree)');
+  say(MODE === 'cid1'
+    ? 'D-ID-1 suite: identity rows on cid1 (direct); M17-M19 on the UNREPAIRED shipped paths'
+    : 'D-ID-1 regression suite vs the UNREPAIRED identity (evaluate().candidateTree)');
   say(`EH1 run: ${run.id}`);
 
   // CONTROLS: the oracle, and readiness
@@ -188,14 +201,59 @@ try {
     record('M12', 'INVARIANCE', 'OWN .git internals', !same ? { outcome: 'APPARATUS_FAULT' } : { outcome: a && a === b ? 'HOLDS' : 'VIOLATED (INVARIANCE)', idA: a, idB: b }); }
   // M13 symlink retarget (link text, never followed)
   { const d = ownRepo(join(mk('M13'), 'c'), { ...BASE, 'a.txt': 'A\n', 'b.txt': 'B\n' });
-    let made = true; try { symlinkSync('a.txt', join(d, 'link')); commitAll(d, 'link'); } catch (e) { made = false; record('M13', 'FIDELITY', 'OWN symlink', { outcome: 'NOT_RUNNABLE', note: `symlink cannot be created here: ${e.code}` }); }
+    let made = true; try { symlinkSync('a.txt', join(d, 'link')); commitAll(d, 'link'); } catch (e) { made = false; record('M13', 'FIDELITY', 'OWN symlink', { outcome: 'NOT_RUNNABLE', note: `UNMEASURED ON WINDOWS - requires a symlink-capable environment (${e.code})` }); }
     if (made) await fidelity('M13', 'OWN symlink uncommitted', d, (x) => { unlinkSync(join(x, 'link')); symlinkSync('b.txt', join(x, 'link')); }); }
   // M14 declared blind spots
   // empty dirs are declared OUT of the snapshot, so this is an INVARIANCE row (the oracle agrees: no entry)
   { const d = ownRepo(join(mk('M14e'), 'c')); const a = await identity(d); mkdirSync(join(d, 'emptydir')); const b = await identity(d);
     record('M14', 'INVARIANCE', 'OWN empty dir (declared out)', { outcome: a && a === b ? 'HOLDS' : 'VIOLATED (INVARIANCE)', idA: a, idB: b }); }
   record('M14', 'INVARIANCE', 'exec bit', { outcome: 'NOT_RUNNABLE', note: 'Windows has no exec bit to flip; declared blind spot' });
-  // M15 unrepresentable name -> must be UNAVAILABLE
+  // M15 (cid1 mode, Amendment 2): refuse only what cannot be FAITHFULLY named
+  const exactPath = (d, name) => '\\\\?\\' + resolve(d) + '\\' + name;
+  if (MODE === 'cid1') {
+    // M15a: odd. is named, and the WORKER's own view of /candidate lists exactly the host's entries
+    { const d = ownRepo(join(mk('M15a'), 'c'));
+      let made = true; try { writeFileSync(exactPath(d, 'odd.'), 'trailing dot\n'); } catch (e) { made = false; record('M15a', 'REPRESENTABILITY', 'OWN odd.', { outcome: 'NOT_RUNNABLE', note: e.code }); }
+      if (made) {
+        const r = cid1(d);
+        const host = [...snapshot(d).keys()].sort();
+        const v = await evaluate(d, { id: 'm15a', requested: { script: "cd /candidate && find . -name .git -prune -o \\( -type f -o -type l \\) -print | sed 's|^\\./||' | sort" }, protected: { script: 'true' } });
+        const worker = String(v.requested?.out || '').split('\n').map((s) => s.trim()).filter(Boolean).sort();
+        const agree = JSON.stringify(host) === JSON.stringify(worker);
+        record('M15a', 'REPRESENTABILITY', 'OWN odd. + worker view', {
+          outcome: v.requested?.verdict !== 'PASS' ? `APPARATUS_FAULT (listing ${v.requested?.verdict})` : !r.ok ? `VIOLATED (AVAILABILITY) ${r.reason}` : agree ? 'HOLDS' : 'VIOLATED (REPRESENTABILITY)',
+          idA: r.ok ? r.id : null, host, worker,
+          note: `cid1 ${r.ok ? 'named ' + r.entries + ' entries' : 'refused: ' + r.reason}; host [${host.join(',')}] worker [${worker.join(',')}]` });
+      } }
+    // M15b: COLLAPSE - {odd, odd.} with different bytes must not share an identity with {odd}
+    { const a = bare(join(mk('M15b1'), 'c'), { odd: 'ODD\n' }); const b = bare(join(mk('M15b2'), 'c'), { odd: 'ODD\n' });
+      let made = true; try { writeFileSync(exactPath(b, 'odd.'), 'DIFFERENT BYTES\n'); } catch (e) { made = false; record('M15b', 'REPRESENTABILITY', 'collapse', { outcome: 'NOT_RUNNABLE', note: e.code }); }
+      if (made) { const pre = sameSnapshot(snapshot(a), snapshot(b)); const ia = cid1(a), ib = cid1(b);
+        record('M15b', 'REPRESENTABILITY', '{odd} vs {odd, odd.}', { outcome: pre.same ? 'APPARATUS_FAULT' : !ia.ok || !ib.ok ? `VIOLATED (AVAILABILITY) ${ia.reason || ib.reason}` : ia.id !== ib.id ? 'HOLDS' : 'VIOLATED (REPRESENTABILITY)', idA: ia.id, idB: ib.id, note: `snapshot ${pre.diffs.join(',')}` }); } }
+    // M15c: a name that is not well-formed Unicode -> UNAVAILABLE.
+    // APPARATUS NOTE (run ac3dfe9e): Node cannot CREATE such a name - it writes U+FFFD instead, so
+    // that run's M15c tested a well-formed name and its "VIOLATED" was a failed precondition. The
+    // names are now made by .NET, and the lone surrogate is PROVEN on disk from PowerShell's own
+    // code points before cid1 is asked. c2 adds the well-formed lookalike Node would decode it to.
+    const lone = (dir, files) => {
+      const ps = files.map(([n, body]) => `[IO.File]::WriteAllText('${dir}\\' + ${n}, '${body}')`).join('; ')
+        + `; Get-ChildItem -LiteralPath '${dir}' | ForEach-Object { ($_.Name.ToCharArray() | ForEach-Object { '{0:X4}' -f [int]$_ }) -join ' ' }`;
+      try { return execFileSync('powershell', ['-NoProfile', '-Command', ps], { encoding: 'utf8', windowsHide: true }).trim().split(/\r?\n/); } catch (e) { return null; }
+    };
+    for (const [shape, files] of [
+      ['lone surrogate alone', [["'bad' + [char]0xD800 + 'name'", 'lone']]],
+      ['lone + its U+FFFD lookalike', [["'bad' + [char]0xD800 + 'name'", 'lone'], ["'bad' + [char]0xFFFD + [char]0xFFFD + [char]0xFFFD + 'name'", 'lookalike']]],
+    ]) {
+      const d = resolve(bare(join(mk('M15c'), 'c'), { 'ok.txt': 'x\n' }));
+      const cps = lone(d, files);
+      const proven = !!cps && cps.some((l) => / D8[0-9A-F]{2} /.test(` ${l} `));
+      if (!proven) { record('M15c', 'REPRESENTABILITY', shape, { outcome: 'NOT_RUNNABLE', note: `no lone surrogate on disk (${JSON.stringify(cps)})` }); continue; }
+      const r = cid1(d); const seen = readdirSync(d).filter((n) => n !== 'ok.txt');
+      record('M15c', 'REPRESENTABILITY', shape, { outcome: r.ok ? 'VIOLATED (REPRESENTABILITY)' : 'HOLDS', idA: r.ok ? r.id : null, onDisk: cps,
+        note: `on disk [${cps.join(' | ')}]; Node readdir ${JSON.stringify(seen)}; cid1 ${r.ok ? 'RETURNED an identity' : 'refused: ' + r.reason}` });
+    }
+  } else
+  // M15 (head mode, the original run): unrepresentable name -> must be UNAVAILABLE
   { const d = ownRepo(join(mk('M15'), 'c'));
     const odd = '\\\\?\\' + resolve(d) + '\\odd.';
     let made = true; try { writeFileSync(odd, 'trailing dot\n'); } catch (e) { made = false; record('M15', 'REPRESENTABILITY', 'OWN odd name', { outcome: 'NOT_RUNNABLE', note: e.code }); }
@@ -216,11 +274,15 @@ try {
     const t1 = r.results.find((x) => x.task === 't1');
     const cand = snapshot(join(root, 'ws', 't1')), base = snapshot(join(root, 'ws', '.accepted-baseline'));
     const cb = sameSnapshot(cand, base), cn = startOfT2.snap ? sameSnapshot(cand, startOfT2.snap) : { same: false, diffs: ['t2 never started'] };
-    record('M17', 'PRESERVATION', 'candidate vs baseline', { outcome: t1?.acceptance?.disposition !== 'RETAIN' ? `APPARATUS_FAULT (t1 ${t1?.acceptance?.disposition})` : cb.same ? 'HOLDS' : 'VIOLATED (PRESERVATION)', snapshotDiff: cb.diffs, note: `t1=${t1?.acceptance?.disposition} missing/changed: ${cb.diffs.join(',') || '-'}` });
+    // cid1 mode: does the identity REPORT the difference? (it should - the copy is wrong, not the identity)
+    const idNote = MODE === 'cid1' ? (() => { const x = cid1(join(root, 'ws', 't1')), y = cid1(join(root, 'ws', '.accepted-baseline'));
+      return ` | cid1 candidate ${String(x.id).slice(5, 17)} vs baseline ${String(y.id).slice(5, 17)}: ${x.id === y.id ? 'SAME (identity would hide the copy defect!)' : 'DIFFERENT (identity reports it)'}`; })() : '';
+    record('M17', 'PRESERVATION', 'candidate vs baseline', { outcome: t1?.acceptance?.disposition !== 'RETAIN' ? `APPARATUS_FAULT (t1 ${t1?.acceptance?.disposition})` : cb.same ? 'HOLDS' : 'VIOLATED (PRESERVATION)', snapshotDiff: cb.diffs, note: `t1=${t1?.acceptance?.disposition} missing/changed: ${cb.diffs.join(',') || '-'}${idNote}` });
     record('M17', 'PRESERVATION', 'candidate vs t2 start', { outcome: cn.same ? 'HOLDS' : 'VIOLATED (PRESERVATION)', snapshotDiff: cn.diffs, note: `${cn.diffs.join(',') || '-'}` }); }
 
   // M18 CONSISTENCY: the candidate changes while the check runs
   { const d = ownRepo(join(mk('M18'), 'c')); const before = snapshot(d);
+    const cidBefore = MODE === 'cid1' ? cid1(d).id : null;
     const t0 = Date.now();
     const p = evaluate(d, { id: 'm18', requested: { script: 'sleep 8; cat /candidate/subject.js' }, protected: { script: 'true' } });
     await sleep(4000); const tm = Date.now() - t0;
@@ -229,7 +291,8 @@ try {
     const changed = !sameSnapshot(before, snapshot(d)).same;
     const saw = /MUTATED MID-CHECK/.test(v.requested?.out || '') ? 'the MUTATED bytes' : /CANDIDATE/.test(v.requested?.out || '') ? 'the ORIGINAL bytes' : 'neither';
     record('M18', 'CONSISTENCY', 'OWN host write mid-check', { outcome: !changed ? 'APPARATUS_FAULT' : v.verdict === 'EVALUATION_ERROR' ? 'HOLDS' : `VIOLATED (CONSISTENCY) verdict=${v.verdict}`,
-      idA: v.candidateTree, note: `mutated at ${tm}ms of ${t1}ms; the check printed ${saw}` }); }
+      idA: v.candidateTree, note: `mutated at ${tm}ms of ${t1}ms; the check printed ${saw}`
+        + (MODE === 'cid1' ? ` | cid1 before/after ${cidBefore === cid1(d).id ? 'SAME' : 'DIFFER (the signal D-CONS needs exists; nothing consumes it yet)'}` : '') }); }
 
   // M19 BINDING: the receipt must name the bytes the check actually saw
   { const d = ownRepo(join(mk('M19'), 'c'));
@@ -244,7 +307,22 @@ try {
   // "M1, M5 fail in the no-.git shape; M3, M4 fail UNAVAILABLE; M7, M8, M9, M10, M13 fail when
   //  uncommitted; M17 fails; M2, M6, M12, M16 expected to pass in their own-repo forms"
   const violated = (row, shapeRe) => rows.some((r) => r.row === row && shapeRe.test(r.shape) && /^VIOLATED/.test(r.outcome));
-  const preds = [
+  const measured = (row) => rows.some((r) => r.row === row && !/NOT_RUNNABLE|APPARATUS/.test(r.outcome));
+  const allHold = (row) => rows.filter((r) => r.row === row).every((r) => r.outcome === 'HOLDS');
+  // "not measured" is UNSCORED, never "wrong" (the head-mode run printed WRONG for M13 - corrected)
+  const preds = MODE === 'cid1' ? [
+    // Amendment 2, a69aaddd
+    ...['M3', 'M4'].map((r) => [`${r} holds (AVAILABILITY)`, allHold(r), measured(r)]),
+    ...['M1', 'M2', 'M5', 'M6', 'M12', 'M14', 'M16'].map((r) => [`${r} holds genuinely, every measured shape`, rows.filter((x) => x.row === r && !/NOT_RUNNABLE/.test(x.outcome)).every((x) => x.outcome === 'HOLDS'), measured(r)]),
+    ...['M7', 'M8', 'M9', 'M10', 'M11'].map((r) => [`${r} holds, every shape`, allHold(r), measured(r)]),
+    ['M15a odd. AVAILABLE (worker listing: no prediction)', rows.some((x) => x.row === 'M15a' && !/AVAILABILITY/.test(x.outcome)), measured('M15a')],
+    ['M15b holds (no collapse)', allHold('M15b'), measured('M15b')],
+    ['M15c UNAVAILABLE', allHold('M15c'), measured('M15c')],
+    ['M13 unmeasured on Windows', !measured('M13'), true],
+    ['M17 STAYS RED', violated('M17', /./), measured('M17')],
+    ['M18 STAYS RED', violated('M18', /./), measured('M18')],
+    ['M19 STAYS RED', violated('M19', /./), measured('M19')],
+  ].map(([p, ok, m]) => [p, m ? ok : null]) : [
     ['M1 violated BARE', violated('M1', /BARE/)], ['M5 violated BARE', violated('M5', /BARE/)],
     ['M3 violated (unavailable)', violated('M3', /./)], ['M4 violated (unavailable)', violated('M4', /./)],
     ...['M7', 'M8', 'M9', 'M10', 'M13'].map((r) => [`${r} violated uncommitted`, violated(r, /uncommitted/)]),
@@ -256,15 +334,18 @@ try {
 
   // ── report by property / boundary, never a total ────────────────────────────────────────────
   say('\n=== BY PROPERTY (boundary) ===');
+  // Grouped by the property VIOLATED (parsed from the outcome), not the row's declared tag: the
+  // first run listed M3/M4 under INVARIANCE although they violate AVAILABILITY.
+  const violatedProp = (r) => (String(r.outcome).match(/^VIOLATED \((\w+)\)/) || [])[1] || null;
   for (const tag of Object.keys(TAGS)) {
-    const rs = rows.filter((r) => r.tag === tag); if (!rs.length) continue;
+    const rs = rows.filter((r) => (violatedProp(r) || r.tag) === tag); if (!rs.length) continue;
     const v = rs.filter((r) => /^VIOLATED/.test(r.outcome));
     say(`  ${tag.padEnd(16)} [${TAGS[tag]}]  violated in: ${v.length ? v.map((r) => `${r.row}/${r.shape}`).join('; ') : 'none'}`);
     const vac = rs.filter((r) => r.outcome === 'HOLDS_VACUOUSLY'); if (vac.length) say(`  ${''.padEnd(16)} held only vacuously (named the parent): ${vac.map((r) => `${r.row}/${r.shape}`).join('; ')}`);
     const nr = rs.filter((r) => /NOT_RUNNABLE|APPARATUS/.test(r.outcome)); if (nr.length) say(`  ${''.padEnd(16)} not measured: ${nr.map((r) => `${r.row}/${r.shape}=${r.outcome}`).join('; ')}`);
   }
   say('\n=== PREDICTIONS (frozen in the prereg) ===');
-  for (const p of result.predictions) say(`  ${p.correct ? 'correct' : 'WRONG  '}  ${p.prediction}`);
+  for (const p of result.predictions) say(`  ${p.correct === null ? 'UNSCORED' : p.correct ? 'correct ' : 'WRONG   '}  ${p.prediction}`);
 
   run.artifact('did1-regression.log', log.join('\n') + '\n');
   run.artifact('result.json', result);
@@ -277,5 +358,7 @@ try {
   process.exitCode = 1;
 } finally {
   for (const d of temps) { try { rmSync(d, { recursive: true, force: true }); } catch { /* best effort */ } }
-  console.log('NOTHING WAS REPAIRED. cid1 NOT WRITTEN.');
+  console.log(MODE === 'cid1'
+    ? 'cid1 measured as a pure observer, wired into nothing. D-COPY / D-CONS / D-BIND NOT repaired.'
+    : 'NOTHING WAS REPAIRED. cid1 NOT WRITTEN.');
 }
