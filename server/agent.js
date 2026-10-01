@@ -33,6 +33,7 @@ import { goalEntry as goalEntryOf } from './goalEntry.mjs';   // FG-4 SUBJECT: t
 import { verifyGodotFiles } from './godotVerify.js';
 import { escalate, estimateTokens, tokenBudgetExceeded } from './escalate.js';
 import * as workQueue from './queue.js';
+import { CONTINUABLE } from './finishVerdicts.mjs';   // CONT-2: which verdicts may autonomously start a dependent
 import * as assetLib from './assets.js';
 import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT, systemPromptFor } from './agentPrompt.js';
@@ -3709,6 +3710,7 @@ function recordRunIndex(run) {
       // test_web auto-finish, and this file is the only forever record - see finishVerdict().
       finishKind: finishVerdict(run),
       finishSubject: run.finishSubject || null,   // FG-5 RECEIPT: the entry, files and identity the verdict is about
+      continuation: run.continuation || null,     // CONT-2: HELD on a predecessor, AUTHORIZED_BY_OVERRIDE on a dependent a human started
       ms: Date.now() - (run.createdAt || Date.now()),
       calls: run.modelCalls || 0,
       steps: steps.length,
@@ -3788,6 +3790,7 @@ function saveTrace(run) {
       // unstripping the text would not help: a run with no note (route 2 had none) would still look clean.
       finishKind: finishVerdict(run),
       finishSubject: run.finishSubject || null,   // FG-5 RECEIPT: same subject as the index row, verbatim
+      continuation: run.continuation || null,     // CONT-2: same record as the index row
       // Who wrote it (stamped by noteModelCall) and who asked for it - so a training slice
       // can be cut by model, and supervisor-generated goals told apart from a human's.
       provider: run.provider || null, model: run.model || null, source: run.source || 'human',
@@ -5608,7 +5611,7 @@ ${result}${syntaxNote}${handedBack}`;
     // as if nothing had happened". That was a word-for-word description of what the
     // SUCCESS path was still doing. Reported by the Strategy session with a reproduction.
     if (run.status === 'done' && !run.depth && run.queueItemId) {
-      try { workQueue.complete(run.queueItemId, { status: 'done', runId: run.id }); }
+      try { workQueue.complete(run.queueItemId, { status: 'done', runId: run.id, finishKind: finishVerdict(run) }); }   // CONT-2: the verdict travels with the item
       catch { /* the queue must never take a finished run down with it */ }
     }
 
@@ -5624,11 +5627,23 @@ ${result}${syntaxNote}${handedBack}`;
       try {
         const next = workQueue.dequeue({ completedIds: completedQueueIds() });
         if (next) {
-          const stop = supervisorBrake(next);
+          // CONT-2 (legasus/screen/CONT-2_PREREG.md). Ending a run, completing its item and being allowed to
+          // start the NEXT goal are three different facts. This branch used to read only the first:
+          // CONT-1 (EH1 825b2036) measured a verified finish, a no-work finish, a forced finish and a
+          // bounded unverified finish all advancing the chain identically. The item above is complete
+          // regardless; autonomous advancement needs the predecessor's VERDICT to be continuable. Anything
+          // else is HELD exactly as the brake holds: released back to the queue with a note naming the
+          // verdict, resumable by a person - whose act is the authorization, and is recorded on the
+          // dependent when they start it (see /agent/queue/run). The predecessor's verdict is never rewritten.
+          // Amendment 1: judged on the EDGE (next.after -> its predecessor's stored verdict), not on this run,
+          // so an independent queued goal is not held on this run's account (runLifecycle caught the first
+          // version doing that) and the tick applies the same rule.
+          const held = heldByPredecessor(next);
+          const stop = held || supervisorBrake(next);
           if (stop) {
             // Put it back: this is "a human should look at this", not "throw the work away".
             workQueue.release(next.id);
-            pushStep(run, { type: 'note', text: `Supervisor stopped: ${stop} The queue keeps "${next.goal.slice(0, 60)}" — start it from the queue panel to continue.` });
+            pushStep(run, { type: 'note', text: `${held ? 'Held' : 'Supervisor stopped'}: ${stop} The queue keeps "${next.goal.slice(0, 60)}" — start it from the queue panel to continue.` });
           } else {
             pushStep(run, { type: 'note', text: `Supervisor: picking up the next queued goal (gen ${next.generation || 0}) — ${next.goal.slice(0, 100)}` });
             autoStart(loadDb, next);   // checks the workspace is free at the moment of starting
@@ -5732,6 +5747,21 @@ function activeTopLevelRun() {
 
 function completedQueueIds() {
   return workQueue.list().filter((i) => i.status === 'done').map((i) => i.id);
+}
+/**
+ * CONT-2 Amendment 1: may this dequeued item start WITHOUT a person? Judged on the dependency EDGE: an
+ * item with `after` starts autonomously only if its predecessor item's stored verdict is continuable.
+ * Returns the hold reason, or '' when the brake may decide. Independent items (no `after`) are not held
+ * here - whether sharing a workspace is itself a dependency is an open contract question, recorded.
+ * Used by BOTH autonomous entrances (the terminal hand-off and the supervisor tick).
+ */
+function heldByPredecessor(next) {
+  if (!next || !next.after) return '';
+  const pred = workQueue.list().find((i) => i.id === next.after);
+  if (!pred || !pred.finishKind || CONTINUABLE.has(pred.finishKind)) return '';
+  const r = pred.runId ? runs.get(pred.runId) : null;
+  if (r) r.continuation = { decision: 'HELD', predecessorKind: pred.finishKind, next: next.id };
+  return `the previous goal (${pred.id}) ended '${pred.finishKind}', not verified.`;
 }
 
 /**
@@ -5928,8 +5958,10 @@ function supervisorTick(loadDb) {
     // 3. Nothing running, nothing to resume - take the next ticket.
     const next = workQueue.dequeue({ completedIds: completedQueueIds() });
     if (!next) return;
-    const stop = supervisorBrake(next);
-    if (stop) { workQueue.release(next.id); return; }
+    // CONT-2 Amendment 1: the tick is the second autonomous entrance; the same edge rule holds here.
+    const held = heldByPredecessor(next);
+    const stop = held || supervisorBrake(next);
+    if (stop) { workQueue.release(next.id); if (held) console.log(`[agent] supervisor held "${String(next.goal).slice(0, 60)}": ${held}`); return; }
     console.log(`[agent] supervisor picked up a queued goal: ${String(next.goal).slice(0, 70)}`);
     autoStart(loadDb, next);
   } catch (e) {
@@ -6394,6 +6426,16 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     // Carry the hop count, or starting an item by hand would silently reset the chain
     // depth the supervisor's brake relies on.
     const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0, entrance: 'http:queue-run', inheritedAuthority: next.authority || null });
+    // CONT-2: a person starting a dependent whose predecessor was NOT continuable is the authorization the
+    // supervisor withheld. It is RECORDED on the dependent - never by rewriting the predecessor - so history
+    // reads "G1: <kind>, continuation: AUTHORIZED_BY_OVERRIDE (human), G2: started".
+    if (next.after) {
+      const pred = workQueue.list().find((i) => i.id === next.after);
+      if (pred && pred.finishKind && !CONTINUABLE.has(pred.finishKind)) {
+        run.continuation = { decision: 'AUTHORIZED_BY_OVERRIDE', by: 'human', predecessorItem: pred.id, predecessorKind: pred.finishKind };
+        pushStep(run, { type: 'note', text: `Continuation authorized by a person: the previous goal (${pred.id}) ended '${pred.finishKind}', not verified; this goal starts on that basis.` });
+      }
+    }
     res.json({ runId: run.id, item: next });
   });
 

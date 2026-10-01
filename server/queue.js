@@ -197,13 +197,16 @@ function dequeueLocked({ completedIds = [] } = {}) {
   return next;
 }
 
-function completeLocked(id, { status = 'done', runId = null, summary = '' } = {}) {
+function completeLocked(id, { status = 'done', runId = null, summary = '', finishKind = null } = {}) {
   const s = load();
   const it = s.items.find((i) => i.id === id);
   if (it) {
     it.status = status;
     it.runId = runId;
     it.summary = String(summary || '').slice(0, 500);
+    // CONT-2: the item carries the run's verdict, so a chain's label can be read from the items alone and a
+    // dependent's start can be judged against its predecessor without the run file (which is reaped).
+    if (finishKind) it.finishKind = finishKind;
     it.finishedAt = Date.now();
     save(s);
   }

@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T15-57-25-060Z__CONT-2-OVERRIDE-AFTER__ae71baf4",
+  "label": "CONT-2-OVERRIDE-AFTER",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "CONT-2 C7 after: human override after a held unverified predecessor.",
+  "command": "CONT2_PHASE=after node server/cont2.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T15:57:25.062Z",
+  "endedAt": "2026-10-01T15:57:34.179Z",
+  "exitStatus": 0,
+  "commit": "645deaf2a5644998f0c575e64b5cbfad1ef2232e",
+  "worktreeClean": false,
+  "worktreeDiffHash": "1dd766cf5342160e8afe7c9701c175b3bf4aeebc6f1feb72259fe1712803202b",
+  "dirtyEntryCount": 70,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "cont2.log",
+      "bytes": 441,
+      "sha256": "03b3c519bbfd1bebe8b64ee5435d5deb58adb3963b8058640da1b3dda19c9b91"
+    },
+    {
+      "name": "result.json",
+      "bytes": 1158,
+      "sha256": "e4a7da40b95430f3450c2c447e30ffeaabf62648eb5cad6babbaeba0450829f1"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

@@ -1,0 +1,463 @@
+{
+  "phase": "after",
+  "rows": [
+    {
+      "id": "C1",
+      "label": "A verified (positive control)",
+      "outcome": "A verified; A item=done kind=null/idx=verified | B started=true item=done status=done | B observed: -",
+      "settled": true,
+      "items": [
+        {
+          "id": "0ad85c01",
+          "status": "done",
+          "after": null,
+          "runId": "9315f183-ddf6-45c9-99e4-57756c1d8afd",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "1a6603ab",
+          "status": "done",
+          "after": "0ad85c01",
+          "runId": "2ad59dfd-2228-41b4-b4d1-74a6cf4f3ad0",
+          "summary": "",
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": null,
+        "idxKind": "verified",
+        "idxSubject": "present",
+        "traceKind": "verified",
+        "finishBlocks": 0
+      },
+      "B": {
+        "item": "done",
+        "started": true,
+        "runStatus": "done",
+        "finishKind": null,
+        "idxKind": "verified",
+        "observed": null
+      },
+      "outFile": "module.exports = { probe: () => 'A' };",
+      "itemsGrew": false
+    },
+    {
+      "id": "C2",
+      "label": "A unverified-no-work",
+      "outcome": "A item=done kind=unverified-no-work/idx=unverified-no-work | B started=false item=queued status=null | B observed: -",
+      "settled": false,
+      "items": [
+        {
+          "id": "65052823",
+          "status": "done",
+          "after": null,
+          "runId": "05cfaa66-93e2-4a8b-9dbb-4b8aa96cd590",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "0b79071b",
+          "status": "queued",
+          "after": "65052823",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": "unverified-no-work",
+        "idxKind": "unverified-no-work",
+        "idxSubject": "absent",
+        "traceKind": "unverified-no-work",
+        "finishBlocks": 1
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "module.exports = {};",
+      "itemsGrew": false
+    },
+    {
+      "id": "C3",
+      "label": "A forced (3 blocks, gate steps aside)",
+      "outcome": "A item=done kind=forced/idx=forced | B started=false item=queued status=null | B observed: -",
+      "settled": false,
+      "items": [
+        {
+          "id": "7c035d0c",
+          "status": "done",
+          "after": null,
+          "runId": "3c122c87-a506-4af8-bef0-5eaa43ee238c",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "2ef8514d",
+          "status": "queued",
+          "after": "7c035d0c",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": "forced",
+        "idxKind": "forced",
+        "idxSubject": "absent",
+        "traceKind": "forced",
+        "finishBlocks": 3
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "throw new Error('out is broken');",
+      "itemsGrew": false
+    },
+    {
+      "id": "C4",
+      "label": "A unverified (bounded: verifier closed)",
+      "outcome": "A item=done kind=null/idx=unverified | B started=false item=queued status=null | B observed: -",
+      "settled": false,
+      "items": [
+        {
+          "id": "386b7369",
+          "status": "done",
+          "after": null,
+          "runId": "74822a8f-8bf2-49e6-8d02-0aaa9e61108a",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "8a67506c",
+          "status": "queued",
+          "after": "386b7369",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": null,
+        "idxKind": "unverified",
+        "idxSubject": "absent",
+        "traceKind": "unverified",
+        "finishBlocks": 0
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "module.exports = { probe: () => 'A' };",
+      "itemsGrew": false
+    },
+    {
+      "id": "C5",
+      "label": "A stopped (repeat guard) - failure path",
+      "outcome": "A item=stopped kind=null/idx=not_finished | B started=false item=queued status=null | B observed: -",
+      "settled": false,
+      "items": [
+        {
+          "id": "d3a6dda1",
+          "status": "stopped",
+          "after": null,
+          "runId": "49d42ab9-b53a-4260-a4c8-64784d14470e",
+          "summary": "loop: Stopped: the model produced the same response 3 times in the last 4 steps without making progress.",
+          "repairOf": null
+        },
+        {
+          "id": "b79a56c5",
+          "status": "queued",
+          "after": "c33d7816",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        },
+        {
+          "id": "c33d7816",
+          "status": "stopped",
+          "after": null,
+          "runId": "8cd813f6-c0f0-4111-95a0-03738205ce25",
+          "summary": "loop: Stopped: the model produced the same response 3 times in the last 4 steps without making progress.",
+          "repairOf": "d3a6dda1"
+        }
+      ],
+      "A": {
+        "item": "stopped",
+        "runStatus": "stopped",
+        "finishKind": null,
+        "idxKind": "not_finished",
+        "idxSubject": "absent",
+        "traceKind": "not_finished",
+        "finishBlocks": 0
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "module.exports = { probe: () => 'A' };",
+      "itemsGrew": true
+    },
+    {
+      "id": "C6",
+      "label": "A error (machine failure) - failure path",
+      "outcome": "UNMEASURED: no fault injection for a genuine machine failure in this harness"
+    },
+    {
+      "id": "X2-C2",
+      "label": "A's kind survives B (C2)",
+      "outcome": "index=unverified-no-work trace=unverified-no-work subject=absent; item carries runId=true"
+    },
+    {
+      "id": "X2-C3",
+      "label": "A's kind survives B (C3)",
+      "outcome": "index=forced trace=forced subject=absent; item carries runId=true"
+    },
+    {
+      "id": "X2-C4",
+      "label": "A's kind survives B (C4)",
+      "outcome": "index=unverified trace=unverified subject=absent; item carries runId=true"
+    },
+    {
+      "id": "X3",
+      "label": "chain label on the queue items",
+      "outcome": "C1: done>done (kind on item: none); C2: done>queued (kind on item: none); C3: done>queued (kind on item: none); C4: done>queued (kind on item: none); C5: stopped>queued>stopped (kind on item: none)"
+    }
+  ],
+  "results": {
+    "C1": {
+      "settled": true,
+      "items": [
+        {
+          "id": "0ad85c01",
+          "status": "done",
+          "after": null,
+          "runId": "9315f183-ddf6-45c9-99e4-57756c1d8afd",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "1a6603ab",
+          "status": "done",
+          "after": "0ad85c01",
+          "runId": "2ad59dfd-2228-41b4-b4d1-74a6cf4f3ad0",
+          "summary": "",
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": null,
+        "idxKind": "verified",
+        "idxSubject": "present",
+        "traceKind": "verified",
+        "finishBlocks": 0
+      },
+      "B": {
+        "item": "done",
+        "started": true,
+        "runStatus": "done",
+        "finishKind": null,
+        "idxKind": "verified",
+        "observed": null
+      },
+      "outFile": "module.exports = { probe: () => 'A' };",
+      "itemsGrew": false
+    },
+    "C2": {
+      "settled": false,
+      "items": [
+        {
+          "id": "65052823",
+          "status": "done",
+          "after": null,
+          "runId": "05cfaa66-93e2-4a8b-9dbb-4b8aa96cd590",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "0b79071b",
+          "status": "queued",
+          "after": "65052823",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": "unverified-no-work",
+        "idxKind": "unverified-no-work",
+        "idxSubject": "absent",
+        "traceKind": "unverified-no-work",
+        "finishBlocks": 1
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "module.exports = {};",
+      "itemsGrew": false
+    },
+    "C3": {
+      "settled": false,
+      "items": [
+        {
+          "id": "7c035d0c",
+          "status": "done",
+          "after": null,
+          "runId": "3c122c87-a506-4af8-bef0-5eaa43ee238c",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "2ef8514d",
+          "status": "queued",
+          "after": "7c035d0c",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": "forced",
+        "idxKind": "forced",
+        "idxSubject": "absent",
+        "traceKind": "forced",
+        "finishBlocks": 3
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "throw new Error('out is broken');",
+      "itemsGrew": false
+    },
+    "C4": {
+      "settled": false,
+      "items": [
+        {
+          "id": "386b7369",
+          "status": "done",
+          "after": null,
+          "runId": "74822a8f-8bf2-49e6-8d02-0aaa9e61108a",
+          "summary": "",
+          "repairOf": null
+        },
+        {
+          "id": "8a67506c",
+          "status": "queued",
+          "after": "386b7369",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        }
+      ],
+      "A": {
+        "item": "done",
+        "runStatus": "done",
+        "finishKind": null,
+        "idxKind": "unverified",
+        "idxSubject": "absent",
+        "traceKind": "unverified",
+        "finishBlocks": 0
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "module.exports = { probe: () => 'A' };",
+      "itemsGrew": false
+    },
+    "C5": {
+      "settled": false,
+      "items": [
+        {
+          "id": "d3a6dda1",
+          "status": "stopped",
+          "after": null,
+          "runId": "49d42ab9-b53a-4260-a4c8-64784d14470e",
+          "summary": "loop: Stopped: the model produced the same response 3 times in the last 4 steps without making progress.",
+          "repairOf": null
+        },
+        {
+          "id": "b79a56c5",
+          "status": "queued",
+          "after": "c33d7816",
+          "runId": null,
+          "summary": null,
+          "repairOf": null
+        },
+        {
+          "id": "c33d7816",
+          "status": "stopped",
+          "after": null,
+          "runId": "8cd813f6-c0f0-4111-95a0-03738205ce25",
+          "summary": "loop: Stopped: the model produced the same response 3 times in the last 4 steps without making progress.",
+          "repairOf": "d3a6dda1"
+        }
+      ],
+      "A": {
+        "item": "stopped",
+        "runStatus": "stopped",
+        "finishKind": null,
+        "idxKind": "not_finished",
+        "idxSubject": "absent",
+        "traceKind": "not_finished",
+        "finishBlocks": 0
+      },
+      "B": {
+        "item": "queued",
+        "started": false,
+        "runStatus": null,
+        "finishKind": null,
+        "idxKind": null,
+        "observed": null
+      },
+      "outFile": "module.exports = { probe: () => 'A' };",
+      "itemsGrew": true
+    }
+  }
+}

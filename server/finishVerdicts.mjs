@@ -31,3 +31,7 @@
 //                        reader did not keep it.
 export const UNVERIFIED = new Set(['forced', 'auto_clean_tests', 'unverified', 'unverified-no-work']);
 export const KNOWN = new Set(['verified', 'screen_checked', 'not_finished', ...UNVERIFIED]);
+// CONT-2 (legasus/screen/CONT-2_PREREG.md): the kinds whose predecessor may AUTONOMOUSLY start a dependent
+// goal. Every other kind that reached 'done' is HELD for a human - the item is complete, the chain is
+// not advanced by the hub on its own. CONT-1 (EH1 825b2036) measured every done kind advancing alike.
+export const CONTINUABLE = new Set(['verified', 'screen_checked']);
