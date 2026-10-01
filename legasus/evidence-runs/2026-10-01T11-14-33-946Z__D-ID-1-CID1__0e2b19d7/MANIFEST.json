@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T11-14-33-946Z__D-ID-1-CID1__0e2b19d7",
+  "label": "D-ID-1-CID1",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "D-ID-1 suite, identity rows measured on cid1.mjs directly; M17-M19 on the unrepaired shipped paths. Prereg 1c3a2b1c + A1 3e14f827 + A2 a69aaddd; reconcile 0d4ec46f.",
+  "command": "DID1_IDENTITY=cid1 node server/did1.regression.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T11:14:33.948Z",
+  "endedAt": "2026-10-01T11:15:09.846Z",
+  "exitStatus": 0,
+  "commit": "9165f9e4f89d976376f600795f94f5b261d2e3ed",
+  "worktreeClean": false,
+  "worktreeDiffHash": "f2d57863aac4b263b0f1f6370c53bcc6ce18d96ebae4913bbb439922405f50e8",
+  "dirtyEntryCount": 33,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "did1-regression.log",
+      "bytes": 6121,
+      "sha256": "7329628596572da2fc19b6d360e2131d720957e024490eb148103ea7e6326ae2"
+    },
+    {
+      "name": "result.json",
+      "bytes": 18044,
+      "sha256": "ab37a4f6db2507109d1892045d3cd4d8a89973c717c40f1e97d4f6ec6fb77c05"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

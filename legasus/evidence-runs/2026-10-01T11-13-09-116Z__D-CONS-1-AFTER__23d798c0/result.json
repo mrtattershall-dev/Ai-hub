@@ -1,0 +1,101 @@
+{
+  "phase": "after",
+  "rows": [
+    {
+      "id": "K0",
+      "label": "no mutation",
+      "outcome": "ADMISSIBLE, subject=C0",
+      "verdict": "PASS",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24"
+    },
+    {
+      "id": "K1",
+      "label": "file bytes change",
+      "outcome": "NOT AUTHORIZING (EVALUATION_ERROR)",
+      "verdict": "EVALUATION_ERROR",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec",
+      "note": "8939ms; check output: \"\""
+    },
+    {
+      "id": "K2",
+      "label": "file added",
+      "outcome": "NOT AUTHORIZING (EVALUATION_ERROR)",
+      "verdict": "EVALUATION_ERROR",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:ef85a1703ac8adbf9486e0bc1e20d2725a9f30260a76b3b220887d9645eff9f5",
+      "note": "9091ms; check output: \"\""
+    },
+    {
+      "id": "K3",
+      "label": "file removed",
+      "outcome": "NOT AUTHORIZING (EVALUATION_ERROR)",
+      "verdict": "EVALUATION_ERROR",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:f7f80106c1d546cda93e1fd343ded9a7bb36c4f55c8f0876ccfe347850d2bef2",
+      "note": "8966ms; check output: \"\""
+    },
+    {
+      "id": "K4",
+      "label": "rename, bytes equivalent",
+      "outcome": "NOT AUTHORIZING (EVALUATION_ERROR)",
+      "verdict": "EVALUATION_ERROR",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:174e4f8baa1d3a021df1d266111b20f6a1b9b2abe3a1b2e52ed4c612e3992a79",
+      "note": "9054ms; check output: \"\""
+    },
+    {
+      "id": "K5",
+      "label": "mutate -> restore before the post-check",
+      "outcome": "ADMISSIBLE, check saw only C0",
+      "verdict": "PASS",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "endpointsEqual": true,
+      "transientObserved": false,
+      "note": "14022ms; endpoints EQUAL; output \"module.exports={probe:()=>\\\"ORIGINAL\\\"}; module.exports={probe:()=>\\\"ORIGINAL\\\"}; \""
+    },
+    {
+      "id": "K6",
+      "label": "check writes /candidate",
+      "outcome": "WRITE REFUSED, subject unchanged",
+      "verdict": "PASS",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24"
+    },
+    {
+      "id": "K7",
+      "label": "mutation, then the check times out",
+      "outcome": "NO AUTHORITATIVE VERDICT",
+      "verdict": "EVALUATION_ERROR",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec"
+    },
+    {
+      "id": "K8",
+      "label": "mutation between verdict and commit",
+      "outcome": "RETAINED A STATE THE VERDICT NEVER JUDGED (expected red: commit boundary)",
+      "verdict": "PASS",
+      "disposition": "RETAIN",
+      "survivingVerdict": "FAIL",
+      "judged": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "committed": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec",
+      "note": "surviving re-check: FAIL"
+    }
+  ],
+  "verdict": {
+    "k0Admissible": true,
+    "k1to4NotAuthorizing": true,
+    "k5ImmutableJudgment": true,
+    "k6": true,
+    "k7": true,
+    "k8StillRed": true
+  }
+}

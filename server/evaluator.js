@@ -39,6 +39,8 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, cpSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { WORKER_IMAGE, WorkerUnavailable, WorkerUnconfirmed } from './worker.js';
+import { cid1 } from './cid1.mjs';
+import { copySnapshot } from './snapshotCopy.mjs';
 
 const exec = promisify(execFile);
 
@@ -134,9 +136,34 @@ export async function evaluate(workspace, task, { timeoutSec = 120, image = WORK
     return { ...base, verdict: VERDICT.EVALUATION_ERROR, reason: 'the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict' };
   }
 
+  // D-CONS-1 (legasus/screen/D-CONS-1_PREREG.md, 9165f9e4): IMMUTABLE JUDGMENT.
+  //
+  // The checks used to run against the LIVE workspace. Anything that wrote to it during a check
+  // changed what was being judged: a mutation mid-check was judged PASS, and a mutate-then-restore
+  // left both endpoints equal while the check had read the transient bytes (K5, run d8318c57).
+  // Endpoint hashing cannot see that; construction can. So the checks run against a PRIVATE
+  // snapshot built with D-COPY's rule and verified to be C0 - an object nothing else writes to.
+  //
+  // C0 is the SUBJECT of the verdict. The candidateTree receipt above is unchanged in this step:
+  // what the receipt names is D-BIND's boundary, not this one.
+  const subject = cid1(workspace);
+  if (!subject.ok) {
+    return { ...base, subject: null, verdict: VERDICT.EVALUATION_ERROR, reason: `the candidate snapshot could not be identified (${subject.reason}) - a judgment needs a subject` };
+  }
+  const C0 = subject.id;
+  base.subject = C0;
+  const snapRoot = mkdtempSync(join(tmpdir(), 'legasus-judged-'));
+  const judged = join(snapRoot, 'candidate');
   // Materialise the checks OUTSIDE the workspace, fresh each time.
   const checkDir = mkdtempSync(join(tmpdir(), 'legasus-check-'));
   try {
+    try { copySnapshot(workspace, judged); } catch (e) {
+      return { ...base, verdict: VERDICT.EVALUATION_ERROR, reason: `the candidate could not be copied for judgment: ${e.code || e.name}` };
+    }
+    const S0 = cid1(judged);
+    if (!S0.ok || S0.id !== C0) {
+      return { ...base, verdict: VERDICT.EVALUATION_ERROR, reason: `the copy made for judgment is not the candidate (${S0.ok ? S0.id : S0.reason}) - it changed while being copied` };
+    }
     const parts = {};
     for (const kind of ['requested', 'protected']) {
       const spec = task[kind];
@@ -146,7 +173,7 @@ export async function evaluate(workspace, task, { timeoutSec = 120, image = WORK
       writeFileSync(file, spec.script, 'utf8');
       if (spec.files) for (const [name, body] of Object.entries(spec.files)) writeFileSync(join(checkDir, name), body, 'utf8');
       try {
-        const r = await runCheck(workspace, checkDir, `sh /check/${kind}.sh`, { timeoutSec, image });
+        const r = await runCheck(judged, checkDir, `sh /check/${kind}.sh`, { timeoutSec, image });   // the private snapshot, never the live workspace
         if (r.timedOut) {
           parts[kind] = { verdict: VERDICT.EVALUATION_ERROR, reason: `the ${kind} check timed out after ${timeoutSec}s - it established nothing about the candidate`, out: r.out.slice(0, 2000) };
         } else {
@@ -171,8 +198,26 @@ export async function evaluate(workspace, task, { timeoutSec = 120, image = WORK
     const verdict = vals.includes(VERDICT.EVALUATION_ERROR) ? VERDICT.EVALUATION_ERROR
       : vals.includes(VERDICT.FAIL) ? VERDICT.FAIL
         : vals.length ? VERDICT.PASS : VERDICT.EVALUATION_ERROR;
-    return { ...base, verdict, requested: parts.requested, protected: parts.protected };
+
+    // THE HAND-OFF GUARD. The judged object must still be C0, and the LIVE workspace - the thing the
+    // caller will retain or restore - must still be C0 too. A judgment of C0 cannot authorize C1.
+    // When it fails, the checks' results are kept as an AUDIT record about C0, and every verdict
+    // field a consumer might act on becomes EVALUATION_ERROR - a caller reading only `requested`
+    // must not find a PASS that authorizes a different object.
+    const S1 = cid1(judged), C1 = cid1(workspace);
+    const consistency = { subject: C0, judgedAfter: S1.ok ? S1.id : null, liveAfter: C1.ok ? C1.id : null };
+    if (!S1.ok || S1.id !== C0 || !C1.ok || C1.id !== C0) {
+      const why = !S1.ok || S1.id !== C0
+        ? 'the judged snapshot changed during evaluation'
+        : `the candidate changed during evaluation (live ${C1.ok ? C1.id : C1.reason}) - a judgment of ${C0} cannot authorize it`;
+      const neuter = (p) => (p && p.verdict ? { verdict: VERDICT.EVALUATION_ERROR, reason: why, judgedVerdict: p.verdict } : p);
+      return { ...base, verdict: VERDICT.EVALUATION_ERROR, reason: why, consistency,
+        requested: neuter(parts.requested), protected: neuter(parts.protected),
+        auditOfSubject: { verdict, requested: parts.requested, protected: parts.protected } };
+    }
+    return { ...base, verdict, consistency, requested: parts.requested, protected: parts.protected };
   } finally {
     try { rmSync(checkDir, { recursive: true, force: true }); } catch { /* best effort */ }
+    try { rmSync(snapRoot, { recursive: true, force: true }); } catch { /* best effort */ }
   }
 }

@@ -304,7 +304,7 @@ try {
     const saw = /MUTATED MID-CHECK/.test(v.requested?.out || '') ? 'the MUTATED bytes' : /CANDIDATE/.test(v.requested?.out || '') ? 'the ORIGINAL bytes' : 'neither';
     record('M18', 'CONSISTENCY', 'OWN host write mid-check', { outcome: !changed ? 'APPARATUS_FAULT' : v.verdict === 'EVALUATION_ERROR' ? 'HOLDS' : `VIOLATED (CONSISTENCY) verdict=${v.verdict}`,
       idA: v.candidateTree, note: `mutated at ${tm}ms of ${t1}ms; the check printed ${saw}`
-        + (MODE !== 'head' ? ` | cid1 before/after ${cidBefore === ID(d).id ? 'SAME' : 'DIFFER (the signal D-CONS needs exists; nothing consumes it yet)'}` : '') }); }
+        + (MODE !== 'head' ? ` | cid1 before/after ${cidBefore === ID(d).id ? 'SAME' : 'DIFFER (since D-CONS-1 the evaluator consumes this: the verdict becomes EVALUATION_ERROR; the check output moves to auditOfSubject)'}` : '') }); }
 
   // M19 BINDING: the receipt must name the bytes the check actually saw
   { const d = ownRepo(join(mk('M19'), 'c'));

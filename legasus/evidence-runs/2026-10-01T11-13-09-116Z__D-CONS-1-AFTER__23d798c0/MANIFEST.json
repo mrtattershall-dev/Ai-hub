@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T11-13-09-116Z__D-CONS-1-AFTER__23d798c0",
+  "label": "D-CONS-1-AFTER",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "D-CONS-1 after the evaluator repair. Prereg 9165f9e4.",
+  "command": "DCONS_PHASE=after node server/dcons1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T11:13:09.118Z",
+  "endedAt": "2026-10-01T11:14:23.257Z",
+  "exitStatus": 0,
+  "commit": "9165f9e4f89d976376f600795f94f5b261d2e3ed",
+  "worktreeClean": false,
+  "worktreeDiffHash": "9c0f4d5c64d922f19ed6d275adeb6e4f7cc3d09f0cb3ef118d303b4633b0380e",
+  "dirtyEntryCount": 32,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "dcons1.log",
+      "bytes": 1351,
+      "sha256": "6ce360779e9638945bba386693cdabed71e04c1ed855ebb4f56c396e36c7480d"
+    },
+    {
+      "name": "result.json",
+      "bytes": 4214,
+      "sha256": "fff0cab63011986783466e902ddd37d09be81da9745066f4d6c330439e65c887"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

@@ -1,0 +1,104 @@
+{
+  "phase": "before",
+  "rows": [
+    {
+      "id": "K0",
+      "label": "no mutation",
+      "outcome": "PASS, subject ABSENT",
+      "verdict": "PASS",
+      "subject": null,
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24"
+    },
+    {
+      "id": "K1",
+      "label": "file bytes change",
+      "outcome": "AUTHORIZED (PASS) - VIOLATION",
+      "verdict": "PASS",
+      "subject": null,
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec",
+      "note": "8937ms; check output: \"module.exports={probe:()=>\\\"MUTATED\\\"}; keep.txt lib.js subject.js \""
+    },
+    {
+      "id": "K2",
+      "label": "file added",
+      "outcome": "AUTHORIZED (PASS) - VIOLATION",
+      "verdict": "PASS",
+      "subject": null,
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:ef85a1703ac8adbf9486e0bc1e20d2725a9f30260a76b3b220887d9645eff9f5",
+      "note": "8965ms; check output: \"module.exports={probe:()=>\\\"ORIGINAL\\\"}; added.txt keep.txt lib.js subje\""
+    },
+    {
+      "id": "K3",
+      "label": "file removed",
+      "outcome": "AUTHORIZED (PASS) - VIOLATION",
+      "verdict": "PASS",
+      "subject": null,
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:f7f80106c1d546cda93e1fd343ded9a7bb36c4f55c8f0876ccfe347850d2bef2",
+      "note": "8950ms; check output: \"module.exports={probe:()=>\\\"ORIGINAL\\\"}; lib.js subject.js \""
+    },
+    {
+      "id": "K4",
+      "label": "rename, bytes equivalent",
+      "outcome": "AUTHORIZED (PASS) - VIOLATION",
+      "verdict": "PASS",
+      "subject": null,
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:174e4f8baa1d3a021df1d266111b20f6a1b9b2abe3a1b2e52ed4c612e3992a79",
+      "note": "8980ms; check output: \"module.exports={probe:()=>\\\"ORIGINAL\\\"}; keep.txt lib2.js subject.js \""
+    },
+    {
+      "id": "K5",
+      "label": "mutate -> restore before the post-check",
+      "outcome": "CHECK SAW TRANSIENT BYTES, verdict PASS - VIOLATION",
+      "verdict": "PASS",
+      "subject": null,
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "endpointsEqual": true,
+      "transientObserved": true,
+      "note": "13982ms; endpoints EQUAL; output \"module.exports={probe:()=>\\\"ORIGINAL\\\"}; module.exports={probe:()=>\\\"MUTATED\\\"}; \""
+    },
+    {
+      "id": "K6",
+      "label": "check writes /candidate",
+      "outcome": "WRITE REFUSED, subject unchanged",
+      "verdict": "PASS",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24"
+    },
+    {
+      "id": "K7",
+      "label": "mutation, then the check times out",
+      "outcome": "NO AUTHORITATIVE VERDICT",
+      "verdict": "EVALUATION_ERROR",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C1": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec"
+    },
+    {
+      "id": "K8",
+      "label": "mutation between verdict and commit",
+      "outcome": "RETAINED A STATE THE VERDICT NEVER JUDGED (expected red: commit boundary)",
+      "verdict": "PASS",
+      "disposition": "RETAIN",
+      "survivingVerdict": "FAIL",
+      "judged": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "committed": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec",
+      "note": "surviving re-check: FAIL"
+    }
+  ],
+  "verdict": {
+    "mustFire": true,
+    "k1to4Authorized": [
+      "K1",
+      "K2",
+      "K3",
+      "K4"
+    ],
+    "k5TransientSeen": true,
+    "k8Red": true
+  }
+}
