@@ -49,6 +49,7 @@
 import { readdirSync, lstatSync, readFileSync, readlinkSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
+import { isGitComponent } from './snapshotPath.mjs';
 
 export const CID1_DOMAIN = Buffer.concat([Buffer.from('legasus/candidate-identity/cid1', 'ascii'), Buffer.from([0])]);
 const WIN = process.platform === 'win32';
@@ -98,7 +99,7 @@ export function cid1(root) {
     let names;
     try { names = readdirSync(absExact); } catch (e) { throw new Refusal(`readdir failed: ${e.code || e.message}`, rel || '.'); }
     for (const name of names) {
-      if (name === '.git') continue;                                      // EXACT component only
+      if (isGitComponent(name)) continue;                                 // EXACT component only (snapshotPath.mjs)
       if (!name.isWellFormed()) throw new Refusal('name is not well-formed Unicode', rel);
       const r = rel ? `${rel}/${name}` : name;
       const p = child(absExact, name);

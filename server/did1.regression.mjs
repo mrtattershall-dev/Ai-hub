@@ -283,7 +283,12 @@ try {
     const cb = sameSnapshot(cand, base), cn = startOfT2.snap ? sameSnapshot(cand, startOfT2.snap) : { same: false, diffs: ['t2 never started'] };
     // cid1 mode: does the identity REPORT the difference? (it should - the copy is wrong, not the identity)
     const idNote = MODE !== 'head' ? (() => { const x = ID(join(root, 'ws', 't1')), y = ID(join(root, 'ws', '.accepted-baseline'));
-      return ` | cid1 candidate ${String(x.id).slice(5, 17)} vs baseline ${String(y.id).slice(5, 17)}: ${x.id === y.id ? 'SAME (identity would hide the copy defect!)' : 'DIFFERENT (identity reports it)'}`; })() : '';
+      return ` | cid1 candidate ${String(x.id).slice(5, 17)} vs baseline ${String(y.id).slice(5, 17)}: ${
+        // Judged AGAINST THE ORACLE (cb, below). Run 14779b72 printed "SAME (identity would hide the
+        // copy defect!)" after D-COPY, when the snapshots really were equal - a label that assumed the
+        // defect. Now it warns only when the oracle and the identity disagree.
+        x.id === y.id ? (cb.same ? 'SAME (snapshots equal per the oracle)' : 'SAME BUT THE ORACLE SEES A DIFFERENCE - identity hides it!')
+          : (cb.same ? 'DIFFERENT BUT THE ORACLE SEES NONE - identity disagrees with the oracle!' : 'DIFFERENT (identity reports the copy defect)')}`; })() : '';
     record('M17', 'PRESERVATION', 'candidate vs baseline', { outcome: t1?.acceptance?.disposition !== 'RETAIN' ? `APPARATUS_FAULT (t1 ${t1?.acceptance?.disposition})` : cb.same ? 'HOLDS' : 'VIOLATED (PRESERVATION)', snapshotDiff: cb.diffs, note: `t1=${t1?.acceptance?.disposition} missing/changed: ${cb.diffs.join(',') || '-'}${idNote}` });
     record('M17', 'PRESERVATION', 'candidate vs t2 start', { outcome: cn.same ? 'HOLDS' : 'VIOLATED (PRESERVATION)', snapshotDiff: cn.diffs, note: `${cn.diffs.join(',') || '-'}` }); }
 

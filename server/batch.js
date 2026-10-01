@@ -33,8 +33,9 @@
  * EVALUATION ERRORS ARE NOT CODE FAILURES. They are counted in their own column, always.
  */
 import { appendFileSync, mkdirSync, writeFileSync, readFileSync, existsSync, cpSync, rmSync } from 'node:fs';
-import { join, sep } from 'node:path';
+import { join, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { isExcludedRelPath } from './snapshotPath.mjs';
 import { confirmStopped, confirmNoneRunning, attemptExists, newAttemptId } from './worker.js';
 import { evaluate, VERDICT } from './evaluator.js';
 import { applyAcceptance, DISPOSITION } from './acceptance.js';
@@ -186,7 +187,11 @@ export async function runBatch(tasks, opts) {
       // The only path that advances the baseline.
       try {
         rmSync(acceptedBaselineDir, { recursive: true, force: true });
-        cpSync(ws, acceptedBaselineDir, { recursive: true, filter: (src) => !src.includes(`${sep}.git`) });
+        // D-COPY-1: preserve the snapshot exactly. The old filter `!src.includes(sep + '.git')` was a
+        // SUBSTRING test on the ABSOLUTE path: it dropped .gitignore/.gitattributes/.github/.gitconfig,
+        // and under any ancestor named .git* it copied NOTHING. Judged relative to the copy root now,
+        // by the one shared rule (snapshotPath.mjs), so cid1(ws) === cid1(baseline).
+        cpSync(ws, acceptedBaselineDir, { recursive: true, filter: (src) => !isExcludedRelPath(relative(ws, src)) });
         acceptedBaselineTree = acceptance.survivingWorkspaceVerdict?.candidateTree || null;
         acceptedBaselineTask = task.id;
         acceptedTasks.add(task.id);
@@ -266,7 +271,7 @@ export async function runBatch(tasks, opts) {
     mkdirSync(ws, { recursive: true });
     const fromBaseline = chain && acceptedBaselineDir && existsSync(acceptedBaselineDir);
     if (fromBaseline) {
-      cpSync(acceptedBaselineDir, ws, { recursive: true, filter: (src) => !src.includes(`${sep}.git`) });
+      cpSync(acceptedBaselineDir, ws, { recursive: true, filter: (src) => !isExcludedRelPath(relative(acceptedBaselineDir, src)) });   // D-COPY-1
     } else if (task.seed) {
       for (const [f, body] of Object.entries(task.seed)) writeFileSync(join(ws, f), body, 'utf8');
     }

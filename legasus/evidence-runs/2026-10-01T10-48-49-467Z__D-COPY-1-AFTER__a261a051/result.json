@@ -1,0 +1,166 @@
+{
+  "phase": "after",
+  "prereg": "4bec21ce",
+  "layouts": [
+    {
+      "layout": "ordinary location",
+      "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\dcopy-Bk5wND\\hub",
+      "t1": "RETAIN",
+      "t2": "COMPLETED",
+      "cidCandidate": "cid1:631d5c068ec846ea122274156f63772db93f1fe88ad22199a75d57a0045d6d47",
+      "cidBaseline": "cid1:631d5c068ec846ea122274156f63772db93f1fe88ad22199a75d57a0045d6d47",
+      "cidT2Start": "cid1:631d5c068ec846ea122274156f63772db93f1fe88ad22199a75d57a0045d6d47",
+      "baselineEqualsCandidate": true,
+      "t2StartEqualsCandidate": true,
+      "baselineExists": true,
+      "baselineFileCount": 9,
+      "matrix": [
+        {
+          "path": ".gitignore",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": ".gitattributes",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "foo.git",
+          "rule": true,
+          "predictedCurrent": true,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": ".gitconfig",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "nested/.git/HEAD",
+          "rule": false,
+          "predictedCurrent": false,
+          "inBaseline": false,
+          "inT2Start": false
+        },
+        {
+          "path": "nested/.github/x.yml",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "README.md",
+          "rule": true,
+          "predictedCurrent": true,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "src/deep/a/b/c.js",
+          "rule": true,
+          "predictedCurrent": true,
+          "inBaseline": true,
+          "inT2Start": true
+        }
+      ]
+    },
+    {
+      "layout": "under an ancestor named .gitlab-runner",
+      "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\dcopy-anc-vZTNn6\\.gitlab-runner\\hub",
+      "t1": "RETAIN",
+      "t2": "COMPLETED",
+      "cidCandidate": "cid1:631d5c068ec846ea122274156f63772db93f1fe88ad22199a75d57a0045d6d47",
+      "cidBaseline": "cid1:631d5c068ec846ea122274156f63772db93f1fe88ad22199a75d57a0045d6d47",
+      "cidT2Start": "cid1:631d5c068ec846ea122274156f63772db93f1fe88ad22199a75d57a0045d6d47",
+      "baselineEqualsCandidate": true,
+      "t2StartEqualsCandidate": true,
+      "baselineExists": true,
+      "baselineFileCount": 9,
+      "matrix": [
+        {
+          "path": ".gitignore",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": ".gitattributes",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "foo.git",
+          "rule": true,
+          "predictedCurrent": true,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": ".gitconfig",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "nested/.git/HEAD",
+          "rule": false,
+          "predictedCurrent": false,
+          "inBaseline": false,
+          "inT2Start": false
+        },
+        {
+          "path": "nested/.github/x.yml",
+          "rule": true,
+          "predictedCurrent": false,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "README.md",
+          "rule": true,
+          "predictedCurrent": true,
+          "inBaseline": true,
+          "inT2Start": true
+        },
+        {
+          "path": "src/deep/a/b/c.js",
+          "rule": true,
+          "predictedCurrent": true,
+          "inBaseline": true,
+          "inT2Start": true
+        }
+      ]
+    }
+  ],
+  "verdict": {
+    "m17Green": true,
+    "matrixExact": true
+  }
+}

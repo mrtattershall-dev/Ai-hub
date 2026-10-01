@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T10-47-12-434Z__D-COPY-1-BEFORE__3675fddd",
+  "label": "D-COPY-1-BEFORE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "D-COPY-1 before the batch.js repair. Prereg 4bec21ce.",
+  "command": "DCOPY_PHASE=before node server/dcopy1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T10:47:12.436Z",
+  "endedAt": "2026-10-01T10:47:26.103Z",
+  "exitStatus": 0,
+  "commit": "4bec21ced6fa72b434b1a90fed3786038895cee7",
+  "worktreeClean": false,
+  "worktreeDiffHash": "51746ef0dcc495087230a2472b3f6fca9136ec03b6b02593f969aac87af54cf4",
+  "dirtyEntryCount": 26,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "dcopy1.log",
+      "bytes": 2376,
+      "sha256": "2135e3d11218ec491c6d0a97c1edbecace3d4fc52778392f75ef4074dd425207"
+    },
+    {
+      "name": "result.json",
+      "bytes": 4631,
+      "sha256": "a2f1c90e341a3d079d8cebf49e1786bad55de7ce3207a0b29e92356bf6bb6d93"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}
