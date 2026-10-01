@@ -675,3 +675,19 @@ record. The rule against passing prose through a shell argument already existed,
 occurrences, and I broke it again while documenting a different recording defect.
 
 Amended from a file. The lesson is unchanged and apparently needs a mechanism rather than a rule.
+
+## Hazard 17 — AN EDITOR SILENTLY CONVERTING A WHOLE FILE'S LINE ENDINGS — RULE ONLY
+
+Occurrence 1, 2026-10-01, FG-3 ADMISSION. One exact-string edit to server/agent.js (an LF file, 6,672
+lines) left the WORKING COPY with 6,672 CRs: the editing tool rewrote every line ending as CR LF. git
+normalised the commit back to LF (the warning "CRLF will be replaced by LF" was the only signal), so
+the repository was never wrong - but for one commit window the file on disk, the file the running hub
+loads and the file the next edit would read were all CR LF, and `git status` reported CLEAN because
+normalisation hid the difference. Found only because the warning was read rather than scrolled past,
+then measured: CR count working copy vs `git show HEAD:` (6672 vs 0). Repaired by rewriting CR LF to
+LF and proving `git diff --quiet`.
+
+Rule: after any tool edit of a server/*.js file, count CRs in the working copy against HEAD before
+running anything that loads it, and never trust `git status` to show an EOL-only difference.
+Same family as hazard 1 (an apparatus rewriting bytes it was not asked to touch) and the autocrlf
+restore-not-byte-exact finding of GOVERNED-UI.
