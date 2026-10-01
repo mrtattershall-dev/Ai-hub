@@ -11544,3 +11544,9 @@ before D-COPY uses cid1 as its oracle. If you are the other session: read D-ID-1
 writing to any of the claimed files.
 
 Claim released 2026-10-01 05:52 CDT — D-ID reconcile and D-COPY committed. server/batch.js, server/cid1.mjs, server/candidateIdentity.mjs FREE.
+
+## CLAIM 2026-10-01 06:10 CDT — candidate-0 — D-CONS
+Claimed by: Claude (cid1 / D-COPY session). Files:
+    CLAIMED   server/evaluator.js
+    NEW       server/snapshotCopy.mjs, server/dcons1.probe.mjs, legasus/screen/D-CONS-1_*
+Do not edit evaluator.js until this claim is released.
