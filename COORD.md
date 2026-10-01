@@ -11613,3 +11613,11 @@ T2/T3/T4 measured through the real paths (seam, grep-guarded); T5b UNMEASURABLE 
 IDENTITY_DRIFT policy frozen (no halt, loud event). Regression 7/9 unrepaired -> 17/0.
 
 Claim released 2026-10-01 08:53 CDT — FG-1..FG-4 committed (last 84732083); FG-5 RECEIPT frozen (b965558e) with its probe committed UNRUN. server/verifyProject.js and the agent.js finish-gate region FREE. Session stopped at its usage limit.
+
+## CLAIM 2026-10-01 09:45 CDT — candidate-0 — FG-5 RECEIPT (resumed)
+Claimed by: Claude (finish-gate session). Files:
+    CLAIMED   server/finishVerdicts.mjs, server/runIndex.mjs, training-data/factory/tochat.mjs,
+              server/verifyProject.js, server/agent.js ONLY branch 4 (~4634-4700), saveTrace (~3792) and the
+              run-index row writer (~3700-3716)
+    NEW       legasus/screen/FG-5-RECEIPT_RESULT.md
+Frozen at b965558e; probe 37a41cbd runs BEFORE first, unchanged. Do not edit the claimed files until released.
