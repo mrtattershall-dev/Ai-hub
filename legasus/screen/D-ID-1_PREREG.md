@@ -94,3 +94,83 @@ This is the definition and its tests. Wiring the identity into evaluator.js, acc
 journal, and repairing the batch.js copy filter, are separate steps, each with its own controls.
 The receipt fields keep their old names until a migration is designed; D stays unrepaired until
 D-ID-1 passes.
+
+## Amendment 1 - 2026-10-01 - before the regression suite exists (tatte's corrections)
+
+### Responsibility boundaries. Every result is reported against ONE of these, never as a total.
+
+    finding                                        boundary                  property tag
+    same snapshot, different identity              identity construction     INVARIANCE
+    different snapshot, same identity              identity construction     FIDELITY
+    readable candidate receives no identity        identity construction     AVAILABILITY
+    unrepresentable candidate receives an identity identity construction     REPRESENTABILITY
+    baseline missing candidate files               WORKSPACE CONSTRUCTION    PRESERVATION
+    identity changes during evaluation, undetected evaluation consistency    CONSISTENCY
+    receipt names a different snapshot             receipt binding           BINDING
+
+M17 is re-tagged PRESERVATION - a WORKSPACE-construction property. A correct cid1 reporting that
+the baseline differs from the candidate is the identity working, not failing. cid1 is NEVER
+weakened to absorb the copy defect; the copy is repaired on its own counterexample.
+
+### M17 compares SNAPSHOTS, not recorded trees
+
+M17 runs the real batch.js copy (runBatch, chain on) on a candidate holding .gitignore,
+.gitattributes and .github/, then compares the evaluated workspace with .accepted-baseline - and
+with the next task's starting directory - using a direct snapshot comparison oracle (below), not
+git trees and not any identity under test.
+
+### Symlinks: which object (DECIDED by this amendment)
+
+cid1 identifies the LINK ITSELF: its stored target text as returned by readlink, never followed.
+Following a link and hashing its destination identifies a different object (the destination
+belongs to whatever the link points at, possibly outside the candidate). Consequences, frozen:
+retargeting a link -> DIFFERENT; changing the destination's bytes while the link text is unchanged
+-> SAME for the link entry (the destination, if inside the root, is its own entry); a dangling link
+has an identity. On this machine creating a symlink may need privilege: if it cannot be created,
+M13 is NOT_RUNNABLE, never passed.
+
+### Two rows added, versioned by addition
+
+    M18 CONSISTENCY  the candidate is modified from the host WHILE a check runs  -> EVALUATION_ERROR
+    M19 BINDING      a check prints what it saw; the receipt's named snapshot must contain
+                     exactly those bytes (uncommitted change, own repo)           -> receipt matches
+
+### Concurrency limitation, stated like B's TOCTOU bound
+
+The before/after comparison detects a change ACROSS the evaluation interval. It does not make the
+snapshot atomic: a file that changes and changes back between the two traversals, or a write that
+lands between two entries of ONE traversal, is not detected. The read-only mount prevents the CHECK
+from writing; it does not prevent the host. Atomic capture (copy-then-evaluate, or a filesystem
+snapshot) is a separate design question, not claimed by cid1.
+
+### The comparison oracle (test apparatus, deliberately NOT cid1)
+
+Pairwise comparison of two directories: the entry set (exact-.git-component exclusion, lstat type,
+readlink text for links, exact bytes for files) compared directly, entry by entry, with no digest
+and no canonical form. It establishes each row's PRECONDITION - that the two snapshots really are
+the same, or really differ - so no row can pass or fail vacuously. Its own controls: a copy compares
+SAME, a one-byte change compares DIFFERENT.
+
+### How the CURRENT identity is measured
+
+Through the shipped path: `evaluate(dir, trivial task).candidateTree`, null = UNAVAILABLE. Each
+row runs in the shape(s) where it is meaningful: OWN (the candidate has its own committed repo, the
+production shape) and BARE (no own .git, inside a parent repo). A BARE identity equal to the
+enclosing repo's HEAD tree is flagged NAMES_PARENT - a row that "holds" that way holds vacuously.
+
+### Outcomes per row and shape
+
+    HOLDS / VIOLATED (property tag) / HOLDS_VACUOUSLY / NOT_RUNNABLE / APPARATUS_FAULT
+The milestone is NOT 17/17 green: it is a preserved record of exactly where the old identity
+violates the contract, sealed through EH1, compared against the predictions above.
+
+### Acceptance criteria for the EVENTUAL repair (frozen now, judged later)
+
+    1 every readable, representable candidate receives an identity
+    2 identical snapshots -> identical identities, regardless of repository context
+    3 every included content or path mutation changes the identity
+    4 a snapshot changed during evaluation -> EVALUATION_ERROR
+    5 the receipt identifies the snapshot actually checked
+    6 the baseline copy preserves the included snapshot          (workspace construction)
+    7 existing consumers remain green
+    8 the D-PROP-1 and D'-1 counterexamples REVERSE with their inputs unchanged
