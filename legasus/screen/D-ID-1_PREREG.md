@@ -201,7 +201,7 @@ Every variable-length field is length-prefixed, so no filename can forge a bound
 ### Representability, reinterpreted (tatte)
 
 Fail closed on what cid1 CANNOT FAITHFULLY NAME - not on names that look strange. On Windows, cid1
-traverses with the `\?\` path form, which addresses names exactly (no trailing-dot or
+traverses with the `\\?\` path form, which addresses names exactly (no trailing-dot or
 trailing-space stripping). A name that can be enumerated, read and encoded exactly is AVAILABLE.
 REFUSED (UNAVAILABLE) only when:
     - a name or link target is not well-formed Unicode (a lone surrogate cannot be encoded to UTF-8
