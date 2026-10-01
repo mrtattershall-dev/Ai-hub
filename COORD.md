@@ -11531,3 +11531,14 @@ STEP5_AUTHORITY_CONTINUITY_PREREG.md:160 still says the quiet part: "It does not
 enabling the flag anywhere." 0C is the ONLY step that may change whether bytes land.
 
 P6 candidate (b) is NOT claimed and NOT implemented here. It stays frozen.
+
+## CLAIM 2026-10-01 05:36 CDT — candidate-0 — D-ID reconcile, then D-COPY
+Claimed by: Claude (D-CONSUME-1 / cid1.mjs session). Files:
+    CLAIMED   server/batch.js (D-COPY, after the reconcile)
+    CLAIMED   server/cid1.mjs, server/candidateIdentity.mjs (reconcile only: one survives, the other is
+              recorded as superseded, NEITHER deleted)
+    NEW       legasus/screen/D-ID-1_RECONCILE.md, legasus/screen/D-COPY-1_PREREG.md, server/dcopy1.*
+Why: two cid1 implementations landed on candidate-0 within 9 minutes (3e7db019/0c1e8571 and 8a062953)
+with contradicting measurements of lstat through the extended-length prefix. Settling by measurement
+before D-COPY uses cid1 as its oracle. If you are the other session: read D-ID-1_RECONCILE.md before
+writing to any of the claimed files.
