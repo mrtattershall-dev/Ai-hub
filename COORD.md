@@ -11558,3 +11558,5 @@ Claimed by: Claude (cid1 / D-COPY / D-CONS session). Files:
     CLAIMED   server/evaluator.js, server/acceptance.js, server/evaluator.test.mjs
     NEW       server/dbind1.probe.mjs, legasus/screen/D-BIND-1_*
 Do not edit the claimed files until this claim is released.
+
+Claim released 2026-10-01 07:35 CDT — D-BIND committed. server/evaluator.js, server/acceptance.js, server/evaluator.test.mjs FREE.
