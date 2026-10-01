@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T12-27-01-499Z__D-BIND-1-BEFORE__8725480d",
+  "label": "D-BIND-1-BEFORE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "D-BIND-1 before the receipt repair.",
+  "command": "DBIND_PHASE=before node server/dbind1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T12:27:01.501Z",
+  "endedAt": "2026-10-01T12:27:38.278Z",
+  "exitStatus": 0,
+  "commit": "c24cde0dd8cfbb86df8ec63444670f98b4386c72",
+  "worktreeClean": false,
+  "worktreeDiffHash": "6842576b0a935b3ce5bf9503c7441c207b5b8bbf8e943d76664a2925eb0d19cc",
+  "dirtyEntryCount": 32,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "dbind1.log",
+      "bytes": 1594,
+      "sha256": "b589461fa2140c49656af95e4483b3c593a689db1be82b49cd40d7fc6ea9b873"
+    },
+    {
+      "name": "result.json",
+      "bytes": 4776,
+      "sha256": "8a067a4149e0f3263f64a941a32102799a4df248eaccd6be56400cc334724cc4"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

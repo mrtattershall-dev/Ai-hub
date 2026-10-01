@@ -1,0 +1,128 @@
+{
+  "phase": "before",
+  "rows": [
+    {
+      "id": "B0",
+      "label": "ordinary PASS, own repo",
+      "outcome": "VIOLATION: candidateTree ≠ subject",
+      "verdict": "PASS",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "candidateTree": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24"
+    },
+    {
+      "id": "B1",
+      "label": "D-PROP-1 reversed: receipt names the judged bytes",
+      "outcome": "VIOLATION: receipt names the tree never judged (git)",
+      "receipt": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f",
+      "subject": "cid1:0af2f66e863f8857aaf8e6df0ff1104e81275b5c810810187afd2a245be9db2b",
+      "idK": "cid1:0af2f66e863f8857aaf8e6df0ff1104e81275b5c810810187afd2a245be9db2b",
+      "idC": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "note": "receipt 8688fd06b709c7f0e2  K cid1:0af2f66e863f8  C cid1:3fbf1ecb8705c"
+    },
+    {
+      "id": "B1i",
+      "label": "ignored file present, all committed",
+      "outcome": "VIOLATION: receipt excludes the ignored file (git view)",
+      "receipt": "d0623c0aeeefd0f9a1bf4b4ef42dec0da3eca35c",
+      "idWith": "cid1:2464e5606eac51578349dafd0fc8bc29277328d5a8badc31e9ec0f1e1da313c4"
+    },
+    {
+      "id": "B2",
+      "label": "D'-1 A5 reversed: 4 parents, one receipt",
+      "outcome": "VIOLATION: 3 distinct receipts; verdicts PASS/PASS/EVALUATION_ERROR/EVALUATION_ERROR",
+      "receipts": {
+        "P1": {
+          "receipt": "f83aecd74c46c87e3bee89d2c822282d54e0e44b",
+          "verdict": "PASS"
+        },
+        "P2": {
+          "receipt": "e948c2cda9cd06550e96ff360a55b84f82c794ca",
+          "verdict": "PASS"
+        },
+        "P0": {
+          "receipt": null,
+          "verdict": "EVALUATION_ERROR"
+        },
+        "Pc": {
+          "receipt": null,
+          "verdict": "EVALUATION_ERROR"
+        }
+      },
+      "note": "P1:f83aecd74c46c87e3b/PASS P2:e948c2cda9cd06550e/PASS P0:null/EVALUATION_ERROR Pc:null/EVALUATION_ERROR"
+    },
+    {
+      "id": "B3",
+      "label": "HEAD moved, snapshot unchanged",
+      "outcome": "VIOLATION: receipt follows HEAD",
+      "r1": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f",
+      "r2": "84eb21859a663e2d8c22fe89c402daf88fee885f",
+      "note": "receipts 8688fd06b709c7f0e2 vs 84eb21859a663e2d8c"
+    },
+    {
+      "id": "B4",
+      "label": "live mutated after the verdict",
+      "outcome": "VIOLATION: candidateTree ≠ subject",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "candidateTree": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f",
+      "liveNow": "cid1:9f42936eae537101737f6e6b1250be39c612c2d73bd715045e495d68492230d2"
+    },
+    {
+      "id": "B5",
+      "label": "unavailable subject, git HEAD present",
+      "outcome": "VIOLATION: FELL BACK TO GIT: candidateTree = HEAD^{tree}",
+      "verdict": "EVALUATION_ERROR",
+      "subject": null,
+      "candidateTree": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f",
+      "headTree": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f"
+    },
+    {
+      "id": "B6",
+      "label": "consumers transport the subject to the baseline",
+      "outcome": "VIOLATION: acceptance carries no subject",
+      "verdictSubject": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "accSubject": null,
+      "accTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+      "survivingTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+      "survivingSubject": null,
+      "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+      "baselineCid1": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "note": "baselineTree 0c365d421742308ea5  cid1(baseline) cid1:1e9cd50323fd4"
+    },
+    {
+      "id": "B7",
+      "label": "D-CONSUME-1 finding 1: audit of an uncommitted restore",
+      "outcome": "VIOLATION: 1 label disagreement(s): a correct restore reads as wrong",
+      "labelDisagreements": 1,
+      "t2": {
+        "disposition": "RESTORED",
+        "treesEqual": true,
+        "labelAgrees": false
+      }
+    },
+    {
+      "id": "K8",
+      "label": "mutation between verdict and commit",
+      "outcome": "RETAINED C1 with receipt.subject = C0 (red: commit boundary)",
+      "receipt": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "live": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec"
+    }
+  ],
+  "verdict": {
+    "mustFire": true,
+    "violated": [
+      "B0",
+      "B1",
+      "B1i",
+      "B2",
+      "B3",
+      "B4",
+      "B5",
+      "B6",
+      "B7"
+    ],
+    "b7": 1,
+    "k8Red": true
+  }
+}

@@ -311,9 +311,21 @@ try {
     writeFileSync(join(d, 'subject.js'), 'module.exports={probe:()=>"UNCOMMITTED WORK"};\n');
     const v = await evaluate(d, { id: 'm19', requested: { script: 'cat /candidate/subject.js' }, protected: { script: 'true' } });
     const seen = String(v.requested?.out || '').trim();
-    const named = v.candidateTree ? git(d, ['show', `${v.candidateTree}:subject.js`]).trim() : null;
-    record('M19', 'BINDING', 'OWN uncommitted', { outcome: !seen ? 'APPARATUS_FAULT' : named === seen ? 'HOLDS' : 'VIOLATED (BINDING)', idA: v.candidateTree,
-      note: `check saw ${JSON.stringify(seen.slice(0, 48))}; receipt names ${JSON.stringify(String(named).slice(0, 48))}` }); }
+    // Amendment 1's oracle: "the receipt's named snapshot must contain exactly those bytes". Run
+    // 8fdad31c looked the receipt up with `git show <receipt>:subject.js`, which assumes the receipt
+    // is a git tree - after D-BIND-1 it is a cid1 subject, so that lookup read ERR and the row stayed
+    // red for an apparatus reason. The snapshot the receipt names is now REBUILT from the bytes the
+    // check printed (every other file as the candidate had it) and identified independently; the
+    // receipt must equal that identity. A git-tree receipt fails this the same way it failed before.
+    const twin = join(mk('M19twin'), 'c'); write(twin, { ...BASE, 'subject.js': seen + '\n' });
+    const namedId = cid1(twin); const receipt = v.candidateTree ?? null;
+    const binds = !!receipt && namedId.ok && receipt === namedId.id;
+    // NEGATIVE CONTROL for the oracle itself: a twin holding the COMMITTED bytes (what the old git
+    // receipt named) must NOT match. If it did, the comparison would be vacuous.
+    const wrongTwin = join(mk('M19wrong'), 'c'); write(wrongTwin, BASE); const wrongId = cid1(wrongTwin);
+    const oracleDiscriminates = wrongId.ok && namedId.ok && wrongId.id !== namedId.id && receipt !== wrongId.id;
+    record('M19', 'BINDING', 'OWN uncommitted', { outcome: !seen ? 'APPARATUS_FAULT' : !oracleDiscriminates ? 'APPARATUS_FAULT (oracle cannot discriminate)' : binds ? 'HOLDS' : 'VIOLATED (BINDING)', idA: receipt, namedId: namedId.ok ? namedId.id : null, committedTwinId: wrongId.ok ? wrongId.id : null,
+      note: `check saw ${JSON.stringify(seen.slice(0, 48))}; receipt ${String(receipt).slice(0, 18)}; identity of a snapshot holding those bytes ${String(namedId.ok ? namedId.id : namedId.reason).slice(0, 18)}` }); }
 
   // ── predictions frozen in the prereg, scored ─────────────────────────────────────────────────
   // "M1, M5 fail in the no-.git shape; M3, M4 fail UNAVAILABLE; M7, M8, M9, M10, M13 fail when

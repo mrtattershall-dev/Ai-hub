@@ -56,13 +56,12 @@ const dockerRaw = async (args, timeoutMs) => {
   }
 };
 
-/** The tree id of the candidate being judged, so a verdict names exactly what it saw. */
-async function candidateTree(workspace) {
-  try {
-    const { stdout } = await exec('git', ['-C', workspace, 'rev-parse', 'HEAD^{tree}'], { encoding: 'utf8', windowsHide: true });
-    return String(stdout).trim();
-  } catch { return null; }
-}
+// D-BIND-1 (legasus/screen/D-BIND-1_PREREG.md): the receipt no longer consults git. There used to be a
+// candidateTree() here - `git rev-parse HEAD^{tree}` - and it was the only place an identity was
+// COMPUTED for a receipt. It named the committed tree while the working bytes were judged
+// (D-PROP-1), named the ENCLOSING repository's tree when the candidate had no .git of its own
+// (D'-1 A5), and was used as a fallback when the real subject was unavailable (D-BIND-1 B5). The
+// receipt is now the subject D-CONS established, transported unchanged.
 
 /**
  * Run ONE check script against the candidate, in the worker.
@@ -130,10 +129,16 @@ async function runCheck(workspace, checkDir, script, { timeoutSec = 120, image =
 // changed nothing and the check quietly ran normally - an inert probe reporting a real PASS,
 // which is the same shape as every other apparatus artifact recorded in this project.
 export async function evaluate(workspace, task, { timeoutSec = 120, image = WORKER_IMAGE } = {}) {
-  const tree = await candidateTree(workspace);
-  const base = { task: task.id, candidateTree: tree, at: new Date().toISOString(), image };
-  if (!tree) {
-    return { ...base, verdict: VERDICT.EVALUATION_ERROR, reason: 'the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict' };
+  // THE SUBJECT, computed once at admission. `subject` is the receipt; `candidateTree` is a DEPRECATED
+  // ALIAS equal to it by construction, kept so acceptance.js, batch.js, governance.js and the audit
+  // readers carry the subject unchanged under the name they already transport. Nothing downstream may
+  // recompute it. When cid1 refuses, BOTH are null and the verdict is EVALUATION_ERROR - never a git
+  // fallback: a receipt that names a different object is worse than no receipt.
+  const subject = cid1(workspace);
+  const C0 = subject.ok ? subject.id : null;
+  const base = { task: task.id, subject: C0, candidateTree: C0, at: new Date().toISOString(), image };
+  if (!C0) {
+    return { ...base, verdict: VERDICT.EVALUATION_ERROR, reason: `the candidate snapshot could not be identified (${subject.reason}) - a judgment needs a subject` };
   }
 
   // D-CONS-1 (legasus/screen/D-CONS-1_PREREG.md, 9165f9e4): IMMUTABLE JUDGMENT.
@@ -144,14 +149,7 @@ export async function evaluate(workspace, task, { timeoutSec = 120, image = WORK
   // Endpoint hashing cannot see that; construction can. So the checks run against a PRIVATE
   // snapshot built with D-COPY's rule and verified to be C0 - an object nothing else writes to.
   //
-  // C0 is the SUBJECT of the verdict. The candidateTree receipt above is unchanged in this step:
-  // what the receipt names is D-BIND's boundary, not this one.
-  const subject = cid1(workspace);
-  if (!subject.ok) {
-    return { ...base, subject: null, verdict: VERDICT.EVALUATION_ERROR, reason: `the candidate snapshot could not be identified (${subject.reason}) - a judgment needs a subject` };
-  }
-  const C0 = subject.id;
-  base.subject = C0;
+  // C0 is the SUBJECT of the verdict (computed above, at admission; since D-BIND-1 it is also the receipt).
   const snapRoot = mkdtempSync(join(tmpdir(), 'legasus-judged-'));
   const judged = join(snapRoot, 'candidate');
   // Materialise the checks OUTSIDE the workspace, fresh each time.

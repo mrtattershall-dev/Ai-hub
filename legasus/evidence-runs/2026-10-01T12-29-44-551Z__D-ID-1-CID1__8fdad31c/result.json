@@ -1,0 +1,563 @@
+{
+  "prereg": [
+    "1c3a2b1c",
+    "3e14f827"
+  ],
+  "image": "sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3",
+  "controls": {
+    "oracleCopySame": true,
+    "oracleOneByteDifferent": true,
+    "readiness": true
+  },
+  "rows": [
+    {
+      "row": "M1",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE in P1 vs P2",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M1",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN in P1 vs P2",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M2",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN moved",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M2",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE moved in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M3",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN vs BARE no-repo",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M4",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN vs BARE commitless",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M5",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE parent HEAD moved",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be"
+    },
+    {
+      "row": "M5",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN parent HEAD moved",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be"
+    },
+    {
+      "row": "M6",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE sibling modified",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false
+    },
+    {
+      "row": "M6",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN sibling modified",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false
+    },
+    {
+      "row": "M7",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:c661bc0667fd3f8b17e218f947b374945bda00859a099582d841c4d9f5bc8549",
+      "snapshotDiff": [
+        "~subject.js"
+      ],
+      "note": "snapshot ~subject.js"
+    },
+    {
+      "row": "M7",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:c661bc0667fd3f8b17e218f947b374945bda00859a099582d841c4d9f5bc8549",
+      "snapshotDiff": [
+        "~subject.js"
+      ],
+      "note": "snapshot ~subject.js"
+    },
+    {
+      "row": "M7",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:c661bc0667fd3f8b17e218f947b374945bda00859a099582d841c4d9f5bc8549",
+      "snapshotDiff": [
+        "~subject.js"
+      ],
+      "note": "snapshot ~subject.js"
+    },
+    {
+      "row": "M8",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:a164028464907ae5d911cd4b7ae97795adc7043d269f4d5404473c1af9cd3785",
+      "snapshotDiff": [
+        "-keep.txt",
+        "+added.js"
+      ],
+      "note": "snapshot -keep.txt,+added.js"
+    },
+    {
+      "row": "M8",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:a164028464907ae5d911cd4b7ae97795adc7043d269f4d5404473c1af9cd3785",
+      "snapshotDiff": [
+        "-keep.txt",
+        "+added.js"
+      ],
+      "note": "snapshot -keep.txt,+added.js"
+    },
+    {
+      "row": "M8",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:a164028464907ae5d911cd4b7ae97795adc7043d269f4d5404473c1af9cd3785",
+      "snapshotDiff": [
+        "-keep.txt",
+        "+added.js"
+      ],
+      "note": "snapshot -keep.txt,+added.js"
+    },
+    {
+      "row": "M9",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:f3e05ffe9738415af3f0fcb832a3d8d689b3194fcb02204595fdd2781fbb2c6d",
+      "snapshotDiff": [
+        "-lib/util.js",
+        "+lib/util2.js"
+      ],
+      "note": "snapshot -lib/util.js,+lib/util2.js"
+    },
+    {
+      "row": "M9",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:f3e05ffe9738415af3f0fcb832a3d8d689b3194fcb02204595fdd2781fbb2c6d",
+      "snapshotDiff": [
+        "-lib/util.js",
+        "+lib/util2.js"
+      ],
+      "note": "snapshot -lib/util.js,+lib/util2.js"
+    },
+    {
+      "row": "M9",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:f3e05ffe9738415af3f0fcb832a3d8d689b3194fcb02204595fdd2781fbb2c6d",
+      "snapshotDiff": [
+        "-lib/util.js",
+        "+lib/util2.js"
+      ],
+      "note": "snapshot -lib/util.js,+lib/util2.js"
+    },
+    {
+      "row": "M10",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:56e029bfdb0b52654c505271d2fbe1edabcbb12a781ce8c4095d8c69eb55c225",
+      "snapshotDiff": [
+        "~keep.txt"
+      ],
+      "note": "snapshot ~keep.txt"
+    },
+    {
+      "row": "M10",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:56e029bfdb0b52654c505271d2fbe1edabcbb12a781ce8c4095d8c69eb55c225",
+      "snapshotDiff": [
+        "~keep.txt"
+      ],
+      "note": "snapshot ~keep.txt"
+    },
+    {
+      "row": "M10",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:56e029bfdb0b52654c505271d2fbe1edabcbb12a781ce8c4095d8c69eb55c225",
+      "snapshotDiff": [
+        "~keep.txt"
+      ],
+      "note": "snapshot ~keep.txt"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:e8bdb2734378e997edeac409304f0592346c09087b2d216d753ff00975e317e8",
+      "snapshotDiff": [
+        "+.gitattributes",
+        "+.github/workflows/ci.yml",
+        "+.gitignore"
+      ],
+      "note": "snapshot +.gitattributes,+.github/workflows/ci.yml,+.gitignore"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:e8bdb2734378e997edeac409304f0592346c09087b2d216d753ff00975e317e8",
+      "snapshotDiff": [
+        "+.gitattributes",
+        "+.github/workflows/ci.yml",
+        "+.gitignore"
+      ],
+      "note": "snapshot +.gitattributes,+.github/workflows/ci.yml,+.gitignore"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:e8bdb2734378e997edeac409304f0592346c09087b2d216d753ff00975e317e8",
+      "snapshotDiff": [
+        "+.gitattributes",
+        "+.github/workflows/ci.yml",
+        "+.gitignore"
+      ],
+      "note": "snapshot +.gitattributes,+.github/workflows/ci.yml,+.gitignore"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN ignored, committed",
+      "outcome": "HOLDS",
+      "idA": "cid1:7f1b57e48d59dd2aaa43947319d08b61d40f23c97a146de801ae0c99a2ef8d9f",
+      "idB": "cid1:f761068954aac0245543c0a3e4cccd6cca05ae292df9b23cd54f01c2238681ab",
+      "snapshotDiff": [
+        "+debug.log"
+      ],
+      "note": "snapshot +debug.log"
+    },
+    {
+      "row": "M12",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN .git internals",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be"
+    },
+    {
+      "row": "M13",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN symlink",
+      "outcome": "NOT_RUNNABLE",
+      "note": "UNMEASURED ON WINDOWS - requires a symlink-capable environment (EPERM)"
+    },
+    {
+      "row": "M14",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN empty dir (declared out)",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be"
+    },
+    {
+      "row": "M14",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "exec bit",
+      "outcome": "NOT_RUNNABLE",
+      "note": "Windows has no exec bit to flip; declared blind spot"
+    },
+    {
+      "row": "M15a",
+      "tag": "REPRESENTABILITY",
+      "boundary": "identity construction",
+      "shape": "OWN odd. + worker view",
+      "outcome": "HOLDS",
+      "idA": "cid1:a4c7a45ac4072371c8e8c6af37ef69ef60bc769ad637121daf4de6bbfaf3a3ef",
+      "host": [
+        "keep.txt",
+        "lib/util.js",
+        "odd.",
+        "subject.js"
+      ],
+      "worker": [
+        "keep.txt",
+        "lib/util.js",
+        "odd.",
+        "subject.js"
+      ],
+      "note": "cid1 named 4 entries; host [keep.txt,lib/util.js,odd.,subject.js] worker [keep.txt,lib/util.js,odd.,subject.js]"
+    },
+    {
+      "row": "M15b",
+      "tag": "REPRESENTABILITY",
+      "boundary": "identity construction",
+      "shape": "{odd} vs {odd, odd.}",
+      "outcome": "HOLDS",
+      "idA": "cid1:fdcb0b552390d4993e1ff7886695ee7a4c6b5ceed334fbfbe9e1a8672c965a92",
+      "idB": "cid1:71ff2d55200916648c564b408655f4849ccd71a3f87f97c2b976a5c076e8d8bb",
+      "note": "snapshot +odd."
+    },
+    {
+      "row": "M15c",
+      "tag": "REPRESENTABILITY",
+      "boundary": "identity construction",
+      "shape": "lone surrogate alone",
+      "outcome": "HOLDS",
+      "idA": null,
+      "onDisk": [
+        "0062 0061 0064 D800 006E 0061 006D 0065",
+        "006F 006B 002E 0074 0078 0074"
+      ],
+      "note": "on disk [0062 0061 0064 D800 006E 0061 006D 0065 | 006F 006B 002E 0074 0078 0074]; Node readdir [\"bad���name\"]; cid1 refused: lstat failed: ENOENT"
+    },
+    {
+      "row": "M15c",
+      "tag": "REPRESENTABILITY",
+      "boundary": "identity construction",
+      "shape": "lone + its U+FFFD lookalike",
+      "outcome": "HOLDS",
+      "idA": null,
+      "onDisk": [
+        "0062 0061 0064 D800 006E 0061 006D 0065",
+        "0062 0061 0064 FFFD FFFD FFFD 006E 0061 006D 0065",
+        "006F 006B 002E 0074 0078 0074"
+      ],
+      "note": "on disk [0062 0061 0064 D800 006E 0061 006D 0065 | 0062 0061 0064 FFFD FFFD FFFD 006E 0061 006D 0065 | 006F 006B 002E 0074 0078 0074]; Node readdir [\"bad���name\",\"bad���name\"]; cid1 refused: two entries share one path encoding"
+    },
+    {
+      "row": "M16",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN vs BARE in P1",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "idB": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M17",
+      "tag": "PRESERVATION",
+      "boundary": "WORKSPACE construction",
+      "shape": "candidate vs baseline",
+      "outcome": "HOLDS",
+      "snapshotDiff": [],
+      "note": "t1=RETAIN missing/changed: - | cid1 candidate 05983b2c8d24 vs baseline 05983b2c8d24: SAME (snapshots equal per the oracle)"
+    },
+    {
+      "row": "M17",
+      "tag": "PRESERVATION",
+      "boundary": "WORKSPACE construction",
+      "shape": "candidate vs t2 start",
+      "outcome": "HOLDS",
+      "snapshotDiff": [],
+      "note": "-"
+    },
+    {
+      "row": "M18",
+      "tag": "CONSISTENCY",
+      "boundary": "evaluation consistency",
+      "shape": "OWN host write mid-check",
+      "outcome": "HOLDS",
+      "idA": "cid1:b090d1480f9c95a51e7cfdde2a2702bc5e662786db5918400c2b67c08c4398be",
+      "note": "mutated at 4021ms of 9822ms; the check printed neither | cid1 before/after DIFFER (since D-CONS-1 the evaluator consumes this: the verdict becomes EVALUATION_ERROR; the check output moves to auditOfSubject)"
+    },
+    {
+      "row": "M19",
+      "tag": "BINDING",
+      "boundary": "receipt binding",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (BINDING)",
+      "idA": "cid1:3fdb3141023adb1da5be1f55ca6103c8b9e1128fca4af61d5596a3cdd57a3c4d",
+      "note": "check saw \"module.exports={probe:()=>\\\"UNCOMMITTED WORK\\\"};\"; receipt names \"ERR:Command failed: git -C C:\\\\Users\\\\tatte\\\\AppDat\""
+    }
+  ],
+  "predictions": [
+    {
+      "prediction": "M3 holds (AVAILABILITY)",
+      "correct": true
+    },
+    {
+      "prediction": "M4 holds (AVAILABILITY)",
+      "correct": true
+    },
+    {
+      "prediction": "M1 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M2 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M5 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M6 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M12 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M14 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M16 holds genuinely, every measured shape",
+      "correct": true
+    },
+    {
+      "prediction": "M7 holds, every shape",
+      "correct": true
+    },
+    {
+      "prediction": "M8 holds, every shape",
+      "correct": true
+    },
+    {
+      "prediction": "M9 holds, every shape",
+      "correct": true
+    },
+    {
+      "prediction": "M10 holds, every shape",
+      "correct": true
+    },
+    {
+      "prediction": "M11 holds, every shape",
+      "correct": true
+    },
+    {
+      "prediction": "M15a odd. AVAILABLE (worker listing: no prediction)",
+      "correct": true
+    },
+    {
+      "prediction": "M15b holds (no collapse)",
+      "correct": true
+    },
+    {
+      "prediction": "M15c UNAVAILABLE",
+      "correct": true
+    },
+    {
+      "prediction": "M13 unmeasured on Windows",
+      "correct": true
+    },
+    {
+      "prediction": "M17 STAYS RED",
+      "correct": false
+    },
+    {
+      "prediction": "M18 STAYS RED",
+      "correct": false
+    },
+    {
+      "prediction": "M19 STAYS RED",
+      "correct": true
+    }
+  ]
+}

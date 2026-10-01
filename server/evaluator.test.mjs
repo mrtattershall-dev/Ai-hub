@@ -47,7 +47,8 @@ try {
   const r1 = await evaluate(good, TASK);
   say(r1.verdict === VERDICT.PASS, `PASS (${r1.verdict})`);
   say(r1.requested.verdict === VERDICT.PASS && r1.protected.verdict === VERDICT.PASS, 'both parts reported SEPARATELY, both PASS');
-  say(/^[0-9a-f]{40}$/.test(r1.candidateTree || ''), `the verdict names the exact candidate tree it judged (${String(r1.candidateTree).slice(0, 8)})`);
+  // D-BIND-1: the receipt is the cid1 subject the immutable judgment was made about, not a git tree.
+  say(/^cid1:[0-9a-f]{64}$/.test(r1.subject || '') && r1.candidateTree === r1.subject, `the verdict names the exact snapshot it judged (${String(r1.subject).slice(0, 13)}), and the legacy field carries the same value`);
 
   // ── 2. the new behaviour is missing -> FAIL, and only the requested part fails ──
   console.log('\n=== 2. requested behaviour absent ===');
@@ -90,13 +91,17 @@ try {
   say(r5.verdict === VERDICT.EVALUATION_ERROR, `an unavailable worker yields EVALUATION_ERROR, NOT FAIL (${r5.verdict})`);
   say(r5.verdict !== VERDICT.FAIL, 'this candidate is CORRECT - scoring it FAIL would have been evidence about the model produced by a broken instrument');
   say(/could not be run/.test(r5.requested?.reason || ''), 'and the reason names an apparatus failure rather than a wrong answer');
-  // ── 6. a candidate that cannot be identified is not judged ──
+  // ── 6. a verdict must name what it judged - and a repository is not what identifies a candidate ──
+  // Before D-BIND-1 this section asserted that a candidate WITHOUT a git repository is refused. That
+  // encoded the defect: identity came from git, so no repository meant no identity. The frozen contract
+  // (D-ID-1) says every readable candidate has an identity, so the same bytes are judged the same way
+  // with or without a .git - and the receipt is the cid1 subject either way.
   console.log('\n=== 6. a verdict must name what it judged ===');
   const nogit = mkdtempSync(join(tmpdir(), 'nogit-')); dirs.push(nogit);
   writeFileSync(join(nogit, 'lib.js'), DOUBLE, 'utf8');
   const r6 = await evaluate(nogit, TASK);
-  say(r6.verdict === VERDICT.EVALUATION_ERROR, 'an unidentifiable candidate is an EVALUATION_ERROR, not a FAIL');
-  say(/could not be identified/.test(r6.reason || ''), 'and the reason says so');
+  say(r6.verdict !== VERDICT.EVALUATION_ERROR && /^cid1:/.test(r6.subject || ''), `a candidate with no repository is still identified and judged (${r6.verdict}, subject ${String(r6.subject).slice(0, 13)})`);
+  say(r6.candidateTree === r6.subject, 'and its receipt is the subject, not a git tree');
 } finally {
   for (const d of dirs) { try { rmSync(d, { recursive: true, force: true }); } catch { /* best effort */ } }
 }

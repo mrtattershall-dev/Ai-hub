@@ -1,0 +1,117 @@
+{
+  "phase": "after",
+  "rows": [
+    {
+      "id": "B0",
+      "label": "ordinary PASS, own repo",
+      "outcome": "HOLDS",
+      "verdict": "PASS",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "candidateTree": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "C0": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24"
+    },
+    {
+      "id": "B1",
+      "label": "D-PROP-1 reversed: receipt names the judged bytes",
+      "outcome": "HOLDS",
+      "receipt": "cid1:0af2f66e863f8857aaf8e6df0ff1104e81275b5c810810187afd2a245be9db2b",
+      "subject": "cid1:0af2f66e863f8857aaf8e6df0ff1104e81275b5c810810187afd2a245be9db2b",
+      "idK": "cid1:0af2f66e863f8857aaf8e6df0ff1104e81275b5c810810187afd2a245be9db2b",
+      "idC": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "note": "receipt cid1:0af2f66e863f8  K cid1:0af2f66e863f8  C cid1:3fbf1ecb8705c"
+    },
+    {
+      "id": "B1i",
+      "label": "ignored file present, all committed",
+      "outcome": "HOLDS",
+      "receipt": "cid1:2464e5606eac51578349dafd0fc8bc29277328d5a8badc31e9ec0f1e1da313c4",
+      "idWith": "cid1:2464e5606eac51578349dafd0fc8bc29277328d5a8badc31e9ec0f1e1da313c4"
+    },
+    {
+      "id": "B2",
+      "label": "D'-1 A5 reversed: 4 parents, one receipt",
+      "outcome": "HOLDS",
+      "receipts": {
+        "P1": {
+          "receipt": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+          "verdict": "PASS"
+        },
+        "P2": {
+          "receipt": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+          "verdict": "PASS"
+        },
+        "P0": {
+          "receipt": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+          "verdict": "PASS"
+        },
+        "Pc": {
+          "receipt": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+          "verdict": "PASS"
+        }
+      },
+      "note": "P1:cid1:3fbf1ecb8705c/PASS P2:cid1:3fbf1ecb8705c/PASS P0:cid1:3fbf1ecb8705c/PASS Pc:cid1:3fbf1ecb8705c/PASS"
+    },
+    {
+      "id": "B3",
+      "label": "HEAD moved, snapshot unchanged",
+      "outcome": "HOLDS",
+      "r1": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "r2": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "note": "receipts cid1:3fbf1ecb8705c vs cid1:3fbf1ecb8705c"
+    },
+    {
+      "id": "B4",
+      "label": "live mutated after the verdict",
+      "outcome": "HOLDS",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "candidateTree": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "liveNow": "cid1:9f42936eae537101737f6e6b1250be39c612c2d73bd715045e495d68492230d2"
+    },
+    {
+      "id": "B5",
+      "label": "unavailable subject, git HEAD present",
+      "outcome": "HOLDS (closed, no fallback)",
+      "verdict": "EVALUATION_ERROR",
+      "subject": null,
+      "candidateTree": null,
+      "headTree": "8688fd06b709c7f0e2afd1fa25a5ef8de720699f"
+    },
+    {
+      "id": "B6",
+      "label": "consumers transport the subject to the baseline",
+      "outcome": "HOLDS",
+      "verdictSubject": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "accSubject": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "accTree": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "survivingTree": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "survivingSubject": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "baselineTree": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "baselineCid1": "cid1:1e9cd50323fd46f22f2b0f2e07b051fe5bb7c33e486deb2d1fc6d1acd1121b7b",
+      "note": "baselineTree cid1:1e9cd50323fd4  cid1(baseline) cid1:1e9cd50323fd4"
+    },
+    {
+      "id": "B7",
+      "label": "D-CONSUME-1 finding 1: audit of an uncommitted restore",
+      "outcome": "HOLDS (0 disagreements)",
+      "labelDisagreements": 0,
+      "t2": {
+        "disposition": "RESTORED",
+        "treesEqual": false,
+        "labelAgrees": true
+      }
+    },
+    {
+      "id": "K8",
+      "label": "mutation between verdict and commit",
+      "outcome": "RETAINED C1 with receipt.subject = C0 (red: commit boundary)",
+      "receipt": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "subject": "cid1:3fbf1ecb8705c2069e0bf29b04836db5bb693a88f336ec438c9e3b93a1bb9b24",
+      "live": "cid1:52b1eb62d76d6a7c0fae79e34482969907bc763134752acc6dd73bb88c790dec"
+    }
+  ],
+  "verdict": {
+    "allHold": true,
+    "b5": "HOLDS (closed, no fallback)",
+    "k8StillRed": true
+  }
+}

@@ -90,6 +90,7 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
       requested: candidateVerdict.requested?.verdict ?? null,
       protected: candidateVerdict.protected?.verdict ?? null,
       candidateTree: candidateVerdict.candidateTree ?? null,
+      subject: candidateVerdict.subject ?? null,   // D-BIND-1: transported from the verdict, never recomputed here
     },
     disposition: null,
     capturedAt: null,
@@ -129,6 +130,7 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
       requested: after.requested?.verdict ?? null,
       protected: after.protected?.verdict ?? null,
       candidateTree: after.candidateTree ?? null,
+      subject: after.subject ?? null,
     };
     const bytes = await bytesIdentical(ws, startRef);
     out.survivingBytes = bytes.identical ? 'IDENTICAL_TO_START' : `DIFFER: ${[...(bytes.differing || []), ...(bytes.extra || [])].slice(0, 5).join(', ') || bytes.reason}`;
@@ -147,6 +149,7 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
     requested: after.requested?.verdict ?? null,
     protected: after.protected?.verdict ?? null,
     candidateTree: after.candidateTree ?? null,
+    subject: after.subject ?? null,
   };
   if (req === VERDICT.PASS) {
     out.disposition = DISPOSITION.RETAIN;
