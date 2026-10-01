@@ -1,4 +1,7 @@
 /**
+ * SUPERSEDED 2026-10-01 together with candidateIdentity.mjs - see
+ * legasus/screen/D-ID-1_RECONCILE.md. Kept as the record of that implementation's suite.
+ *
  * candidateIdentity.test.mjs - D-ID-1's metamorphic suite, M1..M16.
  *
  *   node server/candidateIdentity.test.mjs

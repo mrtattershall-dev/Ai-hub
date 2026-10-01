@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T10-40-36-834Z__D-ID-1-RECONCILE-R5-POSTHOC__d4b733e5",
+  "label": "D-ID-1-RECONCILE-R5-POSTHOC",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "POST HOC, not frozen: does the R4 lookalike case collapse distinguishable states?",
+  "command": "node server/reconcile1r5.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T10:40:36.836Z",
+  "endedAt": "2026-10-01T10:40:40.080Z",
+  "exitStatus": 0,
+  "commit": "0d4ec46f507968ed33cb3b6b3c4da1171ede9386",
+  "worktreeClean": false,
+  "worktreeDiffHash": "45ead66568713a6b1b359343be2be3710e699eb70aa4e4fb09914ef87ca10d40",
+  "dirtyEntryCount": 28,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "r5.log",
+      "bytes": 658,
+      "sha256": "45c337a81c2923cd6c7b88659714506c388221df169b6aff3ceb57fa6b085957"
+    },
+    {
+      "name": "result.json",
+      "bytes": 928,
+      "sha256": "090edd32e5ecaea17f8263001ec2782dfef90858aa23941b6a50062ff9c6c55d"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

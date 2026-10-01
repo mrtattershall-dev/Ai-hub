@@ -54,3 +54,49 @@ removed from any import path. Its tests and records stay.
 
 Encoding choice (length-prefixed vs NUL-terminated fixed-width) is not a correctness question
 here - both are unambiguous for filesystem input. The survivor's encoding is kept as-is.
+
+## RESULT - measured 2026-10-01 after the freeze above
+
+Evidence (EH1, all SEALED): R1-R3 `1f764685`; R4 cid1.mjs `236ef75c` (existing), R4 candidateIdentity
+`30dea105`; R5 POST HOC `d4b733e5`.
+
+    R1  lstat through the prefix, ordinary file:
+          absolute + backslashes      OK
+          absolute + forward slashes  OK      <- my hypothesis was HALF WRONG: slashes are fine
+          join(prefix + root, name)   OK
+          RELATIVE prefixed path      ENOENT  <- the only construction that fails
+        The C-I rejection ("ENOENT even for an ordinary file") does NOT reproduce for any absolute
+        construction. It reproduces for a relative one; C-I's probe code was not preserved, so the
+        cause of C-I's measurement stays UNCONFIRMED - only the general claim is refuted.
+    R2  `odd.` created through a correct prefix EXISTS: node readdir, PowerShell -LiteralPath and the
+        worker's own `ls -A /candidate` all list it. C-I's premise check never created one.
+    R3  {odd = A, odd. = B}: the ORDINARY read of `odd.` returns B - its own bytes. Node namespaces
+        absolute paths itself, so no trailing-dot stripping occurs. This REFUTES two records:
+          cid1 session  "the ordinary form would have read odd. as odd"  (assumed, never measured)
+          C-I session   "readFileSync SUCCEEDED while reading a different object" (3e7db019)
+        Both implementations return an identity and both distinguish {odd, odd.} from {odd}.
+    R4  every identity row, both implementations, same machine. IDENTICAL outcomes on every row
+        except one:
+          M15c lone surrogate + its U+FFFD lookalike   cid1.mjs REFUSES   candidateIdentity RETURNS
+    R5  (POST HOC - not in the frozen plan, reported as such) the consequence R4 predicts: two
+        directories distinguishable on disk (the lone-surrogate file holds VERSION ONE vs VERSION
+        TWO) -> candidateIdentity gives BOTH cid1:f0e26b45f15ad2c9..., a COLLAPSE. Node decodes the
+        lone surrogate to the lookalike's name, both entries read the lookalike's bytes, and no
+        duplicate-path check stops it. cid1.mjs refuses both ("two entries share one path encoding").
+
+## DECISION (by the frozen rule)
+
+    criterion 1  every runnable identity row        cid1.mjs YES   candidateIdentity NO (M15c)
+    criterion 2  available where worker + exact read cid1.mjs YES   candidateIdentity YES
+    criterion 3  never an identity from misread bytes cid1.mjs YES   candidateIdentity NO (R4/R5)
+
+**SURVIVOR: server/cid1.mjs.** candidateIdentity.mjs and its test are marked SUPERSEDED in their
+headers, kept with their records, and imported by nothing new. COORD-1.md's "only one
+implementation of cid1 exists" was true when written and is now historical.
+
+What the superseded implementation got RIGHT and the survivor should consider, not adopted here:
+reserved Windows device names (CON, NUL, COM1..) are rejected by shape there and untested in
+cid1.mjs - an OPEN row, not a known defect.
+
+Corrections made to the survivor's own record: cid1.mjs's comment and D-ID-1_CID1_RESULT.md carried
+the refuted R3 claim; both now say it was assumed and false.

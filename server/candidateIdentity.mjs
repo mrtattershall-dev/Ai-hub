@@ -1,4 +1,14 @@
 /**
+ * ============================================================================================
+ * SUPERSEDED 2026-10-01 by server/cid1.mjs - see legasus/screen/D-ID-1_RECONCILE.md.
+ * Kept, not deleted, with its tests and records. Do NOT import it for new work.
+ * Decided by the reconcile's frozen rule (0d4ec46f): on R4 this implementation returned an
+ * identity for {lone-surrogate name, its U+FFFD lookalike}, and post-hoc R5 (d4b733e5) showed two
+ * on-disk-distinguishable directories sharing ONE identity here - Node decodes the lone surrogate
+ * to the lookalike's name, both entries read the lookalike's bytes, and nothing rejects the
+ * duplicate path. cid1.mjs refuses both. Its other measurements are recorded in the reconcile.
+ * ============================================================================================
+ *
  * candidateIdentity.mjs - cid1. Candidate identity defined independently of Git.
  *
  * Implements the contract frozen in legasus/screen/D-ID-1_PREREG.md (1c3a2b1c) + Amendment 1

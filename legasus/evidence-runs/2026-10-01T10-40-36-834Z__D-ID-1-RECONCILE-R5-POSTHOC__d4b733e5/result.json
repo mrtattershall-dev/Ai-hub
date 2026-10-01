@@ -1,0 +1,36 @@
+{
+  "X": [
+    "0062 0061 0064 D800 006E 0061 006D 0065 = LONE VERSION ONE",
+    "0062 0061 0064 FFFD FFFD FFFD 006E 0061 006D 0065 = LOOKALIKE"
+  ],
+  "Y": [
+    "0062 0061 0064 D800 006E 0061 006D 0065 = LONE VERSION TWO",
+    "0062 0061 0064 FFFD FFFD FFFD 006E 0061 006D 0065 = LOOKALIKE"
+  ],
+  "distinguishable": true,
+  "candidateIdentity": [
+    {
+      "available": true,
+      "identity": "cid1:f0e26b45f15ad2c9be9530cdf166e8411aafb54316d98fc6fafc94b4ff7ba9e5",
+      "entries": 2
+    },
+    {
+      "available": true,
+      "identity": "cid1:f0e26b45f15ad2c9be9530cdf166e8411aafb54316d98fc6fafc94b4ff7ba9e5",
+      "entries": 2
+    }
+  ],
+  "cid1": [
+    {
+      "ok": false,
+      "reason": "two entries share one path encoding",
+      "path": "bad���name"
+    },
+    {
+      "ok": false,
+      "reason": "two entries share one path encoding",
+      "path": "bad���name"
+    }
+  ],
+  "ciCollapse": true
+}

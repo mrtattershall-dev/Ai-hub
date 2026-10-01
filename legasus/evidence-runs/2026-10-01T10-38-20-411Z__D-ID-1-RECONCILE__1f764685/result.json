@@ -1,0 +1,71 @@
+{
+  "R1": {
+    "absolute + backslashes": {
+      "path": "\\\\?\\C:\\Users\\tatte\\AppData\\Local\\Temp\\rec-r1-YRoLlB\\plain.txt",
+      "ok": true,
+      "v": true
+    },
+    "absolute + forward slashes": {
+      "path": "\\\\?\\C:/Users/tatte/AppData/Local/Temp/rec-r1-YRoLlB/plain.txt",
+      "ok": true,
+      "v": true
+    },
+    "relative": {
+      "path": "\\\\?\\..\\..\\AppData\\Local\\Temp\\rec-r1-YRoLlB\\plain.txt",
+      "ok": false,
+      "code": "ENOENT"
+    },
+    "join(prefix+root, name)": {
+      "path": "\\\\?\\C:\\Users\\tatte\\AppData\\Local\\Temp\\rec-r1-YRoLlB\\plain.txt",
+      "ok": true,
+      "v": true
+    }
+  },
+  "R2": {
+    "prefixWrite": {
+      "ok": true
+    },
+    "node": [
+      "keep.txt",
+      "odd."
+    ],
+    "powershell": [
+      "keep.txt",
+      "odd."
+    ],
+    "worker": [
+      ".git",
+      "keep.txt",
+      "odd."
+    ],
+    "workerVerdict": "PASS"
+  },
+  "R3": {
+    "names": [
+      "odd",
+      "odd."
+    ],
+    "ordinary": {
+      "ok": true,
+      "v": "BYTES B (odd.)"
+    },
+    "prefixed": {
+      "ok": true,
+      "v": "BYTES B (odd.)"
+    },
+    "cid1": {
+      "ok": true,
+      "id": "cid1:28f189a2e697fae407e069cd3ded50dfaffb0bcafe60cc10d00e8d791bce9115",
+      "entries": 2
+    },
+    "candidateIdentity": {
+      "available": true,
+      "identity": "cid1:00322f3104be579249513e15cc916ba458d424692f54f600da3f9a1851986c0f",
+      "entries": 2
+    },
+    "distinguish": {
+      "cid1": true,
+      "candidateIdentity": true
+    }
+  }
+}

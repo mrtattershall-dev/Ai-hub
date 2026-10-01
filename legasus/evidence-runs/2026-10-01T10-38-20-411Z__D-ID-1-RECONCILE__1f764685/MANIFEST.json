@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T10-38-20-411Z__D-ID-1-RECONCILE__1f764685",
+  "label": "D-ID-1-RECONCILE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "R1-R3 of D-ID-1_RECONCILE.md (0d4ec46f). Measurement only.",
+  "command": "node server/reconcile1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T10:38:20.418Z",
+  "endedAt": "2026-10-01T10:38:23.764Z",
+  "exitStatus": 0,
+  "commit": "0d4ec46f507968ed33cb3b6b3c4da1171ede9386",
+  "worktreeClean": false,
+  "worktreeDiffHash": "205a91df29de9472b5f85c97964bfe692e8f476e8bf76b7fadeef5abe9aa82e6",
+  "dirtyEntryCount": 24,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "reconcile1.log",
+      "bytes": 1038,
+      "sha256": "89e265f54d55b35ee8647a4f90fbdc66472215780a9ceeba0c1ccc627c132684"
+    },
+    {
+      "name": "result.json",
+      "bytes": 1508,
+      "sha256": "68022f1c130530245c65f733801397689253e8373db11864327ceac0533fa75f"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

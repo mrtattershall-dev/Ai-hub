@@ -77,3 +77,11 @@ Neither result is withdrawn. M15 stays on the register as **a row whose premise 
 constructible on this machine**, and the representability requirement stays **implemented but
 untested**. If a machine is found where a trailing-dot entry really is misread, the row becomes
 runnable and will decide it.
+
+## RESOLVED BY MEASUREMENT - see D-ID-1_RECONCILE.md (2026-10-01)
+
+A trailing-dot entry CAN be created on this machine (R2: node, PowerShell and the worker all list
+`odd.`), and Node reads it by its ordinary absolute name WITHOUT stripping (R3). So "unrepresentable
+on Windows" was false as an example (both sessions' framing), and NOT_RUNNABLE was the consequence of
+a premise check whose prefixed write never created the entry. Under tatte's Amendment 2 reading
+(refuse what cannot be faithfully named), M15 is RUNNABLE here as M15a/b/c; cid1.mjs holds all three.

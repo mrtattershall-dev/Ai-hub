@@ -38,6 +38,8 @@ Two of the red rows now carry the signal their owner will need, unconsumed:
           correct here - nothing the evaluator observes goes unnamed.
     M15b  {odd} vs {odd, odd.} with different bytes -> different identities. No collapse. (The
           ordinary Windows path form would have read `odd.` as `odd` - another file's bytes.)
+          CORRECTED by D-ID-1 RECONCILE R3: that parenthetical was ASSUMED and is FALSE for
+          absolute paths through Node - an ordinary read of `odd.` returned odd.'s own bytes.
     M15c  a REAL lone-surrogate name -> refused (lstat ENOENT); alongside its U+FFFD lookalike ->
           refused (two entries share one path encoding).
 

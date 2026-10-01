@@ -29,8 +29,12 @@
  * collides with a genuine lookalike is caught as two entries with one path encoding. The
  * well-formedness checks stay as defence for callers of identityOf and for other platforms.
  *
- * WINDOWS: traversal uses the \\?\ path form, which addresses names exactly. The ordinary form
- * strips a trailing dot or space, so `odd.` would be read as `odd` - possibly ANOTHER file's bytes.
+ * WINDOWS: traversal uses the \\?\ path form, which addresses names exactly. CORRECTED by
+ * D-ID-1 RECONCILE R3 (1f764685): an earlier version of this comment claimed the ordinary form
+ * "would read `odd.` as `odd`". That was ASSUMED, never measured, and is FALSE for absolute paths
+ * through Node - Node namespaces absolute paths itself, and an ordinary read of `odd.` returned
+ * odd.'s own bytes. The explicit prefix is kept because it does not depend on that Node behaviour
+ * (and a RELATIVE prefixed path fails, so the root is always resolved first).
  *
  * CONCURRENCY (stated, not solved): one traversal is not an atomic snapshot. A write landing
  * between two entries, or a change-and-revert, is not seen. Detecting change across an evaluation

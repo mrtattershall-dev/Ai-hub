@@ -51,3 +51,10 @@ refuses elsewhere.
 
 Deliberately NOT proposed as a design here. Recorded as an open mechanism gap with its concrete
 event, so it is a finding rather than a memory.
+
+## UPDATE 2026-10-01 (another session)
+
+After this record was written, a second implementation (server/cid1.mjs, 8a062953) landed, so two
+existed. D-ID-1_RECONCILE.md settled it by measurement: cid1.mjs survives, candidateIdentity.mjs is
+SUPERSEDED (R4/R5: it collapses a lone-surrogate name onto its U+FFFD lookalike). That session also
+built without checking COORD first - the mechanism problem above recurred within the hour.
