@@ -20,9 +20,9 @@
  * and repairing the batch.js copy filter, are separate steps with their own controls, per the
  * prereg. D stays unrepaired until D-ID-1's suite passes.
  */
-import { readdirSync, lstatSync, readFileSync, readlinkSync } from 'node:fs';
+import { readdirSync, lstatSync, readFileSync, readlinkSync, realpathSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join, sep } from 'node:path';
+import { join, sep, basename } from 'node:path';
 
 export const CID_VERSION = 'cid1';
 
@@ -55,10 +55,45 @@ const isGitComponent = (relParts) => relParts.some((p) => p === '.git');
  * than a boolean keeps the UNAVAILABLE message specific about WHICH name defeated it.
  */
 const RESERVED_WIN32 = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\.|$)/i;
-function unaddressable(name) {
+
+/**
+ * THE INVARIANT, generalized from M15's counterexample:
+ *
+ *     ENUMERATED IDENTITY == OPENED IDENTITY. An entry's bytes may contribute to cid1 only when
+ *     the entry opened by its enumerated name is demonstrably the same entry that was enumerated.
+ *
+ * A trailing dot is ONE counterexample, not the rule. A blacklist of odd Windows names would rot
+ * and would miss the next route; what matters is that the name round-trips.
+ *
+ * MECHANISM, chosen by measurement rather than reasoning:
+ *   - `basename(realpathSync(abs)) === name` is the round-trip. For a name Windows strips when
+ *     opening, realpath reports the stripped name and the comparison fails.
+ *   - the extended-length prefix was MEASURED and REJECTED: `lstatSync('\\\\?\\' + p)` throws
+ *     ENOENT through node even for an ordinary file on this platform, so it would mark every
+ *     entry unavailable. That avenue is closed, and the measurement is recorded so nobody
+ *     re-reaches for it.
+ *
+ * SYMLINKS ARE A NARROWER ARM, stated rather than glossed. `realpathSync` FOLLOWS a link, so the
+ * round-trip would compare against the TARGET's name and is not applicable. For links the shape
+ * rule below is used instead - a heuristic, not a round-trip. A link whose name is stripped by
+ * the platform in some other way is therefore NOT detected, and that is a known gap.
+ */
+function unaddressable(abs, name, isLink) {
   if (process.platform !== 'win32') return null;
-  if (/[. ]$/.test(name)) return 'a trailing dot or space, which Windows strips when opening';
+  if (isLink) {
+    if (/[. ]$/.test(name)) return 'a trailing dot or space in a SYMLINK name (shape rule - the round-trip cannot be applied to links)';
+    if (RESERVED_WIN32.test(name)) return 'a reserved Windows device name in a symlink';
+    return null;
+  }
   if (RESERVED_WIN32.test(name)) return 'a reserved Windows device name';
+  let real;
+  try { real = realpathSync(abs); } catch (e) {
+    return `the name could not be resolved (${e.code || e.message}), so it cannot be shown to address the enumerated entry`;
+  }
+  if (basename(real) !== name) {
+    return `the enumerated name ${JSON.stringify(name)} opens ${JSON.stringify(basename(real))}`
+      + ' - the opened entry is not demonstrably the enumerated one';
+  }
   return null;
 }
 
@@ -88,12 +123,6 @@ export function candidateIdentity(root) {
     for (const name of names) {
       const nextRel = [...relParts, name];
       if (isGitComponent(nextRel)) continue;             // declared exclusion
-      // FAIL CLOSED BEFORE TOUCHING IT. An entry whose enumerated name cannot be addressed would
-      // otherwise be read under a different name and silently counted as this object.
-      const bad = unaddressable(name);
-      if (bad) {
-        return { reason: `entry name is unaddressable on this platform - ${bad}`, at: nextRel.join('/') };
-      }
       const abs = join(absDir, name);
       let st;
       try {
@@ -104,6 +133,14 @@ export function candidateIdentity(root) {
         // UNREPRESENTABLE. Fail closed rather than pretend the object is the one without it.
         return { reason: `entry unrepresentable or unstattable: ${e.code || e.message}`, at: nextRel.join('/') };
       }
+      // FAIL CLOSED BEFORE ANY BYTES CONTRIBUTE. An entry whose enumerated name does not
+      // demonstrably address the enumerated entry would otherwise be read under a different name
+      // and silently counted as this object - M15's defect.
+      const bad = unaddressable(abs, name, st.isSymbolicLink());
+      if (bad) {
+        return { reason: `entry is not demonstrably addressable - ${bad}`, at: nextRel.join('/') };
+      }
+
       if (st.isSymbolicLink()) {
         let target;
         try { target = readlinkSync(abs); } catch (e) {

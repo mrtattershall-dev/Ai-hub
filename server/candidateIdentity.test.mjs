@@ -21,7 +21,7 @@
  * of identity construction - and the prereg defers the wiring they need to separate steps. They
  * are reported NOT_RUN rather than silently absent.
  */
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync, symlinkSync, renameSync, unlinkSync, chmodSync, readdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, symlinkSync, renameSync, unlinkSync, chmodSync, readdirSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -233,16 +233,31 @@ row('M15', 'REPRESENTABILITY', 'UNAVAILABLE', (idf) => {
   }
   try { writeFileSync(`\\\\?\\${join(c, 'weird.')}`, 'x\n', 'utf8'); }
   catch (e) { return { notRunnable: `an unrepresentable name could not be created (${e.code}) - NOT_RUNNABLE, never passed` }; }
-  // Confirm the entry is actually THERE and actually unrepresentable before judging anything.
   const listed = readdirSync(c);
   const trailing = listed.filter((n) => n.endsWith('.'));
   if (!trailing.length) {
     return { notRunnable: `no trailing-dot entry is visible after creation (readdir: ${JSON.stringify(listed)}) - NOT_RUNNABLE` };
   }
+  // THE PREMISE MUST BE ESTABLISHED, NOT ASSUMED: that this entry is actually UNADDRESSABLE.
+  // "A trailing dot is listed" is not that. The prereg calls such a name unrepresentable on
+  // Windows, but whether THIS machine misreads it is an empirical question - long-path support
+  // and the filesystem both matter. So compare what the ordinary path reads against what the
+  // extended-length path reads. Different bytes (or an ordinary-read failure) means the ordinary
+  // name addresses something else, and only then is cid1 obliged to report UNAVAILABLE.
+  const weird = join(c, trailing[0]);
+  let ordinary = null; let ordinaryErr = null; let viaPrefix = null;
+  try { ordinary = readFileSync(weird, 'utf8'); } catch (e) { ordinaryErr = e.code; }
+  try { viaPrefix = readFileSync(`\\\\?\\${weird}`, 'utf8'); } catch (e) { viaPrefix = `THREW:${e.code}`; }
+  const misread = ordinaryErr !== null || ordinary !== viaPrefix;
+  if (!misread) {
+    return { notRunnable: `the entry ${JSON.stringify(trailing[0])} IS addressable on this machine`
+      + ' (ordinary and extended-length reads agree), so its premise does not hold here - NOT_RUNNABLE.'
+      + ' cid1 giving it an identity is CORRECT, not a defect.' };
+  }
   const r = idf(c);
   return { pass: r.available === false,
     detail: r.available
-      ? `entry ${JSON.stringify(trailing)} exists and an identity was returned anyway: ${String(r.identity).slice(0, 30)}`
+      ? `premise held (ordinary read ${ordinaryErr || 'differs'}) and an identity was returned anyway: ${String(r.identity).slice(0, 30)}`
       : `UNAVAILABLE: ${r.reason}` };
 });
 
