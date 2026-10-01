@@ -11648,3 +11648,9 @@ Claimed by: Claude (finish-gate session). Files:
               server/queue.js completeLocked, server/finishVerdicts.mjs (CONTINUABLE export)
     NEW       legasus/screen/CONT-2_RESULT.md
 Under the CONT-2 freeze. Do not edit the claimed regions until released.
+
+## CLAIM 2026-10-01 10:57 CDT — candidate-0 — SIM-0 (simulated-evidence entitlement), CHARACTERIZATION
+Claimed by: Claude (fuzz/standing session). Files, all NEW:
+    NEW       legasus/screen/SIM-0_PREREG.md, legasus/screen/SIM-0_RESULT.md, server/sim0.py, server/sim0.mjs
+No existing file touched. Subject (third-party slot machine, NO licence found) stays OUTSIDE the repo,
+pinned by sha256; it is never copied, vendored or committed. Checked before writing.
