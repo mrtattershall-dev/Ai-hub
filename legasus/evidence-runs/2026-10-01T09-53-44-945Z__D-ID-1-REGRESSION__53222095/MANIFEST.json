@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T09-53-44-945Z__D-ID-1-REGRESSION__53222095",
+  "label": "D-ID-1-REGRESSION",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "D-ID-1 metamorphic suite vs the UNREPAIRED HEAD^{tree} identity. Prereg 1c3a2b1c + A1 3e14f827. cid1 not written.",
+  "command": "node server/did1.regression.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T09:53:44.947Z",
+  "endedAt": "2026-10-01T09:56:24.514Z",
+  "exitStatus": 0,
+  "commit": "3e14f8277b9f20b7effb75af03348d6e408cf804",
+  "worktreeClean": false,
+  "worktreeDiffHash": "e1165c11608fc437e5ad0c832e31b59c4a2e698d36efb2b812b8a0ced51f6c81",
+  "dirtyEntryCount": 16,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "did1-regression.log",
+      "bytes": 5549,
+      "sha256": "9132d1a6aa9dc32864e61b4408c74dfdb246a21455eeb9f674d97d426fa05215"
+    },
+    {
+      "name": "result.json",
+      "bytes": 14312,
+      "sha256": "a636051dce7847c8f67701c18e1700cdb0736c01e10d50115de3b69e5351671a"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

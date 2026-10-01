@@ -1,0 +1,494 @@
+{
+  "prereg": [
+    "1c3a2b1c",
+    "3e14f827"
+  ],
+  "image": "sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3",
+  "controls": {
+    "oracleCopySame": true,
+    "oracleOneByteDifferent": true,
+    "readiness": true
+  },
+  "rows": [
+    {
+      "row": "M1",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE in P1 vs P2",
+      "outcome": "VIOLATED (INVARIANCE)",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "a1d10d125cba985e7424546178e95f1f8f04bbcd",
+      "namesParent": true,
+      "note": "identity is the enclosing repo's tree"
+    },
+    {
+      "row": "M1",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN in P1 vs P2",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M2",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN moved",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "namesParent": false,
+      "note": ""
+    },
+    {
+      "row": "M2",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE moved in P1",
+      "outcome": "HOLDS_VACUOUSLY",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "namesParent": true,
+      "note": "identity is the enclosing repo's tree"
+    },
+    {
+      "row": "M3",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN vs BARE no-repo",
+      "outcome": "VIOLATED (AVAILABILITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": null,
+      "namesParent": false,
+      "note": "B unavailable"
+    },
+    {
+      "row": "M4",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN vs BARE commitless",
+      "outcome": "VIOLATED (AVAILABILITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": null,
+      "namesParent": false,
+      "note": "B unavailable"
+    },
+    {
+      "row": "M5",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE parent HEAD moved",
+      "outcome": "VIOLATED (INVARIANCE)",
+      "idA": "71fa1d1e8caf8d430aa4ccc5444ebead3d9b7d7f",
+      "idB": "27076f0adafe83b124d7fec7a88298ee78d8167d"
+    },
+    {
+      "row": "M5",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN parent HEAD moved",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334"
+    },
+    {
+      "row": "M6",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "BARE sibling modified",
+      "outcome": "HOLDS_VACUOUSLY",
+      "idA": "71fa1d1e8caf8d430aa4ccc5444ebead3d9b7d7f",
+      "idB": "71fa1d1e8caf8d430aa4ccc5444ebead3d9b7d7f",
+      "namesParent": true
+    },
+    {
+      "row": "M6",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN sibling modified",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "namesParent": false
+    },
+    {
+      "row": "M7",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "snapshotDiff": [
+        "~subject.js"
+      ],
+      "note": "snapshot ~subject.js"
+    },
+    {
+      "row": "M7",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "c5a7d211383e043a6839fbda9f4b4dec447e07a2",
+      "snapshotDiff": [
+        "~subject.js"
+      ],
+      "note": "snapshot ~subject.js"
+    },
+    {
+      "row": "M7",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "snapshotDiff": [
+        "~subject.js"
+      ],
+      "note": "snapshot ~subject.js"
+    },
+    {
+      "row": "M8",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "snapshotDiff": [
+        "-keep.txt",
+        "+added.js"
+      ],
+      "note": "snapshot -keep.txt,+added.js"
+    },
+    {
+      "row": "M8",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "35a9a0ff5c7259861d039d23f44c922cf023f1f3",
+      "snapshotDiff": [
+        "-keep.txt",
+        "+added.js"
+      ],
+      "note": "snapshot -keep.txt,+added.js"
+    },
+    {
+      "row": "M8",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "snapshotDiff": [
+        "-keep.txt",
+        "+added.js"
+      ],
+      "note": "snapshot -keep.txt,+added.js"
+    },
+    {
+      "row": "M9",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "snapshotDiff": [
+        "-lib/util.js",
+        "+lib/util2.js"
+      ],
+      "note": "snapshot -lib/util.js,+lib/util2.js"
+    },
+    {
+      "row": "M9",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "07a2d5773233db59759303d235c73c687ac1a473",
+      "snapshotDiff": [
+        "-lib/util.js",
+        "+lib/util2.js"
+      ],
+      "note": "snapshot -lib/util.js,+lib/util2.js"
+    },
+    {
+      "row": "M9",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "snapshotDiff": [
+        "-lib/util.js",
+        "+lib/util2.js"
+      ],
+      "note": "snapshot -lib/util.js,+lib/util2.js"
+    },
+    {
+      "row": "M10",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "snapshotDiff": [
+        "~keep.txt"
+      ],
+      "note": "snapshot ~keep.txt"
+    },
+    {
+      "row": "M10",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "0d30401a4ed9928d90377c773812174c63152f90",
+      "snapshotDiff": [
+        "~keep.txt"
+      ],
+      "note": "snapshot ~keep.txt"
+    },
+    {
+      "row": "M10",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "snapshotDiff": [
+        "~keep.txt"
+      ],
+      "note": "snapshot ~keep.txt"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "snapshotDiff": [
+        "+.gitattributes",
+        "+.github/workflows/ci.yml",
+        "+.gitignore"
+      ],
+      "note": "snapshot +.gitattributes,+.github/workflows/ci.yml,+.gitignore"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN committed",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "d35a3d4000001bb43e138a604a5dfd431aef5c1e",
+      "snapshotDiff": [
+        "+.gitattributes",
+        "+.github/workflows/ci.yml",
+        "+.gitignore"
+      ],
+      "note": "snapshot +.gitattributes,+.github/workflows/ci.yml,+.gitignore"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "BARE in P1",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "snapshotDiff": [
+        "+.gitattributes",
+        "+.github/workflows/ci.yml",
+        "+.gitignore"
+      ],
+      "note": "snapshot +.gitattributes,+.github/workflows/ci.yml,+.gitignore"
+    },
+    {
+      "row": "M11",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN ignored, committed",
+      "outcome": "VIOLATED (FIDELITY)",
+      "idA": "a3e3774687b9a75819f71f310f6ed014b6d1ceaa",
+      "idB": "a3e3774687b9a75819f71f310f6ed014b6d1ceaa",
+      "snapshotDiff": [
+        "+debug.log"
+      ],
+      "note": "snapshot +debug.log"
+    },
+    {
+      "row": "M12",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN .git internals",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334"
+    },
+    {
+      "row": "M13",
+      "tag": "FIDELITY",
+      "boundary": "identity construction",
+      "shape": "OWN symlink",
+      "outcome": "NOT_RUNNABLE",
+      "note": "symlink cannot be created here: EPERM"
+    },
+    {
+      "row": "M14",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN empty dir (declared out)",
+      "outcome": "HOLDS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "6a25ef77e1ada3616601805df9c71c1c81f2f334"
+    },
+    {
+      "row": "M14",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "exec bit",
+      "outcome": "NOT_RUNNABLE",
+      "note": "Windows has no exec bit to flip; declared blind spot"
+    },
+    {
+      "row": "M15",
+      "tag": "REPRESENTABILITY",
+      "boundary": "identity construction",
+      "shape": "OWN name ending \".\"",
+      "outcome": "VIOLATED (REPRESENTABILITY)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "note": "entry present: true; an identity was RETURNED"
+    },
+    {
+      "row": "M16",
+      "tag": "INVARIANCE",
+      "boundary": "identity construction",
+      "shape": "OWN vs BARE in P1",
+      "outcome": "VIOLATED (INVARIANCE)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "idB": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+      "namesParent": true,
+      "note": "identity is the enclosing repo's tree"
+    },
+    {
+      "row": "M17",
+      "tag": "PRESERVATION",
+      "boundary": "WORKSPACE construction",
+      "shape": "candidate vs baseline",
+      "outcome": "VIOLATED (PRESERVATION)",
+      "snapshotDiff": [
+        "-.gitattributes",
+        "-.github/workflows/ci.yml",
+        "-.gitignore"
+      ],
+      "note": "t1=RETAIN missing/changed: -.gitattributes,-.github/workflows/ci.yml,-.gitignore"
+    },
+    {
+      "row": "M17",
+      "tag": "PRESERVATION",
+      "boundary": "WORKSPACE construction",
+      "shape": "candidate vs t2 start",
+      "outcome": "VIOLATED (PRESERVATION)",
+      "snapshotDiff": [
+        "-.gitattributes",
+        "-.github/workflows/ci.yml",
+        "-.gitignore"
+      ],
+      "note": "-.gitattributes,-.github/workflows/ci.yml,-.gitignore"
+    },
+    {
+      "row": "M18",
+      "tag": "CONSISTENCY",
+      "boundary": "evaluation consistency",
+      "shape": "OWN host write mid-check",
+      "outcome": "VIOLATED (CONSISTENCY) verdict=PASS",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "note": "mutated at 4017ms of 9937ms; the check printed the MUTATED bytes"
+    },
+    {
+      "row": "M19",
+      "tag": "BINDING",
+      "boundary": "receipt binding",
+      "shape": "OWN uncommitted",
+      "outcome": "VIOLATED (BINDING)",
+      "idA": "6a25ef77e1ada3616601805df9c71c1c81f2f334",
+      "note": "check saw \"module.exports={probe:()=>\\\"UNCOMMITTED WORK\\\"};\"; receipt names \"module.exports={probe:()=>\\\"CANDIDATE\\\"};\""
+    }
+  ],
+  "predictions": [
+    {
+      "prediction": "M1 violated BARE",
+      "correct": true
+    },
+    {
+      "prediction": "M5 violated BARE",
+      "correct": true
+    },
+    {
+      "prediction": "M3 violated (unavailable)",
+      "correct": true
+    },
+    {
+      "prediction": "M4 violated (unavailable)",
+      "correct": true
+    },
+    {
+      "prediction": "M7 violated uncommitted",
+      "correct": true
+    },
+    {
+      "prediction": "M8 violated uncommitted",
+      "correct": true
+    },
+    {
+      "prediction": "M9 violated uncommitted",
+      "correct": true
+    },
+    {
+      "prediction": "M10 violated uncommitted",
+      "correct": true
+    },
+    {
+      "prediction": "M13 violated uncommitted",
+      "correct": false
+    },
+    {
+      "prediction": "M17 violated",
+      "correct": true
+    },
+    {
+      "prediction": "M2 holds OWN",
+      "correct": true
+    },
+    {
+      "prediction": "M6 holds OWN",
+      "correct": true
+    },
+    {
+      "prediction": "M12 holds OWN",
+      "correct": true
+    },
+    {
+      "prediction": "M16 holds (as predicted)",
+      "correct": false
+    }
+  ]
+}
