@@ -11621,3 +11621,5 @@ Claimed by: Claude (finish-gate session). Files:
               run-index row writer (~3700-3716)
     NEW       legasus/screen/FG-5-RECEIPT_RESULT.md
 Frozen at b965558e; probe 37a41cbd runs BEFORE first, unchanged. Do not edit the claimed files until released.
+
+Claim released 2026-10-01 09:51 CDT — FG-5 RECEIPT committed (5a 93eb8896, 5b above). All FG files FREE. Stopped and reporting per the standing instruction; ESCAPE / symbol check / loop guard NOT started. NEW boundary recorded, unclaimed: agent.js:5604/5617 queue completion + supervisor trigger key on status done alone.
