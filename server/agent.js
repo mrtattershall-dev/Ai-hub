@@ -4648,17 +4648,37 @@ async function drive(loadDb, run) {
                   pushStep(run, { type: 'route_closed', route: 'finish-gate verify', text: 'Finish-time host verification is closed in this configuration; the finish is recorded UNVERIFIED by the hub and judged by the independent evaluator.' });
                   run.finishVerification = 'CLOSED_UNDER_BOUNDING';
                 } else {
-                const v = await verifier.verify(WORKSPACE, { entry: goalEntry, goal: run.goal || '' });
-                if (!v.ok) {
-                  blocked(`Project does not run (${v.kind}) — not finished.`,
-                    `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
+                // FG-3 ADMISSION (legasus/screen/FG-3-ADMISSION_PREREG.md). The gate used to ask verify() one
+                // question - does the file run? - so a run that landed NO write could still be stamped
+                // Verified when the file it never touched happened to load (fatal-09: 2 archive cases, both
+                // scored FAIL, both entered the corpus labelled verified; FG-1 reproduced it here). The count
+                // is the SAME predicate the end-of-run repair already uses (~5406), supplied to verify(),
+                // which owns the rule; this gate owns the once-only policy: the first NO_WORK finish is
+                // refused with the reason, the second is allowed to END the run but is recorded
+                // UNVERIFIED - never Verified, because nothing this run did could have satisfied the goal.
+                const landedWrites = (run.steps || []).filter((s) => s.type === 'tool'
+                  && /^(write_file|edit_file|append_file)$/.test(String(s.tool))
+                  && /^OK/.test(String(s.result || ''))).length;
+                const v = await verifier.verify(WORKSPACE, { entry: goalEntry, goal: run.goal || '', landedWrites });
+                // Amendment 1: the yield applies ONLY when NO_WORK is the sole problem. A project that does
+                // not run is blocked as before, up to the 3-strike cap - finishGateGoalEntry.test caught the
+                // first version ending a crashing project UNVERIFIED on its second finish.
+                const onlyNoWork = v.admission === 'NO_WORK' && v.problems.length === 1;
+                if (!v.ok && onlyNoWork && run.noWorkBlocked) {
+                  run.finishKind = 'unverified-no-work';
+                  pushStep(run, { type: 'note', text: 'Finished UNVERIFIED: no write landed in this run, so nothing could have satisfied the goal. The file(s) the goal names run as they were.' });
+                } else if (!v.ok) {
+                  if (v.admission === 'NO_WORK') run.noWorkBlocked = true;
+                  blocked(onlyNoWork ? 'No work landed in this run — not finished.' : `Project does not run (${v.kind}) — not finished.`,
+                    `Do NOT finish yet — ${onlyNoWork ? 'nothing this run did could have satisfied the goal' : 'the project does not run'}:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
                   continue turn;
-                }
+                } else {
                 // Remember WHAT passed, not merely that something did: the gate blocks up to three times by design,
                 // so a bare boolean let a model break the entry file after a pass and finish on the old verdict.
                 run.verified = true;    // passed — do not pay for it again
                 run.verifiedAt = workspaceStamp();
                 pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
+                }
                 }   // end: unbounded finish-gate verification
               }
             } catch { /* verification is evidence, not a gate that can hang a run */ }

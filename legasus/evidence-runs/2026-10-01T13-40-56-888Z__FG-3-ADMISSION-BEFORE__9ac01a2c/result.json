@@ -1,0 +1,79 @@
+{
+  "phase": "before",
+  "rows": [
+    {
+      "id": "A1",
+      "label": "verify(): add-goal, file lacks it, landedWrites=0",
+      "outcome": "VERIFIED with nothing judged (red)",
+      "ok": true,
+      "admission": null,
+      "notes": []
+    },
+    {
+      "id": "A2",
+      "label": "verify(): same goal, landedWrites=1",
+      "outcome": "ok (holds)",
+      "ok": true,
+      "notes": []
+    },
+    {
+      "id": "A3",
+      "label": "verify(): check-and-report goal, landedWrites=0",
+      "outcome": "ok (holds: no mutating verb)",
+      "ok": true,
+      "notes": []
+    },
+    {
+      "id": "A4",
+      "label": "verify(): landedWrites undefined (existing callers)",
+      "outcome": "ok (holds: rule not applied)",
+      "ok": true
+    },
+    {
+      "id": "A5",
+      "label": "hub: finish at once, twice; zero writes",
+      "outcome": "VERIFIED with zero writes (red)",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 0,
+      "landedWrites": 0,
+      "verifiedNote": true,
+      "unverifiedNote": null,
+      "noWorkBlock": null
+    },
+    {
+      "id": "A6",
+      "label": "hub: model writes the goal, then finishes",
+      "outcome": "Verified (holds)",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 0,
+      "landedWrites": 1,
+      "verifiedNote": true,
+      "unverifiedNote": null,
+      "noWorkBlock": null
+    },
+    {
+      "id": "A7",
+      "label": "hub: finishGateHost's goal, zero writes (unbounded)",
+      "outcome": "Verified (holds)",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 0,
+      "landedWrites": 0,
+      "verifiedNote": true,
+      "unverifiedNote": null,
+      "noWorkBlock": null
+    },
+    {
+      "id": "F4",
+      "label": "SUBJECT: target missing, entry falls through (must stay red)",
+      "outcome": "STILL VERIFIED on the fall-through file (red, as frozen)",
+      "ok": true
+    }
+  ],
+  "verdict": {
+    "mustFire": true,
+    "controls": true
+  }
+}

@@ -253,7 +253,15 @@ export function exportedName(goal) {
   return null;
 }
 
-export async function verify(workspace, { entry, goal } = {}) {
+/**
+ * FG-3 ADMISSION (legasus/screen/FG-3-ADMISSION_PREREG.md): does this goal ask for a CHANGE to named
+ * files? Only then can "zero writes landed" mean "nothing could have satisfied it". Frozen list; its
+ * blind spot is recorded there ("s1_library.js needs checkout()" has no verb here and is not admitted).
+ */
+const MUTATING_VERB = /\b(add|create|implement|write|build|make|fix|change|update|refactor|rename|remove|delete|extend|introduce|replace|move|convert|migrate)\b/i;
+export const asksForChange = (goal) => MUTATING_VERB.test(String(goal || ''));
+
+export async function verify(workspace, { entry, goal, landedWrites } = {}) {
   const detected = detectKind(workspace);
   let { kind } = detected;
   const { files, pkg } = detected;
@@ -280,6 +288,20 @@ export async function verify(workspace, { entry, goal } = {}) {
   const inFiles = sc.named ? files.filter((f) => sc.inScope.has(f)) : files;
   const outFiles = sc.named ? files.filter((f) => !sc.inScope.has(f)) : [];
   const OUTSIDE = 'OUTSIDE THIS GOAL (not blocking)';
+
+  // FG-3 ADMISSION. A `Verified` finish is a receipt for work that happened. fatal-09: two verified
+  // finishes with ZERO landed writes on the goal's file, both scored FAIL, both entered the corpus
+  // labelled verified; FG-1 reproduced the shape here (a file that loads but lacks the goal). The rule
+  // applies only when the caller SUPPLIES the count (undefined = unknown = not applied, so every
+  // existing caller is unchanged), the goal names files, and the goal asks for a change. Everything
+  // else is still collected, so the model sees that the file runs AND that nothing landed.
+  let admission = null;
+  if (landedWrites === 0 && sc.named && asksForChange(goal)) {
+    admission = 'NO_WORK';
+    problems.push('NO WORK LANDED: this goal asks for a change to ' + [...sc.inScope].slice(0, 3).join(', ')
+      + ', and no write succeeded in this run - nothing on disk changed, so the goal cannot have been done by this run.'
+      + ' Make the change (read the file first), or - if existing code already satisfies the goal - say so and finish again; that finish will be recorded UNVERIFIED, not Verified.');
+  }
 
   const syn = await syntaxSweep(workspace, inFiles);
   if (syn.checked) {
@@ -322,7 +344,7 @@ export async function verify(workspace, { entry, goal } = {}) {
     // only confirms the entry point is really there and reachable.
     if (!existsSync(join(workspace, 'index.html'))) problems.push('no index.html - a web app needs an entry point');
     else evidence.push('index.html exists (browser evidence comes from test_web / see_screen)');
-    return { ok: !problems.length, kind, evidence, problems, notes, needsBrowser: true };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission, needsBrowser: true };
   }
 
   if (kind === 'node') {
@@ -377,7 +399,7 @@ export async function verify(workspace, { entry, goal } = {}) {
         }
       }
     }
-    return { ok: !problems.length, kind, evidence, problems, notes };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission };
   }
 
   if (kind === 'python') {
@@ -405,7 +427,7 @@ export async function verify(workspace, { entry, goal } = {}) {
         else problems.push(`\`python ${cand}\` crashed (exit ${r.code}):\n    ${(r.err || r.out).split('\n').slice(-8).join('\n    ').slice(0, 800)}`);
       }
     }
-    return { ok: !problems.length, kind, evidence, problems, notes };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission };
   }
 
   if (kind === 'godot' || kind === 'gdscript') {
@@ -429,7 +451,7 @@ export async function verify(workspace, { entry, goal } = {}) {
       }
       if (!bad) evidence.push(`all ${Math.min(gd.length, 25)} GDScript file(s) parse in headless Godot`);
     }
-    return { ok: !problems.length, kind, evidence, problems, notes };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission };
   }
 
   // unknown: the syntax sweep is all we have, and that is worth saying out loud.

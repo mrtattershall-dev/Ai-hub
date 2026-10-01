@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T13-40-56-888Z__FG-3-ADMISSION-BEFORE__9ac01a2c",
+  "label": "FG-3-ADMISSION-BEFORE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "FG-3 ADMISSION before the repair.",
+  "command": "FG3_PHASE=before node server/fg3.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T13:40:56.898Z",
+  "endedAt": "2026-10-01T13:41:04.293Z",
+  "exitStatus": 0,
+  "commit": "377da8289fbb6dcaac8529e89bfffd352d1e177a",
+  "worktreeClean": false,
+  "worktreeDiffHash": "a3ca74a7bec4c06ad4f2fbfebbfc87c1e5ab32cd514fc48cb105276998ee202d",
+  "dirtyEntryCount": 46,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "fg3.log",
+      "bytes": 872,
+      "sha256": "a6a2ff9cb7f5d2ca6c7ccd13bb7f3374d859939a3cbe9b4b562801e2c0aa9e2b"
+    },
+    {
+      "name": "result.json",
+      "bytes": 1981,
+      "sha256": "11797bef1426f3cdb7a6a00715fad83dae4078fc38facf0a480bd15ec700f785"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

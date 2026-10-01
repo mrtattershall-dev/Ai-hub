@@ -1,0 +1,96 @@
+{
+  "phase": "after",
+  "rows": [
+    {
+      "id": "A1",
+      "label": "verify(): add-goal, file lacks it, landedWrites=0",
+      "outcome": "NOT ok, admission NO_WORK",
+      "ok": false,
+      "admission": "NO_WORK",
+      "notes": [
+        "NO WORK LANDED: this goal asks for a change to s1_library.js, and no write succeeded in this run - nothing on disk changed, so the goal cannot have been done by this run. Make the change (read the file first), or - if existing code already satisfies the goal - say so and finish again; that finish will be recorded UNVERIFIED, not Verified."
+      ]
+    },
+    {
+      "id": "A2",
+      "label": "verify(): same goal, landedWrites=1",
+      "outcome": "ok (holds)",
+      "ok": true,
+      "notes": []
+    },
+    {
+      "id": "A3",
+      "label": "verify(): check-and-report goal, landedWrites=0",
+      "outcome": "ok (holds: no mutating verb)",
+      "ok": true,
+      "notes": []
+    },
+    {
+      "id": "A4",
+      "label": "verify(): landedWrites undefined (existing callers)",
+      "outcome": "ok (holds: rule not applied)",
+      "ok": true
+    },
+    {
+      "id": "A5",
+      "label": "hub: finish at once, twice; zero writes",
+      "outcome": "blocked once, then done UNVERIFIED (no work)",
+      "status": "done",
+      "finishKind": "unverified-no-work",
+      "finishBlocks": 1,
+      "landedWrites": 0,
+      "verifiedNote": false,
+      "unverifiedNote": "Finished UNVERIFIED: no write landed in this run, so nothing could have satisfied the goal. The file(s) the goal names run as they were.",
+      "noWorkBlock": "No work landed in this run — not finished."
+    },
+    {
+      "id": "A6",
+      "label": "hub: model writes the goal, then finishes",
+      "outcome": "Verified (holds)",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 0,
+      "landedWrites": 1,
+      "verifiedNote": true,
+      "unverifiedNote": null,
+      "noWorkBlock": null
+    },
+    {
+      "id": "A7",
+      "label": "hub: finishGateHost's goal, zero writes (unbounded)",
+      "outcome": "Verified (holds)",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 0,
+      "landedWrites": 0,
+      "verifiedNote": true,
+      "unverifiedNote": null,
+      "noWorkBlock": null
+    },
+    {
+      "id": "A8",
+      "label": "hub: own file crashes, zero writes, finish three times",
+      "outcome": "stays BLOCKED (2 blocks, finishKind null)",
+      "status": "stopped",
+      "finishKind": null,
+      "finishBlocks": 2,
+      "landedWrites": 0,
+      "verifiedNote": false,
+      "unverifiedNote": null,
+      "noWorkBlock": null
+    },
+    {
+      "id": "F4",
+      "label": "SUBJECT: target missing, entry falls through (must stay red)",
+      "outcome": "STILL VERIFIED on the fall-through file (red, as frozen)",
+      "ok": true
+    }
+  ],
+  "verdict": {
+    "a1": true,
+    "a5": true,
+    "a8StaysBlocked": true,
+    "controls": true,
+    "f4StillRed": true
+  }
+}
