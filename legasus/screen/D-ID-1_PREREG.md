@@ -174,3 +174,65 @@ violates the contract, sealed through EH1, compared against the predictions abov
     6 the baseline copy preserves the included snapshot          (workspace construction)
     7 existing consumers remain green
     8 the D-PROP-1 and D'-1 counterexamples REVERSE with their inputs unchanged
+
+## Amendment 2 - 2026-10-01 - before cid1 is implemented (tatte: build cid1, keep D-COPY/D-CONS/D-BIND red)
+
+### The four defects are owned separately and repaired in order
+
+    D-ID    identity construction   -> cid1                      (this step)
+    D-COPY  snapshot preservation   -> the copy mechanism         (next)
+    D-CONS  evaluation consistency  -> before/after binding        (then)
+    D-BIND  receipt binding         -> receipt semantics           (last)
+
+cid1 is a PURE OBSERVER: given a directory it returns an identifier or a refusal. It copies nothing,
+runs no git, commits nothing, writes nothing, decides no verdict, and is NOT wired into evaluator.js,
+acceptance.js, batch.js or any receipt in this step - wiring it is D-BIND's.
+
+### Encoding (unambiguous framing, not delimiters)
+
+    digest = sha256( DOMAIN || u64(count) || entry_1 || ... || entry_n )
+    DOMAIN = the ASCII bytes "legasus/candidate-identity/cid1" followed by one 0x00
+    FILE    entry = 0x46 'F' || u64(len path) || path || u64(len bytes) || sha256(bytes)
+    SYMLINK entry = 0x4C 'L' || u64(len path) || path || u64(len target) || target
+    u64 = 8-byte big-endian length. path/target = UTF-8 bytes. Entries sorted by Buffer.compare
+    of path bytes - independent of enumeration order. Identity string: "cid1:" + hex(digest).
+Every variable-length field is length-prefixed, so no filename can forge a boundary.
+
+### Representability, reinterpreted (tatte)
+
+Fail closed on what cid1 CANNOT FAITHFULLY NAME - not on names that look strange. On Windows, cid1
+traverses with the `\?\` path form, which addresses names exactly (no trailing-dot or
+trailing-space stripping). A name that can be enumerated, read and encoded exactly is AVAILABLE.
+REFUSED (UNAVAILABLE) only when:
+    - a name or link target is not well-formed Unicode (a lone surrogate cannot be encoded to UTF-8
+      without collapsing into U+FFFD - two distinct names would share one encoding)
+    - an entry is neither file, directory nor symlink (fifo, socket, device)
+    - any read, stat or readlink fails
+M15 therefore becomes three measurements, replacing "a name ending in '.' -> UNAVAILABLE":
+    M15a  odd. is AVAILABLE and the worker's view of /candidate lists exactly cid1's entry names
+          (if the worker sees something cid1 does not name, or vice versa, M15 is VIOLATED)
+    M15b  COLLAPSE: {odd, odd.} with different bytes vs {odd} alone -> DIFFERENT identities
+    M15c  a name with a lone surrogate -> UNAVAILABLE (NOT_RUNNABLE if it cannot be created)
+The old suite's M15 "VIOLATED" is re-read under this interpretation as: the old identity returned
+an identity that omitted the entry entirely (odd. was never in HEAD) - a FIDELITY fact, not proof
+that availability was wrong.
+
+### M13
+
+UNMEASURED ON WINDOWS - requires a symlink-capable environment. The behaviour is implemented to
+the frozen semantics; the row is run under Linux before the cross-platform contract is declared.
+
+### Predictions for the cid1 run, frozen
+
+    identity rows (measured on cid1 directly):
+      M3, M4                    HOLD (AVAILABILITY)
+      M1, M2, M5, M6, M12, M14, M16   HOLD genuinely (not vacuously)
+      M7-M11, every shape, incl. M11 ignored+committed   HOLD (FIDELITY)
+      M15a  odd. AVAILABLE; worker listing: NO PREDICTION (Docker Desktop's handling of a trailing
+            dot through a bind mount is unknown to me)
+      M15b  HOLD   M15c  UNAVAILABLE or NOT_RUNNABLE
+      M13   UNMEASURED ON WINDOWS
+    other boundaries (shipped paths, unchanged) - must STAY RED:
+      M17 PRESERVATION VIOLATED   M18 CONSISTENCY VIOLATED   M19 BINDING VIOLATED
+    If any of M17-M19 turns green, cid1 has leaked into a mechanism it does not own: a FAILURE of
+    this step, not a bonus.
