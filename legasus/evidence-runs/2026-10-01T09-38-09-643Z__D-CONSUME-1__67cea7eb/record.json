@@ -1,0 +1,2821 @@
+{
+  "prereg": "582f3ef2",
+  "image": "sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3",
+  "arms": {
+    "P1": {
+      "B": {
+        "results": [
+          {
+            "task": "t1",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "1f:a38ac4132ba36ad1",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t2",
+            "state": "FAILED",
+            "termination": "ENDED",
+            "verdict": "FAIL",
+            "requested": "PASS",
+            "protected": "FAIL",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RESTORED",
+            "promotable": false,
+            "countsAsCompletion": false,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t3",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "3f:fe6c4578b485f9d6"
+          }
+        ],
+        "halted": null,
+        "accounting": {
+          "queued": 3,
+          "accountedFor": 3,
+          "complete": true,
+          "missing": [],
+          "counts": {
+            "COMPLETED": 2,
+            "FAILED": 1,
+            "INTERRUPTED": 0,
+            "UNATTEMPTED": 0,
+            "EVAL_ERROR": 0,
+            "BLOCKED": 0
+          }
+        },
+        "baselineBytes": "3f:fe6c4578b485f9d6",
+        "resume": {
+          "results": [
+            {
+              "task": "t1",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t2",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t3",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            }
+          ],
+          "halted": "the worker could not run the task: Error"
+        },
+        "journal": [
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "task seed",
+            "startTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t2",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t2",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t2",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "FAILED",
+            "finalState": "FAILED",
+            "termination": "ENDED",
+            "disposition": "RESTORED",
+            "candidateVerdict": {
+              "overall": "FAIL",
+              "requested": "PASS",
+              "protected": "FAIL",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": false
+          },
+          {
+            "event": "task_baseline",
+            "task": "t3",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t3",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t3",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "baselineTask": "t3",
+            "promotable": true
+          },
+          {
+            "event": "batch_end",
+            "halted": null,
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 2,
+                "FAILED": 1,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 0,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          },
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "accepted baseline from none",
+            "startTree": "9759a7651ad8a3dff0777004b5553403c18c712e"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "ERROR",
+              "exit": null,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "batch_halt",
+            "task": "t1",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "UNATTEMPTED",
+            "finalState": "UNATTEMPTED",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "batch_end",
+            "halted": "the worker could not run the task: Error",
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 0,
+                "FAILED": 0,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 3,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          }
+        ]
+      },
+      "G": {
+        "retain": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RETAIN",
+          "countsAsCompletion": true,
+          "workspaceRestored": false,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        },
+        "restore": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RESTORED",
+          "countsAsCompletion": false,
+          "workspaceRestored": true,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        }
+      },
+      "D": {
+        "ensuredCreated": true,
+        "ownGit": true,
+        "startTree": "0e8d04ed8026f8d0cf8815464ee804057c3ed057",
+        "candidateTree": "b95e60c3d50e6819adcd0e83846767bb4ddbaacb",
+        "invalid": false,
+        "violated": true,
+        "startLoads": "true"
+      },
+      "E": {
+        "ownGit": false,
+        "verdict": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "candidateTree": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+        "reason": null
+      },
+      "M": {
+        "units": [
+          {
+            "task": "t1",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          },
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true,
+            "labelAgrees": false
+          },
+          {
+            "task": "t3",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          }
+        ],
+        "labelDisagreements": [
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true
+          }
+        ]
+      }
+    },
+    "P2": {
+      "B": {
+        "results": [
+          {
+            "task": "t1",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "1f:a38ac4132ba36ad1",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t2",
+            "state": "FAILED",
+            "termination": "ENDED",
+            "verdict": "FAIL",
+            "requested": "PASS",
+            "protected": "FAIL",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RESTORED",
+            "promotable": false,
+            "countsAsCompletion": false,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t3",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "3f:fe6c4578b485f9d6"
+          }
+        ],
+        "halted": null,
+        "accounting": {
+          "queued": 3,
+          "accountedFor": 3,
+          "complete": true,
+          "missing": [],
+          "counts": {
+            "COMPLETED": 2,
+            "FAILED": 1,
+            "INTERRUPTED": 0,
+            "UNATTEMPTED": 0,
+            "EVAL_ERROR": 0,
+            "BLOCKED": 0
+          }
+        },
+        "baselineBytes": "3f:fe6c4578b485f9d6",
+        "resume": {
+          "results": [
+            {
+              "task": "t1",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t2",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t3",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            }
+          ],
+          "halted": "the worker could not run the task: Error"
+        },
+        "journal": [
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "task seed",
+            "startTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t2",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t2",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t2",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "FAILED",
+            "finalState": "FAILED",
+            "termination": "ENDED",
+            "disposition": "RESTORED",
+            "candidateVerdict": {
+              "overall": "FAIL",
+              "requested": "PASS",
+              "protected": "FAIL",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": false
+          },
+          {
+            "event": "task_baseline",
+            "task": "t3",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t3",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t3",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "baselineTask": "t3",
+            "promotable": true
+          },
+          {
+            "event": "batch_end",
+            "halted": null,
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 2,
+                "FAILED": 1,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 0,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          },
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "accepted baseline from none",
+            "startTree": "9759a7651ad8a3dff0777004b5553403c18c712e"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "ERROR",
+              "exit": null,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "batch_halt",
+            "task": "t1",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "UNATTEMPTED",
+            "finalState": "UNATTEMPTED",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "batch_end",
+            "halted": "the worker could not run the task: Error",
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 0,
+                "FAILED": 0,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 3,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          }
+        ]
+      },
+      "G": {
+        "retain": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RETAIN",
+          "countsAsCompletion": true,
+          "workspaceRestored": false,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        },
+        "restore": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RESTORED",
+          "countsAsCompletion": false,
+          "workspaceRestored": true,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        }
+      },
+      "D": {
+        "ensuredCreated": true,
+        "ownGit": true,
+        "startTree": "0e8d04ed8026f8d0cf8815464ee804057c3ed057",
+        "candidateTree": "b95e60c3d50e6819adcd0e83846767bb4ddbaacb",
+        "invalid": false,
+        "violated": true,
+        "startLoads": "true"
+      },
+      "E": {
+        "ownGit": false,
+        "verdict": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "candidateTree": "6c872d3649f2b147255933ec788adb1c4abf12e3",
+        "reason": null
+      },
+      "M": {
+        "units": [
+          {
+            "task": "t1",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          },
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true,
+            "labelAgrees": false
+          },
+          {
+            "task": "t3",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          }
+        ],
+        "labelDisagreements": [
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true
+          }
+        ]
+      }
+    },
+    "P1a": {
+      "B": {
+        "results": [
+          {
+            "task": "t1",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "1f:a38ac4132ba36ad1",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t2",
+            "state": "FAILED",
+            "termination": "ENDED",
+            "verdict": "FAIL",
+            "requested": "PASS",
+            "protected": "FAIL",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RESTORED",
+            "promotable": false,
+            "countsAsCompletion": false,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t3",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "3f:fe6c4578b485f9d6"
+          }
+        ],
+        "halted": null,
+        "accounting": {
+          "queued": 3,
+          "accountedFor": 3,
+          "complete": true,
+          "missing": [],
+          "counts": {
+            "COMPLETED": 2,
+            "FAILED": 1,
+            "INTERRUPTED": 0,
+            "UNATTEMPTED": 0,
+            "EVAL_ERROR": 0,
+            "BLOCKED": 0
+          }
+        },
+        "baselineBytes": "3f:fe6c4578b485f9d6",
+        "resume": {
+          "results": [
+            {
+              "task": "t1",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t2",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t3",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            }
+          ],
+          "halted": "the worker could not run the task: Error"
+        },
+        "journal": [
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "task seed",
+            "startTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t2",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t2",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t2",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "FAILED",
+            "finalState": "FAILED",
+            "termination": "ENDED",
+            "disposition": "RESTORED",
+            "candidateVerdict": {
+              "overall": "FAIL",
+              "requested": "PASS",
+              "protected": "FAIL",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": false
+          },
+          {
+            "event": "task_baseline",
+            "task": "t3",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t3",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t3",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "baselineTask": "t3",
+            "promotable": true
+          },
+          {
+            "event": "batch_end",
+            "halted": null,
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 2,
+                "FAILED": 1,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 0,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          },
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "accepted baseline from none",
+            "startTree": "9759a7651ad8a3dff0777004b5553403c18c712e"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "ERROR",
+              "exit": null,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "batch_halt",
+            "task": "t1",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "UNATTEMPTED",
+            "finalState": "UNATTEMPTED",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "batch_end",
+            "halted": "the worker could not run the task: Error",
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 0,
+                "FAILED": 0,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 3,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          }
+        ]
+      },
+      "G": {
+        "retain": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RETAIN",
+          "countsAsCompletion": true,
+          "workspaceRestored": false,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        },
+        "restore": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RESTORED",
+          "countsAsCompletion": false,
+          "workspaceRestored": true,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        }
+      },
+      "D": {
+        "ensuredCreated": true,
+        "ownGit": true,
+        "startTree": "0e8d04ed8026f8d0cf8815464ee804057c3ed057",
+        "candidateTree": "b95e60c3d50e6819adcd0e83846767bb4ddbaacb",
+        "invalid": false,
+        "violated": true,
+        "startLoads": "true"
+      },
+      "E": {
+        "ownGit": false,
+        "verdict": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "candidateTree": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+        "reason": null
+      },
+      "M": {
+        "units": [
+          {
+            "task": "t1",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          },
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true,
+            "labelAgrees": false
+          },
+          {
+            "task": "t3",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          }
+        ],
+        "labelDisagreements": [
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true
+          }
+        ]
+      }
+    },
+    "P1b": {
+      "B": {
+        "results": [
+          {
+            "task": "t1",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "1f:a38ac4132ba36ad1",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t2",
+            "state": "FAILED",
+            "termination": "ENDED",
+            "verdict": "FAIL",
+            "requested": "PASS",
+            "protected": "FAIL",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RESTORED",
+            "promotable": false,
+            "countsAsCompletion": false,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "2f:6204188f4d01390f"
+          },
+          {
+            "task": "t3",
+            "state": "COMPLETED",
+            "termination": "ENDED",
+            "verdict": "PASS",
+            "requested": "PASS",
+            "protected": "PASS",
+            "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "disposition": "RETAIN",
+            "promotable": true,
+            "countsAsCompletion": true,
+            "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "survivingVerdict": null,
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "startBytes": "2f:6204188f4d01390f",
+            "finalBytes": "3f:fe6c4578b485f9d6"
+          }
+        ],
+        "halted": null,
+        "accounting": {
+          "queued": 3,
+          "accountedFor": 3,
+          "complete": true,
+          "missing": [],
+          "counts": {
+            "COMPLETED": 2,
+            "FAILED": 1,
+            "INTERRUPTED": 0,
+            "UNATTEMPTED": 0,
+            "EVAL_ERROR": 0,
+            "BLOCKED": 0
+          }
+        },
+        "baselineBytes": "3f:fe6c4578b485f9d6",
+        "resume": {
+          "results": [
+            {
+              "task": "t1",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t2",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t3",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            }
+          ],
+          "halted": "the worker could not run the task: Error"
+        },
+        "journal": [
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "task seed",
+            "startTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t2",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t2",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t2",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "FAILED",
+            "finalState": "FAILED",
+            "termination": "ENDED",
+            "disposition": "RESTORED",
+            "candidateVerdict": {
+              "overall": "FAIL",
+              "requested": "PASS",
+              "protected": "FAIL",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "baselineTask": "t1",
+            "promotable": false
+          },
+          {
+            "event": "task_baseline",
+            "task": "t3",
+            "baselineSource": "accepted baseline from t1",
+            "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+          },
+          {
+            "event": "task_start",
+            "task": "t3",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t3",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "COMPLETED",
+            "finalState": "COMPLETED",
+            "termination": "ENDED",
+            "disposition": "RETAIN",
+            "candidateVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "PASS",
+              "requested": "PASS",
+              "protected": "PASS",
+              "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+            },
+            "baselineTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+            "baselineTask": "t3",
+            "promotable": true
+          },
+          {
+            "event": "batch_end",
+            "halted": null,
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 2,
+                "FAILED": 1,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 0,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          },
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "accepted baseline from none",
+            "startTree": "9759a7651ad8a3dff0777004b5553403c18c712e"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "ERROR",
+              "exit": null,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "batch_halt",
+            "task": "t1",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "UNATTEMPTED",
+            "finalState": "UNATTEMPTED",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "batch_end",
+            "halted": "the worker could not run the task: Error",
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 0,
+                "FAILED": 0,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 3,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          }
+        ]
+      },
+      "G": {
+        "retain": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RETAIN",
+          "countsAsCompletion": true,
+          "workspaceRestored": false,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        },
+        "restore": {
+          "ownGitBefore": false,
+          "prepOk": true,
+          "prepReason": null,
+          "startTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "startVerdictProtected": "PASS",
+          "requestedAlreadyPasses": true,
+          "protection": "BEHAVIORAL_ACCEPTANCE",
+          "disposition": "RESTORED",
+          "countsAsCompletion": false,
+          "workspaceRestored": true,
+          "error": null,
+          "verdict": null,
+          "candidateTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "survivingVerdict": null,
+          "survivingTree": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "finalBytes": "2f:6204188f4d01390f"
+        }
+      },
+      "D": {
+        "ensuredCreated": true,
+        "ownGit": true,
+        "startTree": "0e8d04ed8026f8d0cf8815464ee804057c3ed057",
+        "candidateTree": "b95e60c3d50e6819adcd0e83846767bb4ddbaacb",
+        "invalid": false,
+        "violated": true,
+        "startLoads": "true"
+      },
+      "E": {
+        "ownGit": false,
+        "verdict": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "candidateTree": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+        "reason": null
+      },
+      "M": {
+        "units": [
+          {
+            "task": "t1",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          },
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true,
+            "labelAgrees": false
+          },
+          {
+            "task": "t3",
+            "disposition": "RETAIN",
+            "treesEqual": true,
+            "labelAgrees": true
+          }
+        ],
+        "labelDisagreements": [
+          {
+            "task": "t2",
+            "disposition": "RESTORED",
+            "treesEqual": true
+          }
+        ]
+      }
+    },
+    "POS": {
+      "B": {
+        "results": [
+          {
+            "task": "t1",
+            "state": "FAILED",
+            "termination": "ENDED",
+            "verdict": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "disposition": "PRESERVE_INCOMPLETE",
+            "promotable": false,
+            "countsAsCompletion": false,
+            "survivingTree": "0c365d421742308ea5564abba18b3c1ba7792aee",
+            "survivingVerdict": null,
+            "baselineTree": null,
+            "startBytes": "1f:a38ac4132ba36ad1",
+            "finalBytes": "2f:d791cbc2f69064a7"
+          },
+          {
+            "task": "t2",
+            "state": "BLOCKED",
+            "termination": "BLOCKED",
+            "verdict": null,
+            "requested": null,
+            "protected": null,
+            "candidateTree": null,
+            "disposition": null,
+            "promotable": null,
+            "countsAsCompletion": null,
+            "survivingTree": null,
+            "survivingVerdict": null,
+            "baselineTree": null,
+            "startBytes": null,
+            "finalBytes": "ABSENT"
+          },
+          {
+            "task": "t3",
+            "state": "BLOCKED",
+            "termination": "BLOCKED",
+            "verdict": null,
+            "requested": null,
+            "protected": null,
+            "candidateTree": null,
+            "disposition": null,
+            "promotable": null,
+            "countsAsCompletion": null,
+            "survivingTree": null,
+            "survivingVerdict": null,
+            "baselineTree": null,
+            "startBytes": null,
+            "finalBytes": "ABSENT"
+          }
+        ],
+        "halted": null,
+        "accounting": {
+          "queued": 3,
+          "accountedFor": 3,
+          "complete": true,
+          "missing": [],
+          "counts": {
+            "COMPLETED": 0,
+            "FAILED": 1,
+            "INTERRUPTED": 0,
+            "UNATTEMPTED": 0,
+            "EVAL_ERROR": 0,
+            "BLOCKED": 2
+          }
+        },
+        "baselineBytes": "ABSENT",
+        "resume": {
+          "results": [
+            {
+              "task": "t1",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t2",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            },
+            {
+              "task": "t3",
+              "state": "UNATTEMPTED",
+              "resumedFromJournal": false
+            }
+          ],
+          "halted": "the worker could not run the task: Error"
+        },
+        "journal": [
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "task seed",
+            "startTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "DONE",
+              "exit": 0,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "FAILED",
+            "finalState": "FAILED",
+            "termination": "ENDED",
+            "disposition": "PRESERVE_INCOMPLETE",
+            "candidateVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+            },
+            "baselineTree": null,
+            "baselineTask": "none",
+            "promotable": false
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "BLOCKED",
+            "finalState": "BLOCKED",
+            "reason": "prerequisite t1 was not accepted"
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "BLOCKED",
+            "finalState": "BLOCKED",
+            "reason": "prerequisite t1 was not accepted"
+          },
+          {
+            "event": "batch_end",
+            "halted": null,
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 0,
+                "FAILED": 1,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 0,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 2
+              }
+            }
+          },
+          {
+            "event": "batch_start",
+            "tasks": 3,
+            "perTaskSec": 120,
+            "totalSec": 900,
+            "chain": true
+          },
+          {
+            "event": "task_baseline",
+            "task": "t1",
+            "baselineSource": "task seed",
+            "startTree": "0c365d421742308ea5564abba18b3c1ba7792aee"
+          },
+          {
+            "event": "task_start",
+            "task": "t1",
+            "state": "started"
+          },
+          {
+            "event": "task_ran",
+            "task": "t1",
+            "state": "started",
+            "completionRecorded": true,
+            "outcome": {
+              "status": "ERROR",
+              "exit": null,
+              "timedOut": false
+            }
+          },
+          {
+            "event": "batch_halt",
+            "task": "t1",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t1",
+            "state": "UNATTEMPTED",
+            "finalState": "UNATTEMPTED",
+            "reason": "the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t2",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "task_end",
+            "task": "t3",
+            "state": "UNATTEMPTED",
+            "reason": "batch halted: the worker could not run the task: Error"
+          },
+          {
+            "event": "batch_end",
+            "halted": "the worker could not run the task: Error",
+            "accounting": {
+              "queued": 3,
+              "accountedFor": 3,
+              "complete": true,
+              "missing": [],
+              "counts": {
+                "COMPLETED": 0,
+                "FAILED": 0,
+                "INTERRUPTED": 0,
+                "UNATTEMPTED": 3,
+                "EVAL_ERROR": 0,
+                "BLOCKED": 0
+              }
+            }
+          }
+        ]
+      },
+      "M": {
+        "units": [
+          {
+            "task": "t1",
+            "disposition": "PRESERVE_INCOMPLETE",
+            "treesEqual": true,
+            "labelAgrees": true
+          },
+          {
+            "task": "t2",
+            "disposition": null,
+            "treesEqual": null,
+            "labelAgrees": null
+          },
+          {
+            "task": "t3",
+            "disposition": null,
+            "treesEqual": null,
+            "labelAgrees": null
+          }
+        ],
+        "labelDisagreements": []
+      }
+    },
+    "E_P0": {
+      "ownGit": false,
+      "verdict": "EVALUATION_ERROR",
+      "requested": null,
+      "protected": null,
+      "candidateTree": null,
+      "reason": "the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict"
+    },
+    "E_Pc": {
+      "ownGit": false,
+      "verdict": "EVALUATION_ERROR",
+      "requested": null,
+      "protected": null,
+      "candidateTree": null,
+      "reason": "the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict"
+    }
+  },
+  "comparisons": {
+    "noise_P1a_P1b": {
+      "authoritative": [],
+      "receipt": [],
+      "other": []
+    },
+    "mustfire": {
+      "authoritative": [
+        {
+          "path": ".B.results.0.state",
+          "a": "COMPLETED",
+          "b": "FAILED"
+        },
+        {
+          "path": ".B.results.0.verdict",
+          "a": "PASS",
+          "b": "FAIL"
+        },
+        {
+          "path": ".B.results.0.requested",
+          "a": "PASS",
+          "b": "FAIL"
+        },
+        {
+          "path": ".B.results.0.disposition",
+          "a": "RETAIN",
+          "b": "PRESERVE_INCOMPLETE"
+        },
+        {
+          "path": ".B.results.0.promotable",
+          "a": true,
+          "b": false
+        },
+        {
+          "path": ".B.results.0.countsAsCompletion",
+          "a": true,
+          "b": false
+        },
+        {
+          "path": ".B.results.0.finalBytes",
+          "a": "2f:6204188f4d01390f",
+          "b": "2f:d791cbc2f69064a7"
+        },
+        {
+          "path": ".B.results.1.state",
+          "a": "FAILED",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.results.1.termination",
+          "a": "ENDED",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.results.1.verdict",
+          "a": "FAIL",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.requested",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.protected",
+          "a": "FAIL",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.disposition",
+          "a": "RESTORED",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.promotable",
+          "a": false,
+          "b": null
+        },
+        {
+          "path": ".B.results.1.countsAsCompletion",
+          "a": false,
+          "b": null
+        },
+        {
+          "path": ".B.results.1.startBytes",
+          "a": "2f:6204188f4d01390f",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.finalBytes",
+          "a": "2f:6204188f4d01390f",
+          "b": "ABSENT"
+        },
+        {
+          "path": ".B.results.2.state",
+          "a": "COMPLETED",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.results.2.termination",
+          "a": "ENDED",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.results.2.verdict",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.requested",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.protected",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.disposition",
+          "a": "RETAIN",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.promotable",
+          "a": true,
+          "b": null
+        },
+        {
+          "path": ".B.results.2.countsAsCompletion",
+          "a": true,
+          "b": null
+        },
+        {
+          "path": ".B.results.2.startBytes",
+          "a": "2f:6204188f4d01390f",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.finalBytes",
+          "a": "3f:fe6c4578b485f9d6",
+          "b": "ABSENT"
+        },
+        {
+          "path": ".B.accounting",
+          "a": "{\"queued\":3,\"accountedFor\":3,\"complete\":true,\"missing\":[],\"counts\":{\"COMPLETED\":2,\"FAILED\":1,\"INTERRUPTED\":0,\"UNATTEMPTED\":0,\"EVAL_ERROR\":0,\"BLOCKED\":0}}",
+          "b": "{\"queued\":3,\"accountedFor\":3,\"complete\":true,\"missing\":[],\"counts\":{\"COMPLETED\":0,\"FAILED\":1,\"INTERRUPTED\":0,\"UNATTEMPTED\":0,\"EVAL_ERROR\":0,\"BLOCKED\":2}}"
+        },
+        {
+          "path": ".B.baselineBytes",
+          "a": "3f:fe6c4578b485f9d6",
+          "b": "ABSENT"
+        },
+        {
+          "path": ".B.journal.4.state",
+          "a": "COMPLETED",
+          "b": "FAILED"
+        },
+        {
+          "path": ".B.journal.4.finalState",
+          "a": "COMPLETED",
+          "b": "FAILED"
+        },
+        {
+          "path": ".B.journal.4.disposition",
+          "a": "RETAIN",
+          "b": "PRESERVE_INCOMPLETE"
+        },
+        {
+          "path": ".B.journal.4.candidateVerdict.requested",
+          "a": "PASS",
+          "b": "FAIL"
+        },
+        {
+          "path": ".B.journal.4.survivingWorkspaceVerdict.requested",
+          "a": "PASS",
+          "b": "FAIL"
+        },
+        {
+          "path": ".B.journal.4.promotable",
+          "a": true,
+          "b": false
+        },
+        {
+          "path": ".B.journal.5.event",
+          "a": "task_baseline",
+          "b": "task_end"
+        },
+        {
+          "path": ".B.journal.5.baselineSource",
+          "a": "accepted baseline from t1"
+        },
+        {
+          "path": ".B.journal.6.event",
+          "a": "task_start",
+          "b": "task_end"
+        },
+        {
+          "path": ".B.journal.6.state",
+          "a": "started",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.journal.7.event",
+          "a": "task_ran",
+          "b": "batch_end"
+        },
+        {
+          "path": ".B.journal.7.state",
+          "a": "started"
+        },
+        {
+          "path": ".B.journal.8.event",
+          "a": "task_end",
+          "b": "batch_start"
+        },
+        {
+          "path": ".B.journal.8.state",
+          "a": "FAILED"
+        },
+        {
+          "path": ".B.journal.8.finalState",
+          "a": "FAILED"
+        },
+        {
+          "path": ".B.journal.8.termination",
+          "a": "ENDED"
+        },
+        {
+          "path": ".B.journal.8.disposition",
+          "a": "RESTORED"
+        },
+        {
+          "path": ".B.journal.8.candidateVerdict.requested",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.8.candidateVerdict.protected",
+          "a": "FAIL"
+        },
+        {
+          "path": ".B.journal.8.survivingWorkspaceVerdict.requested",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.8.survivingWorkspaceVerdict.protected",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.8.promotable",
+          "a": false
+        },
+        {
+          "path": ".B.journal.9.baselineSource",
+          "a": "accepted baseline from t1",
+          "b": "task seed"
+        },
+        {
+          "path": ".B.journal.12.event",
+          "a": "task_end",
+          "b": "batch_halt"
+        },
+        {
+          "path": ".B.journal.12.state",
+          "a": "COMPLETED"
+        },
+        {
+          "path": ".B.journal.12.finalState",
+          "a": "COMPLETED"
+        },
+        {
+          "path": ".B.journal.12.termination",
+          "a": "ENDED"
+        },
+        {
+          "path": ".B.journal.12.disposition",
+          "a": "RETAIN"
+        },
+        {
+          "path": ".B.journal.12.candidateVerdict.requested",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.12.candidateVerdict.protected",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.12.survivingWorkspaceVerdict.requested",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.12.survivingWorkspaceVerdict.protected",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.12.promotable",
+          "a": true
+        },
+        {
+          "path": ".B.journal.13.event",
+          "a": "batch_end",
+          "b": "task_end"
+        },
+        {
+          "path": ".B.journal.13.halted",
+          "a": null
+        },
+        {
+          "path": ".B.journal.13.accounting",
+          "a": "{\"queued\":3,\"accountedFor\":3,\"complete\":true,\"missing\":[],\"counts\":{\"COMPLETED\":2,\"FAILED\":1,\"INTERRUPTED\":0,\"UNATTEMPTED\":0,\"EVAL_ERROR\":0,\"BLOCKED\":0}}"
+        },
+        {
+          "path": ".B.journal.14.event",
+          "a": "batch_start",
+          "b": "task_end"
+        },
+        {
+          "path": ".B.journal.15.event",
+          "a": "task_baseline",
+          "b": "task_end"
+        },
+        {
+          "path": ".B.journal.15.baselineSource",
+          "a": "accepted baseline from none"
+        },
+        {
+          "path": ".B.journal.16.event",
+          "a": "task_start",
+          "b": "batch_end"
+        },
+        {
+          "path": ".B.journal.16.state",
+          "a": "started"
+        },
+        {
+          "path": ".B.journal.17.event",
+          "a": "task_ran"
+        },
+        {
+          "path": ".B.journal.17.state",
+          "a": "started"
+        },
+        {
+          "path": ".B.journal.18.event",
+          "a": "batch_halt"
+        },
+        {
+          "path": ".B.journal.18.reason",
+          "a": "the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.19.event",
+          "a": "task_end"
+        },
+        {
+          "path": ".B.journal.19.state",
+          "a": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.19.finalState",
+          "a": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.19.reason",
+          "a": "the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.20.event",
+          "a": "task_end"
+        },
+        {
+          "path": ".B.journal.20.state",
+          "a": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.20.reason",
+          "a": "batch halted: the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.21.event",
+          "a": "task_end"
+        },
+        {
+          "path": ".B.journal.21.state",
+          "a": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.21.reason",
+          "a": "batch halted: the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.22.event",
+          "a": "batch_end"
+        },
+        {
+          "path": ".B.journal.22.halted",
+          "a": "the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.22.accounting",
+          "a": "{\"queued\":3,\"accountedFor\":3,\"complete\":true,\"missing\":[],\"counts\":{\"COMPLETED\":0,\"FAILED\":0,\"INTERRUPTED\":0,\"UNATTEMPTED\":3,\"EVAL_ERROR\":0,\"BLOCKED\":0}}"
+        },
+        {
+          "path": ".M.units.0.disposition",
+          "a": "RETAIN",
+          "b": "PRESERVE_INCOMPLETE"
+        },
+        {
+          "path": ".M.units.1.disposition",
+          "a": "RESTORED",
+          "b": null
+        },
+        {
+          "path": ".M.units.1.treesEqual",
+          "a": true,
+          "b": null
+        },
+        {
+          "path": ".M.units.1.labelAgrees",
+          "a": false,
+          "b": null
+        },
+        {
+          "path": ".M.units.2.disposition",
+          "a": "RETAIN",
+          "b": null
+        },
+        {
+          "path": ".M.units.2.treesEqual",
+          "a": true,
+          "b": null
+        },
+        {
+          "path": ".M.units.2.labelAgrees",
+          "a": true,
+          "b": null
+        },
+        {
+          "path": ".M.labelDisagreements",
+          "a": "[{\"task\":\"t2\",\"disposition\":\"RESTORED\",\"treesEqual\":true}]",
+          "b": "[]"
+        },
+        {
+          "path": ".B.journal.5.state",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.journal.5.finalState",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.journal.5.reason",
+          "b": "prerequisite t1 was not accepted"
+        },
+        {
+          "path": ".B.journal.6.finalState",
+          "b": "BLOCKED"
+        },
+        {
+          "path": ".B.journal.6.reason",
+          "b": "prerequisite t1 was not accepted"
+        },
+        {
+          "path": ".B.journal.7.halted",
+          "b": null
+        },
+        {
+          "path": ".B.journal.7.accounting",
+          "b": "{\"queued\":3,\"accountedFor\":3,\"complete\":true,\"missing\":[],\"counts\":{\"COMPLETED\":0,\"FAILED\":1,\"INTERRUPTED\":0,\"UNATTEMPTED\":0,\"EVAL_ERROR\":0,\"BLOCKED\":2}}"
+        },
+        {
+          "path": ".B.journal.12.reason",
+          "b": "the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.13.state",
+          "b": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.13.finalState",
+          "b": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.13.reason",
+          "b": "the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.14.state",
+          "b": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.14.reason",
+          "b": "batch halted: the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.15.state",
+          "b": "UNATTEMPTED"
+        },
+        {
+          "path": ".B.journal.15.reason",
+          "b": "batch halted: the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.16.halted",
+          "b": "the worker could not run the task: Error"
+        },
+        {
+          "path": ".B.journal.16.accounting",
+          "b": "{\"queued\":3,\"accountedFor\":3,\"complete\":true,\"missing\":[],\"counts\":{\"COMPLETED\":0,\"FAILED\":0,\"INTERRUPTED\":0,\"UNATTEMPTED\":3,\"EVAL_ERROR\":0,\"BLOCKED\":0}}"
+        }
+      ],
+      "receipt": [
+        {
+          "path": ".B.results.0.baselineTree",
+          "a": "0c365d421742308ea5564abba18b3c1ba7792aee",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.candidateTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.survivingTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "b": null
+        },
+        {
+          "path": ".B.results.1.baselineTree",
+          "a": "0c365d421742308ea5564abba18b3c1ba7792aee",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.candidateTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.survivingTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "b": null
+        },
+        {
+          "path": ".B.results.2.baselineTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "b": null
+        },
+        {
+          "path": ".B.journal.4.baselineTree",
+          "a": "0c365d421742308ea5564abba18b3c1ba7792aee",
+          "b": null
+        },
+        {
+          "path": ".B.journal.5.startTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+        },
+        {
+          "path": ".B.journal.8.candidateVerdict.candidateTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+        },
+        {
+          "path": ".B.journal.8.survivingWorkspaceVerdict.candidateTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+        },
+        {
+          "path": ".B.journal.8.baselineTree",
+          "a": "0c365d421742308ea5564abba18b3c1ba7792aee"
+        },
+        {
+          "path": ".B.journal.9.startTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040",
+          "b": "0c365d421742308ea5564abba18b3c1ba7792aee"
+        },
+        {
+          "path": ".B.journal.12.candidateVerdict.candidateTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+        },
+        {
+          "path": ".B.journal.12.survivingWorkspaceVerdict.candidateTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+        },
+        {
+          "path": ".B.journal.12.baselineTree",
+          "a": "fc95a5052e6ac0a0ecf8190d92f3513426f06040"
+        },
+        {
+          "path": ".B.journal.15.startTree",
+          "a": "9759a7651ad8a3dff0777004b5553403c18c712e"
+        }
+      ],
+      "other": [
+        {
+          "path": ".B.journal.4.candidateVerdict.overall",
+          "a": "PASS",
+          "b": "FAIL"
+        },
+        {
+          "path": ".B.journal.4.survivingWorkspaceVerdict.overall",
+          "a": "PASS",
+          "b": "FAIL"
+        },
+        {
+          "path": ".B.journal.4.baselineTask",
+          "a": "t1",
+          "b": "none"
+        },
+        {
+          "path": ".B.journal.6.task",
+          "a": "t2",
+          "b": "t3"
+        },
+        {
+          "path": ".B.journal.7.task",
+          "a": "t2"
+        },
+        {
+          "path": ".B.journal.7.completionRecorded",
+          "a": true
+        },
+        {
+          "path": ".B.journal.7.outcome.status",
+          "a": "DONE"
+        },
+        {
+          "path": ".B.journal.7.outcome.exit",
+          "a": 0
+        },
+        {
+          "path": ".B.journal.7.outcome.timedOut",
+          "a": false
+        },
+        {
+          "path": ".B.journal.8.task",
+          "a": "t2"
+        },
+        {
+          "path": ".B.journal.8.candidateVerdict.overall",
+          "a": "FAIL"
+        },
+        {
+          "path": ".B.journal.8.survivingWorkspaceVerdict.overall",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.8.baselineTask",
+          "a": "t1"
+        },
+        {
+          "path": ".B.journal.9.task",
+          "a": "t3",
+          "b": "t1"
+        },
+        {
+          "path": ".B.journal.10.task",
+          "a": "t3",
+          "b": "t1"
+        },
+        {
+          "path": ".B.journal.11.task",
+          "a": "t3",
+          "b": "t1"
+        },
+        {
+          "path": ".B.journal.11.outcome.status",
+          "a": "DONE",
+          "b": "ERROR"
+        },
+        {
+          "path": ".B.journal.11.outcome.exit",
+          "a": 0,
+          "b": null
+        },
+        {
+          "path": ".B.journal.12.task",
+          "a": "t3",
+          "b": "t1"
+        },
+        {
+          "path": ".B.journal.12.candidateVerdict.overall",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.12.survivingWorkspaceVerdict.overall",
+          "a": "PASS"
+        },
+        {
+          "path": ".B.journal.12.baselineTask",
+          "a": "t3"
+        },
+        {
+          "path": ".B.journal.14.tasks",
+          "a": 3
+        },
+        {
+          "path": ".B.journal.14.perTaskSec",
+          "a": 120
+        },
+        {
+          "path": ".B.journal.14.totalSec",
+          "a": 900
+        },
+        {
+          "path": ".B.journal.14.chain",
+          "a": true
+        },
+        {
+          "path": ".B.journal.15.task",
+          "a": "t1",
+          "b": "t3"
+        },
+        {
+          "path": ".B.journal.16.task",
+          "a": "t1"
+        },
+        {
+          "path": ".B.journal.17.task",
+          "a": "t1"
+        },
+        {
+          "path": ".B.journal.17.completionRecorded",
+          "a": true
+        },
+        {
+          "path": ".B.journal.17.outcome.status",
+          "a": "ERROR"
+        },
+        {
+          "path": ".B.journal.17.outcome.exit",
+          "a": null
+        },
+        {
+          "path": ".B.journal.17.outcome.timedOut",
+          "a": false
+        },
+        {
+          "path": ".B.journal.18.task",
+          "a": "t1"
+        },
+        {
+          "path": ".B.journal.19.task",
+          "a": "t1"
+        },
+        {
+          "path": ".B.journal.20.task",
+          "a": "t2"
+        },
+        {
+          "path": ".B.journal.21.task",
+          "a": "t3"
+        },
+        {
+          "path": ".B.journal.8.tasks",
+          "b": 3
+        },
+        {
+          "path": ".B.journal.8.perTaskSec",
+          "b": 120
+        },
+        {
+          "path": ".B.journal.8.totalSec",
+          "b": 900
+        },
+        {
+          "path": ".B.journal.8.chain",
+          "b": true
+        },
+        {
+          "path": ".B.journal.13.task",
+          "b": "t1"
+        },
+        {
+          "path": ".B.journal.14.task",
+          "b": "t2"
+        }
+      ]
+    },
+    "context_B": {
+      "authoritative": [],
+      "receipt": [],
+      "other": []
+    },
+    "context_G": {
+      "authoritative": [],
+      "receipt": [],
+      "other": []
+    },
+    "context_D": {
+      "authoritative": [],
+      "receipt": [],
+      "other": []
+    },
+    "context_M": {
+      "authoritative": [],
+      "receipt": [],
+      "other": []
+    },
+    "context_E": {
+      "authoritative": [],
+      "receipt": [
+        {
+          "path": ".candidateTree",
+          "a": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+          "b": "6c872d3649f2b147255933ec788adb1c4abf12e3"
+        }
+      ],
+      "other": []
+    },
+    "context_E_P0": {
+      "authoritative": [
+        {
+          "path": ".verdict",
+          "a": "PASS",
+          "b": "EVALUATION_ERROR"
+        },
+        {
+          "path": ".requested",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".protected",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".reason",
+          "a": null,
+          "b": "the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict"
+        }
+      ],
+      "receipt": [
+        {
+          "path": ".candidateTree",
+          "a": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+          "b": null
+        }
+      ],
+      "other": []
+    },
+    "context_E_Pc": {
+      "authoritative": [
+        {
+          "path": ".verdict",
+          "a": "PASS",
+          "b": "EVALUATION_ERROR"
+        },
+        {
+          "path": ".requested",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".protected",
+          "a": "PASS",
+          "b": null
+        },
+        {
+          "path": ".reason",
+          "a": null,
+          "b": "the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict"
+        }
+      ],
+      "receipt": [
+        {
+          "path": ".candidateTree",
+          "a": "b5adeeec80454acd4a013ceaac034e91022e6fcd",
+          "b": null
+        }
+      ],
+      "other": []
+    }
+  },
+  "readiness": {
+    "ownGit": false,
+    "verdict": "EVALUATION_ERROR",
+    "requested": null,
+    "protected": null,
+    "candidateTree": null,
+    "reason": "the candidate could not be identified (no git tree) - a verdict that cannot name what it judged is not a verdict"
+  },
+  "classification": {
+    "controls": false,
+    "noiseFields": [],
+    "production": "NOT_EVALUATED (a control failed)",
+    "nonProductionShape": "AUTHORITY-AFFECTING in the no-.git shape (see fields: AVAILABILITY if only EVALUATION_ERROR appears)"
+  }
+}

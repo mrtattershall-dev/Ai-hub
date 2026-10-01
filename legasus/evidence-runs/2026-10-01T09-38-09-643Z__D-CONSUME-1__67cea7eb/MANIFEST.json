@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T09-38-09-643Z__D-CONSUME-1__67cea7eb",
+  "label": "D-CONSUME-1",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "does ambient repository identity reach an authoritative output? D unrepaired. Prereg 582f3ef2.",
+  "command": "node server/dconsume1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T09:38:09.644Z",
+  "endedAt": "2026-10-01T09:40:50.585Z",
+  "exitStatus": 0,
+  "commit": "582f3ef25ab444d8263dc59e89ba221838f9efdb",
+  "worktreeClean": false,
+  "worktreeDiffHash": "ac6259996ef2b5afd48eff5c1e95b92830cc63730897f8303fed41eb8187b469",
+  "dirtyEntryCount": 13,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "dconsume1.log",
+      "bytes": 6645,
+      "sha256": "cd4c99dfcf151505f9d25d364c9dcb9089922cdf1dd66396c942a3a084b8d38f"
+    },
+    {
+      "name": "record.json",
+      "bytes": 82188,
+      "sha256": "05e517137e2ac6a2c92ebc18eaddc57d5bf47ec6c15e59359bf23f303fe72ef8"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}
