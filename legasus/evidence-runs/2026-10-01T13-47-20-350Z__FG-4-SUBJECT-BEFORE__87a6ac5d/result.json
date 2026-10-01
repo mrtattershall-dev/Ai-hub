@@ -1,0 +1,57 @@
+{
+  "phase": "before",
+  "rows": [
+    {
+      "id": "S0",
+      "label": "shipped .find(exists) on the F4 workspace (verbatim)",
+      "outcome": "falls through to s1_library.js (the defect, as a reference)",
+      "shipped": "s1_library.js"
+    },
+    {
+      "id": "S1",
+      "label": "goalEntry: named target missing",
+      "outcome": "REFUSES: missing=s10_desk.js",
+      "missing": "s10_desk.js"
+    },
+    {
+      "id": "S2",
+      "label": "goalEntry: one named file, exists",
+      "outcome": "entry=s1_library.js (holds)"
+    },
+    {
+      "id": "S3",
+      "label": "goalEntry: remove-goal, old.js absent",
+      "outcome": "entry=index.js (exception holds)"
+    },
+    {
+      "id": "S4",
+      "label": "goalEntry: no named code file",
+      "outcome": "no entry, no refusal (holds)"
+    },
+    {
+      "id": "S5",
+      "label": "hub: target never written; model writes s1 and finishes",
+      "outcome": "VERIFIED on the fall-through file (red): Verified (node): all 2 source file(s) pass a syntax check (t",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 1,
+      "verifiedNote": "Verified (node): all 2 source file(s) pass a syntax check (this goal's scope); all 2 module(s) load without throwing (this goal's scope); `node s1_library.js` ran and exited cleanly",
+      "missingBlock": null
+    },
+    {
+      "id": "S6",
+      "label": "hub: model writes s10_desk.js, then finishes",
+      "outcome": "Verified on s10_desk.js (holds)",
+      "status": "done",
+      "finishKind": null,
+      "finishBlocks": 0,
+      "verifiedNote": "Verified (node): all 3 source file(s) pass a syntax check (this goal's scope); all 3 module(s) load without throwing (this goal's scope); `node s10_desk.js` ran and exited cleanly",
+      "missingBlock": null
+    }
+  ],
+  "verdict": {
+    "mustFire": true,
+    "pureHolds": true,
+    "s6": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T13-47-20-350Z__FG-4-SUBJECT-BEFORE__87a6ac5d",
+  "label": "FG-4-SUBJECT-BEFORE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "FG-4 SUBJECT before the agent.js repair.",
+  "command": "FG4_PHASE=before node server/fg4.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T13:47:20.352Z",
+  "endedAt": "2026-10-01T13:47:25.454Z",
+  "exitStatus": 0,
+  "commit": "80174bbeb792688e88adc4bf78225a72b642b2a7",
+  "worktreeClean": false,
+  "worktreeDiffHash": "ee9d0db860735cbeea9ce2b2c7031267914f6796869a1f116fcd93ba2ec353fe",
+  "dirtyEntryCount": 52,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "fg4.log",
+      "bytes": 919,
+      "sha256": "37e8a048130a3712083063fc7ac7923074398560319646e855d34cb2f7135d3d"
+    },
+    {
+      "name": "result.json",
+      "bytes": 1880,
+      "sha256": "c14736cb3dd55f918fe8bf1d8aa9420a6d50feeba96309f3453d61c4a50b9fc9"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

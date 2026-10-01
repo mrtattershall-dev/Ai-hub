@@ -29,6 +29,7 @@ import { classifyCommand, classifyPython, describeMode, MODE as APPROVAL_MODE } 
 import * as ledger from './taskLedger.js';
 import * as visual from './visualCheck.js';
 import * as verifier from './verifyProject.js';
+import { goalEntry as goalEntryOf } from './goalEntry.mjs';   // FG-4 SUBJECT: the file the goal names, or a refusal
 import { verifyGodotFiles } from './godotVerify.js';
 import { escalate, estimateTokens, tokenBudgetExceeded } from './escalate.js';
 import * as workQueue from './queue.js';
@@ -4631,7 +4632,19 @@ async function drive(loadDb, run) {
                 // calling verify() with no entry at all, so the deciding path kept the bug the advisory path
                 // had fixed - it could pass a goal on the strength of a leftover file from another goal.
                 // Reproduced in finishGateEntry.test.mjs before this change.
-                const goalEntry = ledger.namedFiles(run.goal || '').find((f) => /\.(py|c?js|mjs)$/i.test(f) && existsSync(join(WORKSPACE, f)));
+                // FG-4 SUBJECT (legasus/screen/FG-4-SUBJECT_PREREG.md). This used to be
+                //   namedFiles(goal).find((f) => CODE && existsSync(f))
+                // - and the `.find(exists)` was the fall-through fatal-09 recorded as latent: goal 10 names
+                // s10_desk.js, s1_library.js; s10 never written; the entry silently became s1 and the goal was
+                // Verified on a file it never asked to create (FG-1 F4, live here). The entry is the FIRST named
+                // code file; if it does not exist the finish is refused, in every configuration - a missing
+                // target is a filesystem fact, not host execution - and counts toward the 3-strike cap.
+                const { entry: goalEntry, missing: missingTarget } = goalEntryOf(run.goal || '', (f) => existsSync(join(WORKSPACE, f)));
+                if (missingTarget) {
+                  blocked(`The goal names ${missingTarget}, which does not exist — not finished.`,
+                    `Do NOT finish yet — the goal names ${missingTarget} and that file does not exist. Create it: the goal's first-named file is what gets judged, and nothing else will be judged in its place.`);
+                  continue turn;
+                }
                 // ...and the goal travels here too. Fixing only the verify_project TOOL would leave the
                 // DECIDING path stamping verified:true on a file that exports nothing, which is exactly
                 // how the advisory/deciding split has bitten this gate twice before.
