@@ -11630,3 +11630,21 @@ Claimed by: Claude (finish-gate session). Files:
     NOT YET   server/agent.js (~5590-5630 terminal block), server/workQueue.js - read only until a policy is frozen;
               a separate claim precedes any edit
 Independent of the recovery work (Agent 2). Checked before writing.
+
+## RECORD 2026-10-01 10:06 CDT — fuzz2-detail campaign, launched WITHOUT a COORD entry
+Recorded by: Claude (this session), after the fact. Facts only; creator/launcher NOT reconstructed.
+    worktree       C:/Users/tatte/Projects/ai-coding-hub-fuzz2, branch fuzz2-detail, created ~08:40 CDT
+    process        fuzzForever.mjs PID 21088, started 2026-10-01 08:55:44 CDT, argv "500000 12"
+    code           HEAD c952cbc9 (pre-repair; contains none of B/A/D-BIND/COMMIT-1/COMMIT-2/EH1)
+                   + dirty fuzzForever.mjs, fuzzLoop.mjs; untracked fuzzReport.mjs, fuzzStatus.mjs
+    mode           hostile; seeds from 500000; CRASH-2 raw capture (--report-on-fatalerror)
+    creator        UNRECORDED
+Status: final old-code specimen (owner decision). Do not signal, restart or write into it.
+Its fuzz-out/ is evidence. Any Candidate-0 campaign takes a NEW worktree and a COORD entry first.
+
+## CLAIM 2026-10-01 10:13 CDT — candidate-0 — CONT-2 REPAIR
+Claimed by: Claude (finish-gate session). Files:
+    CLAIMED   server/agent.js ONLY the terminal block (~5606-5640: queue completion + supervisor dequeue),
+              server/queue.js completeLocked, server/finishVerdicts.mjs (CONTINUABLE export)
+    NEW       legasus/screen/CONT-2_RESULT.md
+Under the CONT-2 freeze. Do not edit the claimed regions until released.
