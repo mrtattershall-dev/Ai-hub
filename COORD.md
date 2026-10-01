@@ -11542,3 +11542,5 @@ Why: two cid1 implementations landed on candidate-0 within 9 minutes (3e7db019/0
 with contradicting measurements of lstat through the extended-length prefix. Settling by measurement
 before D-COPY uses cid1 as its oracle. If you are the other session: read D-ID-1_RECONCILE.md before
 writing to any of the claimed files.
+
+Claim released 2026-10-01 05:52 CDT — D-ID reconcile and D-COPY committed. server/batch.js, server/cid1.mjs, server/candidateIdentity.mjs FREE.
