@@ -11656,3 +11656,8 @@ No existing file touched. Subject (third-party slot machine, NO licence found) s
 pinned by sha256; it is never copied, vendored or committed. Checked before writing.
 
 Claim released 2026-10-01 11:04 CDT - CONT-1 characterized (3351faed), CONT-2 repaired (the commit above this line in git log). server/agent.js, server/queue.js, server/finishVerdicts.mjs FREE. Stopped and reporting; ESCAPE / symbol check / loop guard NOT started. Open, unclaimed: CONT-3 candidate (independent successors share the workspace of an unverified predecessor); the C4 bounded-hold policy is the owner decision.
+
+## CLAIM 2026-10-01 11:07 CDT — candidate-0 — SIM-0b (replication with the corrected oracle)
+Claimed by: Claude (fuzz/standing session). Files, all NEW:
+    NEW       legasus/screen/SIM-0b_PREREG.md, legasus/screen/SIM-0b_RESULT.md, server/sim0b.py, server/sim0b.mjs
+SIM-0 files (sim0.py, sim0.mjs, SIM-0_*) are frozen and NOT edited. Checked before writing.
