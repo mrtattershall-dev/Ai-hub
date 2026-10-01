@@ -11611,3 +11611,5 @@ Checked before writing. Do not edit the claimed region until this claim is relea
 Claim released 2026-10-01 — COMMIT-2 committed. server/batch.js, server/governance.js FREE.
 T2/T3/T4 measured through the real paths (seam, grep-guarded); T5b UNMEASURABLE -> HOLDS;
 IDENTITY_DRIFT policy frozen (no halt, loud event). Regression 7/9 unrepaired -> 17/0.
+
+Claim released 2026-10-01 08:53 CDT — FG-1..FG-4 committed (last 84732083); FG-5 RECEIPT frozen (b965558e) with its probe committed UNRUN. server/verifyProject.js and the agent.js finish-gate region FREE. Session stopped at its usage limit.
