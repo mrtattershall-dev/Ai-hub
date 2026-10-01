@@ -1,0 +1,144 @@
+{
+  "rows": [
+    {
+      "id": "F6+",
+      "boundary": "control",
+      "label": "complete goal, file has checkout/available",
+      "outcome": "HOLDS (Verified)",
+      "entry": "s1_library.js",
+      "ok": true,
+      "kind": "node",
+      "evidence": [
+        "all 1 source file(s) pass a syntax check",
+        "all 1 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly"
+      ],
+      "problems": [],
+      "notes": [
+        "all 1 source file(s) pass a syntax check",
+        "all 1 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly"
+      ]
+    },
+    {
+      "id": "F6-",
+      "boundary": "control",
+      "label": "the goal's own file throws on load",
+      "outcome": "HOLDS (blocked)",
+      "entry": "s1_library.js",
+      "ok": false,
+      "kind": "node",
+      "evidence": [
+        "all 1 source file(s) pass a syntax check"
+      ],
+      "problems": [
+        "1 of 1 module(s) PARSE but THROW when loaded:\n    s1_library.js: boom\n    A file can pass a syntax check and still crash everything that requires it - typically by exporting a name that was never defined.",
+        "`node s1_library.js` crashed (exit 1):\n    C:\\Users\\tatte\\AppData\\Local\\Temp\\fg1-y4WLsS\\s1_library.js:1\r\n    throw new Error('boom');\r\n    ^\r\n    \r\n    Error: boom\r\n        at Object.<anonymous> (C:\\Users\\tatte\\AppData\\Local\\Temp\\fg1-y4WLsS\\s1_library.js:1:7)\r\n        at Module._compile (node:internal/modules/cjs/loader:1830:14)\r\n        at Object..js (node:internal/modules/cjs/loader:1961:10)\r"
+      ],
+      "notes": [
+        "1 of 1 module(s) PARSE but THROW when loaded: s1_library.js: boom A file can pass a syntax check and still cra",
+        "`node s1_library.js` crashed (exit 1): C:\\Users\\tatte\\AppData\\Local\\Temp\\fg1-y4WLsS\\s1_library.js:1 throw new "
+      ]
+    },
+    {
+      "id": "F1",
+      "boundary": "ADMISSION",
+      "label": "zero landed writes, file loads, goal absent",
+      "outcome": "LIVE: Verified with nothing judged",
+      "entry": "s1_library.js",
+      "ok": true,
+      "kind": "node",
+      "evidence": [
+        "all 1 source file(s) pass a syntax check",
+        "all 1 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly"
+      ],
+      "problems": [],
+      "hasWritesPredicateInBranch4": false,
+      "notes": [
+        "all 1 source file(s) pass a syntax check",
+        "all 1 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly",
+        "agent.js branch 4 carries a landed-writes predicate: false",
+        "file contains checkout: false"
+      ]
+    },
+    {
+      "id": "F2",
+      "boundary": "SCOPE",
+      "label": "clean goal file, unparseable leftover junk.js",
+      "outcome": "LIVE: blocked on a file the goal never named",
+      "entry": "s2.js",
+      "ok": false,
+      "kind": "node",
+      "evidence": [
+        "`node s2.js` ran and exited cleanly"
+      ],
+      "problems": [
+        "1 of 2 source file(s) do not compile:\n    junk.js: C:\\Users\\tatte\\AppData\\Local\\Temp\\fg1-sNjHuE\\junk.js:1\r function (\r ^^^^^^^^\r"
+      ],
+      "notes": [
+        "1 of 2 source file(s) do not compile: junk.js: C:\\Users\\tatte\\AppData\\Local\\Temp\\fg1-sNjHuE\\junk.js:1 function"
+      ]
+    },
+    {
+      "id": "F3",
+      "boundary": "SCOPE",
+      "label": "python: unrelated failing test_other.py",
+      "outcome": "LIVE: blocked by a test the goal never named",
+      "entry": "s3_calc.py",
+      "ok": false,
+      "kind": "python",
+      "evidence": [
+        "all 3 source file(s) pass a syntax check"
+      ],
+      "problems": [
+        "pytest failed:\n    _________________________________ test_broken _________________________________\r\n    \r\n        def test_broken():\r\n    >       assert False\r\n    E       assert False\r\n    \r\n    test_other.py:2: AssertionError\r\n    =========================== short test summary info ===========================\r\n    FAILED test_other.py::test_broken - assert False\r\n    1 failed, 1 passed in 0.13s"
+      ],
+      "notes": [
+        "pytest failed: _________________________________ test_broken _________________________________ def test_broken"
+      ]
+    },
+    {
+      "id": "F4",
+      "boundary": "SUBJECT",
+      "label": "target s10_desk.js missing; entry falls through",
+      "outcome": "LIVE: Verified on s1_library.js, a file the goal did not ask to create",
+      "entry": "s1_library.js",
+      "ok": true,
+      "kind": "node",
+      "evidence": [
+        "all 2 source file(s) pass a syntax check",
+        "all 2 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly"
+      ],
+      "problems": [],
+      "notes": [
+        "entry chosen: s1_library.js",
+        "all 2 source file(s) pass a syntax check",
+        "all 2 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly"
+      ]
+    },
+    {
+      "id": "F5",
+      "boundary": "RECEIPT",
+      "label": "does the Verified note name what was judged?",
+      "outcome": "names entry: true; names the swept SET: false (a count only); names an identity: false",
+      "evidence": [
+        "all 1 source file(s) pass a syntax check",
+        "all 1 module(s) load without throwing",
+        "`node s1_library.js` ran and exited cleanly"
+      ],
+      "cid1OfJudged": "cid1:22cc58e7b23835820768c77f04843087d9b254c4af3c4636218d104cd86d731a"
+    }
+  ],
+  "live": [
+    "F1",
+    "F2",
+    "F3",
+    "F4"
+  ],
+  "controls": true,
+  "pythonAvailable": true
+}

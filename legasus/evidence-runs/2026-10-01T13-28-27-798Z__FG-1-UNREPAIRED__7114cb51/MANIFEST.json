@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T13-28-27-798Z__FG-1-UNREPAIRED__7114cb51",
+  "label": "FG-1-UNREPAIRED",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "FG-1 characterization of the finish gate on candidate-0. Nothing repaired.",
+  "command": "node server/fg1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T13:28:27.799Z",
+  "endedAt": "2026-10-01T13:28:33.010Z",
+  "exitStatus": 0,
+  "commit": "96111eecd4c94dbffc031c4392003b4f2a6781be",
+  "worktreeClean": false,
+  "worktreeDiffHash": "2cb6e88e52f9acec61a4d595bf748a95a917adc84f32290f6198dee8db572823",
+  "dirtyEntryCount": 44,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "fg1.log",
+      "bytes": 2021,
+      "sha256": "d8cee23923025c86291e93f800ac3d3a415e37fc3f8c1e574286185b8f5e107c"
+    },
+    {
+      "name": "result.json",
+      "bytes": 5611,
+      "sha256": "15017ed952440f38ef4de960ec2adcb8de1b22a778ffb612d17122c7298fa273"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}
