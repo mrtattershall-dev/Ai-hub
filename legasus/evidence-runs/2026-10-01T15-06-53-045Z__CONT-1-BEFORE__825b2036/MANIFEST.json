@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T15-06-53-045Z__CONT-1-BEFORE__825b2036",
+  "label": "CONT-1-BEFORE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "CONT-1 before: continuation after each finish kind, real hub + supervisor + chain.",
+  "command": "CONT1_PHASE=before node server/cont1.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T15:06:53.049Z",
+  "endedAt": "2026-10-01T15:13:14.822Z",
+  "exitStatus": 0,
+  "commit": "8a27d45321ffa01780353b4c455dbf7703bb5724",
+  "worktreeClean": false,
+  "worktreeDiffHash": "3f8a3800e5b8438b6f5987f258edb78ec1d43d28163ac5fcd26d789d37c893ae",
+  "dirtyEntryCount": 65,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "cont1.log",
+      "bytes": 1863,
+      "sha256": "5be3ca707d302a1cb5c2708a0e1579474c9e72a078a8ae581ce5b7b59c1184fe"
+    },
+    {
+      "name": "result.json",
+      "bytes": 12910,
+      "sha256": "85bccc64386cab2e0d13dcd1ba33784d91a6262db9db9b5ec933f3bed61b8bf3"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

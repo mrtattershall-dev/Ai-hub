@@ -1,0 +1,39 @@
+{
+  "phase": "before",
+  "A": {
+    "id": "17fc035c",
+    "goal": "Add probe() to out.js returning the string 'A'.",
+    "priority": 0,
+    "source": "human",
+    "after": null,
+    "generation": 0,
+    "repairOf": null,
+    "authority": null,
+    "createdAt": 1790867554228,
+    "status": "done",
+    "takenAt": 1790867554241,
+    "runId": "6b5dfaeb-6ba8-4f37-a94f-9066b796dcd6",
+    "summary": "",
+    "finishedAt": 1790867554982
+  },
+  "B1": {
+    "id": "0a70eb36",
+    "goal": "Check that out.js exports probe and report what it returns.",
+    "priority": 0,
+    "source": "human",
+    "after": "17fc035c",
+    "generation": 0,
+    "repairOf": null,
+    "authority": null,
+    "createdAt": 1790867554232,
+    "status": "done",
+    "takenAt": 1790867554984,
+    "runId": "d16aa5a9-d388-4c7b-8563-dd444f042b21",
+    "summary": "",
+    "finishedAt": 1790867556543
+  },
+  "autoStarted": true,
+  "heldNote": null,
+  "overrideStarted": null,
+  "outcome": "B AUTO-STARTED after an unverified predecessor (the defect, as characterized)"
+}
