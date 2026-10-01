@@ -11597,3 +11597,13 @@ instrumentation are each a NEW claim.
               (c) the IDENTITY_DRIFT chain policy: no halt, loud journal event. Frozen in the prereg.
     NOT       acceptance.js (COMMIT-1's repair stands), evaluator.js, cid1.mjs
 Checked before writing. Do not edit the claimed files until this claim is released.
+
+## CLAIM 2026-10-01 08:28 CDT — candidate-0 — FG-1 (the finish gate as the hub's own receipt)
+Claimed by: Claude (D-chain session). Files:
+    CLAIMED   server/verifyProject.js; server/agent.js ONLY the finish-gate branch 4 region (~4596-4680:
+              goalEntry selection, verifier.verify call, blocked(), the forced-finish hatch)
+    NEW       legasus/screen/FG-1_*, server/fg1.probe.mjs
+    NOT       batch.js, governance.js, acceptance.js, evaluator.js (COMMIT-2 holds the spine)
+Note: the 2026-09-29 CANDIDATE-0 assembly claim on server/agent.js has no release line; its work landed
+at c16c59a6 that morning and nothing has touched agent.js since. Treated as stale; this claim is narrower.
+Checked before writing. Do not edit the claimed region until this claim is released.
