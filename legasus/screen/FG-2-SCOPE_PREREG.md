@@ -68,3 +68,23 @@ asserting a block on an UNRELATED file is a changed-contract assertion and is na
 The 80-file sweep cap, host execution of model code, and the pytest timeout are unchanged. The
 dependency resolver is static: a `require(variable)` is not followed (recorded as a blind spot in
 goalScope.mjs). Import-by-package-name (node_modules) is out of scope by construction.
+
+## Amendment 1 - 2026-10-01 - the ENTRY alone does not narrow the scope (before the fix)
+
+Found by the consumer re-run after the first repair (loadSweep.test 12/0 -> 3/9). That suite calls
+verify(d, { entry }) with NO goal, and its L1/L3/L4/L5/L7 assert that a broken file the entry never
+requires still blocks - the whole-workspace contract c8c3ff2f froze for the no-goal case. My resolver
+treated an entry alone as naming the scope, so those callers were narrowed. Two contracts from two
+sessions collided on a case neither had named.
+
+Narrowing, frozen now: only a GOAL that names existing files narrows the scope. An entry alone never
+does (scope() still accepts it, for the signature, and ignores it for naming). Rationale: in agent.js
+branch 4 the entry is DERIVED from the goal (ledger.namedFiles), so goal-scoping loses nothing on the
+served path; every entry-only caller (tests, pilotEvalTerminal, experiment harnesses) keeps today's
+whole-workspace semantics unchanged. With a goal present, unrelated breakage is a note - the measured
+change fatal-09 ranked first - and F7/F7p still block through the closure.
+
+Also mine: the L2 failure is a WORDING regression - the evidence string gained " in this goal's scope"
+between "module(s)" and "load", breaking a consumer's phrase match. The qualifier moves to the end.
+
+goalScope.test's "the entry alone names the scope" assertion flips with this amendment, by name.
