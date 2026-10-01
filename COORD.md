@@ -11569,3 +11569,7 @@ Claim released 2026-10-01 07:35 CDT — D-BIND committed. server/evaluator.js, s
 
 Checked before writing (the COORD-1 lesson). D-CONS and D-BIND released 07:35; nothing open.
 Do not edit the claimed files until this claim is released.
+
+Claim released 2026-10-01 — COMMIT-1 characterized unrepaired (K8 fired; T5g HOLDS; T5b UNMEASURABLE).
+legasus/screen/COMMIT-1_PREREG.md, COMMIT-1_RESULT.md, server/commit1.probe.mjs FREE.
+The repair is a SEPARATE claim: it will take acceptance.js, and must leave ABA PERMITTED.
