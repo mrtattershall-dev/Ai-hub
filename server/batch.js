@@ -39,6 +39,7 @@ import { isExcludedRelPath } from './snapshotPath.mjs';
 import { confirmStopped, confirmNoneRunning, attemptExists, newAttemptId } from './worker.js';
 import { evaluate, VERDICT } from './evaluator.js';
 import { applyAcceptance, DISPOSITION } from './acceptance.js';
+import { cid1 } from './cid1.mjs';   // COMMIT-2: a cid1 of START, and the restored identity (T5b)
 
 /** Terminal states. Every queued task must end in exactly one of them. */
 export const TASK_STATE = Object.freeze({
@@ -177,12 +178,12 @@ export async function runBatch(tasks, opts) {
    * held candidates all leave the baseline exactly where it was - passing a limited
    * preservation suite does not make a partial change fit to build upon.
    */
-  async function finalise(ws, task, candidateVerdict, startRef, termination) {
+  async function finalise(ws, task, candidateVerdict, startRef, termination, startIdentityId = null) {
     const acceptance = await applyAcceptance(ws, task, candidateVerdict, {
       startRef, captureDir: join(auditDir, 'rejected'), taskId: task.id, image: evalImage,
     });
 
-    let halt = null;
+    let halt = null, restoredIdentityId = null, restoreIdentityHolds = null;
     if (acceptance.disposition === DISPOSITION.RETAIN) {
       // The only path that advances the baseline.
       try {
@@ -204,6 +205,31 @@ export async function runBatch(tasks, opts) {
       halt = acceptance.disposition === DISPOSITION.HELD
         ? 'the evaluation failed, so nothing may be promoted'
         : 'the workspace could not be restored after a protected-behaviour failure';
+    } else if (acceptance.disposition === DISPOSITION.RESTORED) {
+      // COMMIT-2 (b), T5b: the RESTORE transition must return to the PREVIOUSLY AUTHORITATIVE
+      // identity - the cid1 taken at task start - not merely to "whatever git reset produced".
+      // applyAcceptance already checks bytes against startRef; this checks against the identity the
+      // start was recorded under, which is the thing T3 could have drifted. A restore that is not
+      // the start is RESTORE_FAILED in effect: fail closed and halt. A null start identity cannot
+      // be checked, and stays null in the record rather than reading as a pass.
+      const now = cid1(ws);
+      restoredIdentityId = now.ok ? now.id : null;
+      restoreIdentityHolds = startIdentityId ? (now.ok && now.id === startIdentityId) : null;
+      if (startIdentityId && !restoreIdentityHolds) {
+        halt = `the restored state is not the previously authoritative identity (start ${String(startIdentityId).slice(0, 20)}, restored ${String(restoredIdentityId).slice(0, 20)})`;
+      }
+    } else if (acceptance.disposition === DISPOSITION.IDENTITY_DRIFT) {
+      // COMMIT-2 (c), THE POLICY, frozen in COMMIT-2_PREREG so it can be argued with: drift does
+      // NOT halt the chain. The property HELD - nothing wrong became authoritative - so the task is
+      // simply not accepted and the next task starts from the unchanged baseline, as for
+      // PRESERVE_INCOMPLETE. But something mutated the workspace between verdict and commit, which
+      // is a hub anomaly, so it is LOUD: its own journal event, never folded into task_end alone.
+      journal.record({
+        event: 'identity_drift', task: task.id,
+        subject: acceptance.candidateVerdict?.subject ?? null,
+        retainedIdentity: acceptance.retainedIdentity ?? null,
+        note: acceptance.survivingWorkspaceVerdict?.note ?? null,
+      });
     }
 
     const state = acceptance.countsAsCompletion ? TASK_STATE.COMPLETED
@@ -219,6 +245,11 @@ export async function runBatch(tasks, opts) {
       baselineTree: acceptedBaselineTree,
       baselineTask: acceptedBaselineTask,
       promotable: acceptance.promotable,
+      // COMMIT-2 (b): the restore's identity continuity, recorded on every task_end so an
+      // unmeasurable restore (null) is as visible as a failed one (false).
+      startIdentity: startIdentityId,
+      restoredIdentity: restoredIdentityId,
+      restoreIdentityHolds,
     });
     return { state, acceptance, halt };
   }
@@ -279,10 +310,18 @@ export async function runBatch(tasks, opts) {
     git(ws, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'verified starting state');
     const startRef = git(ws, 'rev-parse', 'HEAD');
     const startTree = git(ws, 'rev-parse', 'HEAD^{tree}');
+    // COMMIT-2 (b): a cid1 OF START, taken on the state the start commit captured. This is the
+    // "previously authoritative identity" the RESTORE transition (COMMIT-1 T5) must return to.
+    // Without it T5b was UNMEASURABLE on this path: the restore anchor was a git commit of
+    // whatever T3 copied in, so T2 drift would have become the next restore anchor silently.
+    // Null is recorded loudly rather than defaulted - an unmeasurable restore must stay visible.
+    const startIdentity = cid1(ws);
+    const startIdentityId = startIdentity.ok ? startIdentity.id : null;
     journal.record({
       event: 'task_baseline', task: task.id,
       baselineSource: fromBaseline ? `accepted baseline from ${acceptedBaselineTask}` : 'task seed',
       startTree,
+      startIdentity: startIdentityId,
     });
 
     // IDENTITY RECORDED BEFORE THE WORK IS ATTEMPTED.
@@ -361,10 +400,13 @@ export async function runBatch(tasks, opts) {
       } catch (e) {
         terminalEval = { verdict: VERDICT.EVALUATION_ERROR, reason: String((e && e.name) || e) };
       }
+      // COMMIT-2 (a) FALSIFIABILITY SEAM - see the normal path below for the full note. Both
+      // paths carry it, or the timeout path would be the one transition nobody could attack.
+      if (typeof opts.afterVerdict === 'function') await opts.afterVerdict(ws, task, terminalEval);
 
       const termination = outcome.timedOut ? 'TIMEOUT' : 'COMPLETION_UNCONFIRMED';
       // ACCEPTANCE IS MANDATORY, including for a task that ran out of budget.
-      const acc = await finalise(ws, task, terminalEval, startRef, termination);
+      const acc = await finalise(ws, task, terminalEval, startRef, termination, startIdentityId);
       pushResult(results, onTaskEnd, { task: task.id, state: acc.state, termination, verdict: terminalEval, partialAt: keep, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
       if (acc.halt) { halted = acc.halt; journal.record({ event: 'batch_halt', task: task.id, reason: halted }); }
       continue;
@@ -376,8 +418,16 @@ export async function runBatch(tasks, opts) {
     } catch (e) {
       verdict = { verdict: VERDICT.EVALUATION_ERROR, reason: String(e && e.name || e) };
     }
+    // COMMIT-2 (a) FALSIFIABILITY SEAM. evaluate() and finalise() ran back-to-back with no point at
+    // which a probe could inject drift, so COMMIT-1 could only show T2/T3/T4 firing BY COMPOSITION:
+    // the real path was unfalsifiable at those transitions, and a verification nobody can make
+    // fail is decoration. Same pattern as evaluator's injectable `image` and governed-edit's
+    // `deps.readBack`. Default undefined = no-op. PRODUCTION NEVER PASSES THIS: the COMMIT-2 result
+    // greps every non-test caller and asserts zero, and a production caller passing it would be a
+    // defect of the same class as K8. It is a seam for attacking the transition, not a hook.
+    if (typeof opts.afterVerdict === 'function') await opts.afterVerdict(ws, task, verdict);
     // ACCEPTANCE IS MANDATORY. No task is finalised without it.
-    const acc = await finalise(ws, task, verdict, startRef, 'ENDED');
+    const acc = await finalise(ws, task, verdict, startRef, 'ENDED', startIdentityId);
     pushResult(results, onTaskEnd, { task: task.id, state: acc.state, termination: 'ENDED', verdict, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
     if (acc.halt) { halted = acc.halt; journal.record({ event: 'batch_halt', task: task.id, reason: halted }); }
   }

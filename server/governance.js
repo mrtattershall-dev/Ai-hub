@@ -130,11 +130,16 @@ export async function prepareGoverned(workspace, runId, checks, { qualifiedPath,
  * At the run's terminal boundary: evaluate the candidate, apply the policy, report both
  * verdicts. Never throws - a failure here is itself a recorded outcome.
  */
-export async function concludeGoverned(workspace, run, { captureDir, image = WORKER_IMAGE, timeoutSec = 120 } = {}) {
+export async function concludeGoverned(workspace, run, { captureDir, image = WORKER_IMAGE, timeoutSec = 120, afterVerdict = null } = {}) {
   const g = run.governed;
   try {
     const task = taskOf(run.id, g.checks);
     const candidateVerdict = await evaluate(workspace, task, { timeoutSec, image });
+    // COMMIT-2 (a) FALSIFIABILITY SEAM, the governed twin of batch.js's. evaluate() and
+    // applyAcceptance() ran back-to-back here too, so T4 could only be shown to fire by
+    // composition with T1. Default null = no-op; production never passes it (asserted by grep in
+    // the COMMIT-2 result). A seam for attacking the transition, not a hook for behaviour.
+    if (typeof afterVerdict === 'function') await afterVerdict(workspace, task, candidateVerdict);
     const acceptance = await applyAcceptance(workspace, task, candidateVerdict, { startRef: g.startRef, captureDir, taskId: run.id, image });
     return {
       protection: PROTECTION.BEHAVIORAL_ACCEPTANCE,

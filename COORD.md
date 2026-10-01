@@ -11607,3 +11607,7 @@ Claimed by: Claude (D-chain session). Files:
 Note: the 2026-09-29 CANDIDATE-0 assembly claim on server/agent.js has no release line; its work landed
 at c16c59a6 that morning and nothing has touched agent.js since. Treated as stale; this claim is narrower.
 Checked before writing. Do not edit the claimed region until this claim is released.
+
+Claim released 2026-10-01 — COMMIT-2 committed. server/batch.js, server/governance.js FREE.
+T2/T3/T4 measured through the real paths (seam, grep-guarded); T5b UNMEASURABLE -> HOLDS;
+IDENTITY_DRIFT policy frozen (no halt, loud event). Regression 7/9 unrepaired -> 17/0.
