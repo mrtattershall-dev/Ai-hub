@@ -11573,3 +11573,11 @@ Do not edit the claimed files until this claim is released.
 Claim released 2026-10-01 — COMMIT-1 characterized unrepaired (K8 fired; T5g HOLDS; T5b UNMEASURABLE).
 legasus/screen/COMMIT-1_PREREG.md, COMMIT-1_RESULT.md, server/commit1.probe.mjs FREE.
 The repair is a SEPARATE claim: it will take acceptance.js, and must leave ABA PERMITTED.
+
+## CLAIM 2026-10-01 — candidate-0 — COMMIT-1 REPAIR (K8 only)
+
+    CLAIMED   server/acceptance.js, server/commitBoundary.test.mjs
+    SCOPE     the smallest repair the property dictates: identity equality at RETAIN. NOT T5b
+              instrumentation, NOT neighbouring cleanup, NOT a generalized identity system.
+    MEASURE   server/commit1.probe.mjs rerun UNCHANGED, new EH1 run.
+Checked before writing. Do not edit the claimed files until this claim is released.
