@@ -1,0 +1,85 @@
+{
+  "phase": "after",
+  "rows": [
+    {
+      "id": "R1a",
+      "label": "runIndex: finishKind 'unverified-no-work'",
+      "outcome": "reads the kind (holds)",
+      "verdict": "unverified-no-work",
+      "line": "10-01 09:50  done      unverified-no-work     1     0      —   probe unverified-no-work"
+    },
+    {
+      "id": "R1b",
+      "label": "tochat: no-work row, 1 block",
+      "outcome": "skipped by block count only: {\"finish gate blocked 1x\":1}",
+      "left": "{\"finish gate blocked 1x\":1}"
+    },
+    {
+      "id": "R1c",
+      "label": "runIndex: an unknown finishKind",
+      "outcome": "reads 'unknown' (holds)",
+      "verdict": "unknown",
+      "line": "10-01 09:50  done      unknown               1     0      —   probe something-new"
+    },
+    {
+      "id": "R1d",
+      "label": "runIndex: 'verified' / absent",
+      "outcome": "verified / ?",
+      "holds": true
+    },
+    {
+      "id": "R2",
+      "label": "verify(): judged {entry, files, id} over the scoped set",
+      "outcome": "judged names entry + scoped files; id = identityOf over them (holds)",
+      "judged": {
+        "entry": "s1_library.js",
+        "files": [
+          "s1_library.js"
+        ],
+        "id": "cid1:6096dafe2e5a4ba92bdf196b0ca1673fc7ad83ba30143b9bf36baf077ba97191"
+      },
+      "recomputed": "cid1:6096dafe2e5a4ba92bdf196b0ca1673fc7ad83ba30143b9bf36baf077ba97191"
+    },
+    {
+      "id": "R3",
+      "label": "verify(): judged.id changes with the judged bytes",
+      "outcome": "differs (holds)",
+      "before": "cid1:6096dafe2e5a4ba92bdf196b0ca1673fc7ad83ba30143b9bf36baf077ba97191",
+      "after": "cid1:d67afd8da68cc57d137ec8146bf1063f4e3f6e0321e859ab0977aa42ce79367a"
+    },
+    {
+      "id": "R4",
+      "label": "hub: Verified note + run.finishSubject",
+      "outcome": "note carries entry, files, cid1-over-files; finishSubject matches an independent identityOf (holds)",
+      "note": "Verified (node) [entry s1_library.js; 1 file(s); cid1-over-files cid1:6096dafe2e5a]: all 1 source file(s) pass a syntax check (this goal's scope); all 1 module(",
+      "finishSubject": {
+        "entry": "s1_library.js",
+        "files": [
+          "s1_library.js"
+        ],
+        "id": "cid1:6096dafe2e5a4ba92bdf196b0ca1673fc7ad83ba30143b9bf36baf077ba97191"
+      },
+      "recomputed": "cid1:6096dafe2e5a4ba92bdf196b0ca1673fc7ad83ba30143b9bf36baf077ba97191"
+    },
+    {
+      "id": "R5",
+      "label": "hub: trace row and index row carry finishKind AND finishSubject",
+      "outcome": "both carry finishSubject (holds); finishKind verified/verified",
+      "traceKind": "verified",
+      "indexKind": "verified"
+    },
+    {
+      "id": "R6",
+      "label": "hub: the no-work finish, through the real writer and the index reader",
+      "outcome": "writer and reader agree: unverified-no-work (holds)",
+      "written": "unverified-no-work",
+      "read": "unverified-no-work"
+    }
+  ],
+  "verdict": {
+    "r1": false,
+    "r2r3": true,
+    "r4r5": true,
+    "r6": true
+  }
+}

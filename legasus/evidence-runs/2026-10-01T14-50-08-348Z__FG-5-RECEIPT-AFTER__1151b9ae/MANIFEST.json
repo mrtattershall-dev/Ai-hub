@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T14-50-08-348Z__FG-5-RECEIPT-AFTER__1151b9ae",
+  "label": "FG-5-RECEIPT-AFTER",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "FG-5 RECEIPT after the repair.",
+  "command": "FG5_PHASE=after node server/fg5.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T14:50:08.350Z",
+  "endedAt": "2026-10-01T14:50:16.911Z",
+  "exitStatus": 0,
+  "commit": "93eb889607f19d99fc77433438465a5c0c3ef959",
+  "worktreeClean": false,
+  "worktreeDiffHash": "a17a46184f34db2fa581dc3e9c594725742fdc7cc02ba77bce1a082b04611177",
+  "dirtyEntryCount": 59,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "fg5.log",
+      "bytes": 1203,
+      "sha256": "2af5f27a36f5ab649b4625310b05e16b55cec5f7b61562f0dfc2c09ae62714f2"
+    },
+    {
+      "name": "result.json",
+      "bytes": 3009,
+      "sha256": "d4932e98d576b1219d581f465fd73456f548e694c5a6e670cb89c9f51c45a23b"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

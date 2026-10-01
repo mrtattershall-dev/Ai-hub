@@ -19,6 +19,7 @@ import { existsSync, readdirSync, statSync, readFileSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { scope } from './goalScope.mjs';   // FG-2 SCOPE: which files a goal is about (pure, no git)
+import { identityOf } from './cid1.mjs';   // FG-5 RECEIPT: a content identity over exactly the files judged
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EXEC_TIMEOUT = 45_000;
@@ -339,12 +340,25 @@ export async function verify(workspace, { entry, goal, landedWrites } = {}) {
     }
   }
 
+  // FG-5 RECEIPT (5b). WHAT was judged, named: the entry, the scoped files the sweeps ran over, and a
+  // content identity over exactly those files - cid1's encoding and domain over a SUBSET, so it is
+  // labelled "over N files" and never presented as the workspace's cid1. A refused identity is null
+  // and said so; naming never changes a verdict. D-BIND's discipline, applied to the hub's own receipt:
+  // a Verified note that cannot tell a reader which bytes it is about is the shape M19 had.
+  let judged;
+  const subjectFiles = inFiles.slice(0, 80);
+  try {
+    judged = { entry: entry ?? null, files: subjectFiles, id: identityOf(subjectFiles.map((f) => ({ type: 'F', path: f, bytes: readFileSync(join(workspace, f)) }))) };
+  } catch (e) {
+    judged = { entry: entry ?? null, files: subjectFiles, id: null, reason: `identity unavailable: ${String(e.message || e).slice(0, 120)}` };
+  }
+
   if (kind === 'web') {
     // The web path is covered by test_web + visual inspection in the agent loop; this
     // only confirms the entry point is really there and reachable.
     if (!existsSync(join(workspace, 'index.html'))) problems.push('no index.html - a web app needs an entry point');
     else evidence.push('index.html exists (browser evidence comes from test_web / see_screen)');
-    return { ok: !problems.length, kind, evidence, problems, notes, admission, needsBrowser: true };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission, judged, needsBrowser: true };
   }
 
   if (kind === 'node') {
@@ -399,7 +413,7 @@ export async function verify(workspace, { entry, goal, landedWrites } = {}) {
         }
       }
     }
-    return { ok: !problems.length, kind, evidence, problems, notes, admission };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission, judged };
   }
 
   if (kind === 'python') {
@@ -427,7 +441,7 @@ export async function verify(workspace, { entry, goal, landedWrites } = {}) {
         else problems.push(`\`python ${cand}\` crashed (exit ${r.code}):\n    ${(r.err || r.out).split('\n').slice(-8).join('\n    ').slice(0, 800)}`);
       }
     }
-    return { ok: !problems.length, kind, evidence, problems, notes, admission };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission, judged };
   }
 
   if (kind === 'godot' || kind === 'gdscript') {
@@ -451,7 +465,7 @@ export async function verify(workspace, { entry, goal, landedWrites } = {}) {
       }
       if (!bad) evidence.push(`all ${Math.min(gd.length, 25)} GDScript file(s) parse in headless Godot`);
     }
-    return { ok: !problems.length, kind, evidence, problems, notes, admission };
+    return { ok: !problems.length, kind, evidence, problems, notes, admission, judged };
   }
 
   // unknown: the syntax sweep is all we have, and that is worth saying out loud.

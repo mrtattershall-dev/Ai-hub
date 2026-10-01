@@ -3708,6 +3708,7 @@ function recordRunIndex(run) {
       // HOW it reached that status. 'done' alone cannot tell a verified finish from a forced one or from the
       // test_web auto-finish, and this file is the only forever record - see finishVerdict().
       finishKind: finishVerdict(run),
+      finishSubject: run.finishSubject || null,   // FG-5 RECEIPT: the entry, files and identity the verdict is about
       ms: Date.now() - (run.createdAt || Date.now()),
       calls: run.modelCalls || 0,
       steps: steps.length,
@@ -3786,6 +3787,7 @@ function saveTrace(run) {
       // every one is text-free. A corpus consumer deciding what to train on must not have to regex prose, and
       // unstripping the text would not help: a run with no note (route 2 had none) would still look clean.
       finishKind: finishVerdict(run),
+      finishSubject: run.finishSubject || null,   // FG-5 RECEIPT: same subject as the index row, verbatim
       // Who wrote it (stamped by noteModelCall) and who asked for it - so a training slice
       // can be cut by model, and supervisor-generated goals told apart from a human's.
       provider: run.provider || null, model: run.model || null, source: run.source || 'human',
@@ -4690,7 +4692,11 @@ async function drive(loadDb, run) {
                 // so a bare boolean let a model break the entry file after a pass and finish on the old verdict.
                 run.verified = true;    // passed — do not pay for it again
                 run.verifiedAt = workspaceStamp();
-                pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
+                // FG-5 RECEIPT: what this verdict is ABOUT travels with it - onto the run, the trace row and the
+                // index row - and into the note, so a reader can tell which bytes "Verified" refers to.
+                run.finishSubject = v.judged || null;
+                const subj = v.judged ? ` [entry ${v.judged.entry || '-'}; ${v.judged.files.length} file(s); cid1-over-files ${String(v.judged.id || 'unavailable').slice(0, 17)}]` : '';
+                pushStep(run, { type: 'note', text: `Verified (${v.kind})${subj}: ${v.evidence.join('; ')}` });
                 }
                 }   // end: unbounded finish-gate verification
               }
