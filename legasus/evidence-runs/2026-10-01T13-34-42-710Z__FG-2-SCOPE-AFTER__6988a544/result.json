@@ -1,0 +1,92 @@
+{
+  "phase": "after",
+  "rows": [
+    {
+      "id": "F2",
+      "label": "clean goal file; unparseable junk.js elsewhere",
+      "outcome": "Verified; NOTE names junk.js",
+      "ok": true,
+      "problems": [],
+      "notes": [
+        "OUTSIDE THIS GOAL (not blocking): 1 of 1 file(s) the goal does not name do not compile - leftover from earlier work; the end-of-run repair still applies:\n    junk.js: C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-R3zYJB\\junk.js:1\r function (\r ^^^^^^^^\r"
+      ],
+      "rendered": "PROJECT VERIFICATION (detected: node)\n  ✅ all 1 source file(s) in this goal's scope pass a syntax check\n  ✅ all 1 module(s) in this goal's scope load without throwing\n  ✅ `node s2.js` ran and exited cleanly\n  ⚠️ OUTSIDE THIS GOAL (not blocking): 1 of 1 file(s) the goal does not name do not compile - leftover from earlier work; the end-of-run repair still applies:\n    junk.js: C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-R3zYJB\\junk.js:1\r function (\r ^^^^^^^^\r\n\nThe ⚠️ items are outside this goal and do not block it - but leftover breakage poisons later work. Say so in your summary."
+    },
+    {
+      "id": "F3",
+      "label": "python: own test passes; unrelated test_other.py fails",
+      "outcome": "Verified; NOTE names test_other.py",
+      "ok": true,
+      "problems": [],
+      "notes": [
+        "OUTSIDE THIS GOAL (not blocking): 1 test file(s) the goal does not name fail (test_other.py):\n    E       assert False\r\n    \r\n    test_other.py:2: AssertionError\r\n    =========================== short test summary info ===========================\r\n    FAILED test_other.py::test_broken - assert False\r\n    1 failed in 0.09s"
+      ],
+      "evidence": [
+        "all 1 source file(s) in this goal's scope pass a syntax check",
+        "pytest passed (1 test file(s) in this goal's scope)"
+      ]
+    },
+    {
+      "id": "F6-",
+      "label": "control: the goal's OWN file throws on load",
+      "outcome": "blocked (holds)",
+      "problems": [
+        "1 of 1 module(s) PARSE but THROW when loaded:\n    s1_library.js: boom\n    A file can pass a syntax check and still crash everything that requires it - typically by exporting a name that was never defined.",
+        "`node s1_library.js` crashed (exit 1):\n    C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-VhI59S\\s1_library.js:1\r\n    throw new Error('boom');\r\n    ^\r\n    \r\n    Error: boom\r\n        at Object.<anonymous> (C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-VhI59S\\s1_library.js:1:7)\r\n        at Module._compile (node:internal/modules/cjs/loader:1830:14)\r\n        at Object..js (node:internal/modules/cjs/loader:1961:10)\r"
+      ]
+    },
+    {
+      "id": "F7",
+      "label": "the goal file REQUIRES util.js, which throws",
+      "outcome": "blocked (holds: the closure reaches util.js)",
+      "problems": [
+        "2 of 2 module(s) PARSE but THROW when loaded:\n    s2.js: util is broken\n    util.js: util is broken\n    A file can pass a syntax check and still crash everything that requires it - typically by exporting a name that was never defined.",
+        "`node s2.js` crashed (exit 1):\n    C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-lJLnwJ\\util.js:1\r\n    throw new Error('util is broken');\r\n    ^\r\n    \r\n    Error: util is broken\r\n        at Object.<anonymous> (C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-lJLnwJ\\util.js:1:7)\r\n        at Module._compile (node:internal/modules/cjs/loader:1830:14)\r\n        at Object..js (node:internal/modules/cjs/loader:1961:10)\r"
+      ],
+      "notes": []
+    },
+    {
+      "id": "F7p",
+      "label": "python: a dependency's test (test_helper.py) fails",
+      "outcome": "blocked (holds: helper is in scope)",
+      "problems": [
+        "pytest failed:\n    \r\n        def test_h():\r\n    >       assert h(1) == 2\r\n    E       assert 1 == 2\r\n    E        +  where 1 = h(1)\r\n    \r\n    test_helper.py:3: AssertionError\r\n    =========================== short test summary info ===========================\r\n    FAILED test_helper.py::test_h - assert 1 == 2\r\n    1 failed, 1 passed in 0.07s"
+      ]
+    },
+    {
+      "id": "F8",
+      "label": "goal names NO file; broken junk.js",
+      "outcome": "blocked (holds: whole workspace is the scope)",
+      "problems": [
+        "1 of 2 source file(s) do not compile:\n    junk.js: C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-Tuglvv\\junk.js:1\r function (\r ^^^^^^^^\r",
+        "`node junk.js` crashed (exit 1):\n    C:\\Users\\tatte\\AppData\\Local\\Temp\\fg2-Tuglvv\\junk.js:1\r\n    function (\r\n    ^^^^^^^^\r\n    \r\n    SyntaxError: Function statements require a function name\r\n        at wrapSafe (node:internal/modules/cjs/loader:1763:18)\r\n        at Module._compile (node:internal/modules/cjs/loader:1804:20)\r\n        at Object..js (node:internal/modules/cjs/loader:1961:10)\r"
+      ]
+    },
+    {
+      "id": "F1",
+      "label": "ADMISSION: zero writes, goal absent (must stay red)",
+      "outcome": "STILL VERIFIED (red, as frozen)",
+      "ok": true
+    },
+    {
+      "id": "F4",
+      "label": "SUBJECT: target missing, entry falls through (must stay red)",
+      "outcome": "STILL VERIFIED on s1_library.js (red, as frozen)",
+      "ok": true,
+      "entry": "s1_library.js"
+    },
+    {
+      "id": "F6+",
+      "label": "control: complete goal",
+      "outcome": "Verified (holds)",
+      "problems": []
+    }
+  ],
+  "verdict": {
+    "f2f3Green": true,
+    "closureGuards": true,
+    "noFileCase": true,
+    "controls": true,
+    "f1f4StillRed": true
+  }
+}

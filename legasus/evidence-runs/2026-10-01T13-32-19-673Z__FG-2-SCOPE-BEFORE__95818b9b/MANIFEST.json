@@ -1,0 +1,31 @@
+{
+  "id": "2026-10-01T13-32-19-673Z__FG-2-SCOPE-BEFORE__95818b9b",
+  "label": "FG-2-SCOPE-BEFORE",
+  "state": "SEALED",
+  "evidenceClass": "ORIGINAL",
+  "replayOf": null,
+  "note": "FG-2 SCOPE before the verify() repair.",
+  "command": "FG2_PHASE=before node server/fg2.probe.mjs",
+  "repo": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+  "startedAt": "2026-10-01T13:32:19.674Z",
+  "endedAt": "2026-10-01T13:32:25.157Z",
+  "exitStatus": 0,
+  "commit": "73e2c2ff7bc74bfeb763bf11b0792648bdb971e5",
+  "worktreeClean": false,
+  "worktreeDiffHash": "1a1775beeb120727f0e555f8c447cb0a9b1333932e111a9970850a1d7445aca9",
+  "dirtyEntryCount": 48,
+  "gitAvailable": true,
+  "artifacts": [
+    {
+      "name": "fg2.log",
+      "bytes": 996,
+      "sha256": "c36853daae9d79723129dc0931d0ecb595f18f474dfa17f34e13de27cc791e50"
+    },
+    {
+      "name": "result.json",
+      "bytes": 5073,
+      "sha256": "6124fa2d0474b1f9e0a28329312c16d2da21313d7ffc301106776d7f51f21dc1"
+    }
+  ],
+  "harness": "evidenceRun.mjs EH1"
+}

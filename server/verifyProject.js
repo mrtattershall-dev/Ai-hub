@@ -18,6 +18,7 @@ import { execFile } from 'child_process';
 import { existsSync, readdirSync, statSync, readFileSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { scope } from './goalScope.mjs';   // FG-2 SCOPE: which files a goal is about (pure, no git)
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EXEC_TIMEOUT = 45_000;
@@ -268,14 +269,29 @@ export async function verify(workspace, { entry, goal } = {}) {
   }
   const problems = [];
   const evidence = [];
+  // FG-2 SCOPE (legasus/screen/FG-2-SCOPE_PREREG.md). A finish may be BLOCKED only on evidence about the
+  // goal's named files and their forward dependency closure. fatal-09 measured 23 blocks grounded in a
+  // file the goal never named and 17 from whole-workspace pytest; FG-1 reproduced both on this tree.
+  // Breakage OUTSIDE the scope is not silenced - it goes to `notes`, rendered loudly, and the end-of-run
+  // repair still runs - it just cannot hold a finished goal hostage. A goal that names no file keeps the
+  // whole workspace as its scope (today's behaviour, unchanged).
+  const notes = [];
+  const sc = scope(workspace, { goal, entry, files });
+  const inFiles = sc.named ? files.filter((f) => sc.inScope.has(f)) : files;
+  const outFiles = sc.named ? files.filter((f) => !sc.inScope.has(f)) : [];
+  const OUTSIDE = 'OUTSIDE THIS GOAL (not blocking)';
 
-  const syn = await syntaxSweep(workspace, files);
+  const syn = await syntaxSweep(workspace, inFiles);
   if (syn.checked) {
     if (syn.broken) {
       problems.push(`${syn.broken} of ${syn.checked} source file(s) do not compile:\n    ` + syn.notes.join('\n    '));
     } else {
-      evidence.push(`all ${syn.checked} source file(s) pass a syntax check`);
+      evidence.push(`all ${syn.checked} source file(s) pass a syntax check${sc.named ? " (this goal's scope)" : ''}`);
     }
+  }
+  const synOut = outFiles.length ? await syntaxSweep(workspace, outFiles) : null;
+  if (synOut && synOut.broken) {
+    notes.push(`${OUTSIDE}: ${synOut.broken} of ${synOut.checked} file(s) the goal does not name do not compile - leftover from earlier work; the end-of-run repair still applies:\n    ` + synOut.notes.join('\n    '));
   }
 
   // THE LOAD SWEEP. Deliberately AFTER the syntax sweep and reported separately: "parses" and
@@ -283,7 +299,7 @@ export async function verify(workspace, { entry, goal } = {}) {
   // Only run when syntax is clean - a file that does not parse cannot load either, and reporting
   // both would name one defect twice and bury the root cause.
   if (kind === 'node' && syn.checked && !syn.broken) {
-    const load = await loadSweep(workspace, files);
+    const load = await loadSweep(workspace, inFiles);
     if (load.broken) {
       problems.push(`${load.broken} of ${load.checked} module(s) PARSE but THROW when loaded:\n    `
         + load.notes.join('\n    ')
@@ -291,7 +307,13 @@ export async function verify(workspace, { entry, goal } = {}) {
         + ` typically by exporting a name that was never defined.`);
     } else if (load.checked) {
       evidence.push(`all ${load.checked} module(s) load without throwing`
-        + (load.unknown ? ` (${load.unknown} did not finish loading and were not judged)` : ''));
+        + (load.unknown ? ` (${load.unknown} did not finish loading and were not judged)` : '')
+        + (sc.named ? " (this goal's scope)" : ''));
+    }
+    // The same sweep over files the goal did not name: a loud note, never a block (FG-2 SCOPE).
+    if (outFiles.length && !(synOut && synOut.broken)) {
+      const lo = await loadSweep(workspace, outFiles);
+      if (lo.broken) notes.push(`${OUTSIDE}: ${lo.broken} of ${lo.checked} module(s) the goal does not name throw when loaded:\n    ` + lo.notes.join('\n    '));
     }
   }
 
@@ -300,7 +322,7 @@ export async function verify(workspace, { entry, goal } = {}) {
     // only confirms the entry point is really there and reachable.
     if (!existsSync(join(workspace, 'index.html'))) problems.push('no index.html - a web app needs an entry point');
     else evidence.push('index.html exists (browser evidence comes from test_web / see_screen)');
-    return { ok: !problems.length, kind, evidence, problems, needsBrowser: true };
+    return { ok: !problems.length, kind, evidence, problems, notes, needsBrowser: true };
   }
 
   if (kind === 'node') {
@@ -355,14 +377,22 @@ export async function verify(workspace, { entry, goal } = {}) {
         }
       }
     }
-    return { ok: !problems.length, kind, evidence, problems };
+    return { ok: !problems.length, kind, evidence, problems, notes };
   }
 
   if (kind === 'python') {
-    const testFiles = files.filter((f) => /(^|\/)(test_|tests?\/)/.test(f) && f.endsWith('.py'));
+    const allTests = files.filter((f) => /(^|\/)(test_|tests?\/)/.test(f) && f.endsWith('.py'));
+    // FG-2 SCOPE: only tests that belong to the goal's files may block. The others still RUN, and a
+    // failure among them is a loud note - fatal-09 counted 17 blocks from whole-workspace pytest.
+    const testFiles = sc.named ? sc.tests.filter((t) => allTests.includes(t)) : allTests;
+    const otherTests = allTests.filter((t) => !testFiles.includes(t));
+    if (sc.named && otherTests.length) {
+      const o = await sh('python', ['-m', 'pytest', '-q', ...otherTests], workspace, 90_000);
+      if (!o.ok) notes.push(`${OUTSIDE}: ${otherTests.length} test file(s) the goal does not name fail (${otherTests.join(', ')}):\n    ${(o.out || o.err).split('\n').slice(-6).join('\n    ').slice(0, 600)}`);
+    }
     if (testFiles.length) {
-      const r = await sh('python', ['-m', 'pytest', '-q'], workspace, 90_000);
-      if (r.ok) evidence.push(`pytest passed (${testFiles.length} test file(s))`);
+      const r = await sh('python', ['-m', 'pytest', '-q', ...(sc.named ? testFiles : [])], workspace, 90_000);
+      if (r.ok) evidence.push(`pytest passed (${testFiles.length} test file(s)${sc.named ? " in this goal's scope" : ''})`);
       else problems.push(`pytest failed:\n    ${(r.out || r.err).split('\n').slice(-10).join('\n    ').slice(0, 800)}`);
     } else {
       const cand = entry || ['main.py', 'app.py', '__main__.py'].find((f) => existsSync(join(workspace, f)))
@@ -375,7 +405,7 @@ export async function verify(workspace, { entry, goal } = {}) {
         else problems.push(`\`python ${cand}\` crashed (exit ${r.code}):\n    ${(r.err || r.out).split('\n').slice(-8).join('\n    ').slice(0, 800)}`);
       }
     }
-    return { ok: !problems.length, kind, evidence, problems };
+    return { ok: !problems.length, kind, evidence, problems, notes };
   }
 
   if (kind === 'godot' || kind === 'gdscript') {
@@ -399,7 +429,7 @@ export async function verify(workspace, { entry, goal } = {}) {
       }
       if (!bad) evidence.push(`all ${Math.min(gd.length, 25)} GDScript file(s) parse in headless Godot`);
     }
-    return { ok: !problems.length, kind, evidence, problems };
+    return { ok: !problems.length, kind, evidence, problems, notes };
   }
 
   // unknown: the syntax sweep is all we have, and that is worth saying out loud.
@@ -411,7 +441,9 @@ export async function verify(workspace, { entry, goal } = {}) {
 export function format(r) {
   const L = [`PROJECT VERIFICATION (detected: ${r.kind})`];
   for (const e of r.evidence) L.push(`  ✅ ${e}`);
+  for (const n of r.notes || []) L.push(`  ⚠️ ${n}`);
   for (const p of r.problems) L.push(`  ❌ ${p}`);
   if (r.problems.length) L.push('\nFix these before finishing — the project does not run as written.');
+  else if ((r.notes || []).length) L.push('\nThe ⚠️ items are outside this goal and do not block it - but leftover breakage poisons later work. Say so in your summary.');
   return L.join('\n');
 }
