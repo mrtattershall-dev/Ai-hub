@@ -11581,3 +11581,8 @@ The repair is a SEPARATE claim: it will take acceptance.js, and must leave ABA P
               instrumentation, NOT neighbouring cleanup, NOT a generalized identity system.
     MEASURE   server/commit1.probe.mjs rerun UNCHANGED, new EH1 run.
 Checked before writing. Do not edit the claimed files until this claim is released.
+
+Claim released 2026-10-01 — COMMIT-1 K8 repair committed. server/acceptance.js FREE.
+One file, 39 insertions. Frozen probe reversed T1 unchanged; regression 5/5 -> 10/0; T5g re-measured
+HOLDS; consumers unchanged. T5b still UNMEASURABLE. T2/T3/T4 end-to-end regression and T5b
+instrumentation are each a NEW claim.

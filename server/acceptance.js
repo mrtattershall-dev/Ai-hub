@@ -36,6 +36,7 @@ import { promisify } from 'node:util';
 import { cpSync, mkdirSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { evaluate, VERDICT } from './evaluator.js';
+import { cid1 } from './cid1.mjs';   // COMMIT-1: the identity of the state about to become authoritative
 
 const exec = promisify(execFile);
 const git = async (ws, args) => {
@@ -74,6 +75,11 @@ export const DISPOSITION = Object.freeze({
   RESTORED: 'RESTORED',                      // damage rolled back, starting state re-verified
   RESTORE_FAILED: 'RESTORE_FAILED',          // damage detected and NOT undone - must halt
   HELD: 'HELD',                              // evaluation error: candidate held, nothing promoted
+  // COMMIT-1 (54c35ba7): the verdict was PASS and correct, but the state about to become
+  // authoritative is not the state the verdict judged (or cannot be identified). Authority stays
+  // with the previously authoritative state. Distinct from RESTORE_FAILED (damage not undone) and
+  // from HELD (the instrument failed): here the instrument worked and the binding was missing.
+  IDENTITY_DRIFT: 'IDENTITY_DRIFT',
 });
 
 /**
@@ -152,6 +158,39 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
     subject: after.subject ?? null,
   };
   if (req === VERDICT.PASS) {
+    // ── COMMIT-1 (54c35ba7): IDENTITY EQUALITY AT THE AUTHORITATIVE TRANSITION ──
+    //
+    // K8: a PASS verdict about C0 was correct, the receipt named C0 correctly (D-BIND), the live
+    // workspace had meanwhile become C1, and RETAIN made C1 authoritative under C0's verdict. The
+    // verifier did not lie and the receipt did not lie; the BINDING between the verdict's subject
+    // and the state being promoted was missing. This is that binding.
+    //
+    // The anchor is the identity of the state ABOUT TO BECOME AUTHORITATIVE, computed here,
+    // immediately before authority transfers. It is deliberately NOT `after.subject`: that is a
+    // re-verdict of the live state, answering "does C1 pass on its own" - a different question
+    // from "may C0's authority transfer to C1".
+    //
+    // EQUALITY, not immutability. A workspace that wandered to C1 and came back to C0 is
+    // retained (ABA): the verdict is about an immutable snapshot of C0, and it does not matter
+    // that the mutable staging workspace moved in between, provided the state being committed
+    // IS C0. D-CONS guards the judgment interval; this guards the transition.
+    //
+    // FAIL CLOSED. No identity (cid1 refused) or no subject on the verdict means equality cannot
+    // be established, and a transition whose binding cannot be established does not happen.
+    // Authority stays with the previously authoritative state. The baseline does not advance.
+    const live = cid1(ws);
+    out.retainedIdentity = live.ok ? live.id : null;
+    if (!live.ok || !candidateVerdict.subject || live.id !== candidateVerdict.subject) {
+      out.disposition = DISPOSITION.IDENTITY_DRIFT;
+      out.countsAsCompletion = false;
+      out.promotable = false;
+      out.survivingWorkspaceVerdict.note = !live.ok
+        ? `identity unavailable at the authoritative transition (${live.reason}${live.path ? ' at ' + live.path : ''}); authority stays with the previous state`
+        : !candidateVerdict.subject
+          ? 'the verdict names no subject, so equality cannot be established; authority stays with the previous state'
+          : `identity drift: the verdict authorizes ${String(candidateVerdict.subject).slice(0, 20)} but the state being retained is ${String(live.id).slice(0, 20)}; authority stays with the previous state`;
+      return out;
+    }
     out.disposition = DISPOSITION.RETAIN;
     out.countsAsCompletion = true;
     out.promotable = true;
