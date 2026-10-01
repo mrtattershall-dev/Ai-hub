@@ -1,0 +1,37 @@
+{
+  "phase": "after",
+  "A": {
+    "id": "908c0eba",
+    "goal": "Add probe() to out.js returning the string 'A'.",
+    "priority": 0,
+    "source": "human",
+    "after": null,
+    "generation": 0,
+    "repairOf": null,
+    "authority": null,
+    "createdAt": 1790868294725,
+    "status": "done",
+    "takenAt": 1790868294732,
+    "runId": "55a08540-b7bd-4990-a49c-f97cbc5b7cd2",
+    "summary": "",
+    "finishKind": "unverified-no-work",
+    "finishedAt": 1790868295380
+  },
+  "B1": {
+    "id": "4b0f60ea",
+    "goal": "Check that out.js exports probe and report what it returns.",
+    "priority": 0,
+    "source": "human",
+    "after": "908c0eba",
+    "generation": 0,
+    "repairOf": null,
+    "authority": null,
+    "createdAt": 1790868294726,
+    "status": "queued",
+    "heldAt": 1790868295385
+  },
+  "autoStarted": false,
+  "heldNote": "Held: the previous goal ended 'unverified-no-work', not verified. The queue keeps \"Check that out.js exports probe and report what it returns.\" — start it from the queue panel to continue.",
+  "overrideStarted": true,
+  "outcome": "HELD with a note naming the verdict; human run started B (holds)"
+}

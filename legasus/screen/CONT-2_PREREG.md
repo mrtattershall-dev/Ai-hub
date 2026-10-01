@@ -95,3 +95,33 @@ unverifiedFinishRecorded, forcedFinish - baselined BEFORE the change.
     generationChain 2/0    autoStart 4    supervisorTick 5/0    runLifecycle 9/0
     unverifiedFinishRecorded 10/0 (+1 known-open)    forcedFinish 3/0
     plus the ten finish-gate consumers at their FG-5 counts
+
+## Amendment 1 - 2026-10-01 - a trace gap, an over-reach, and the rule moved onto the dependency EDGE
+
+Found by the first AFTER chain (CONT-1 AFTER EH1 24667b17, C7 AFTER b5daf159, consumers):
+
+1. TRACE GAP (mine). CONT-1 enumerated two autonomous entrances - the terminal branch (~5623) and
+   POST /agent/queue/run - and missed the third: supervisorTick() (~5906), a timer that dequeues with the
+   same completedIds and autoStarts when the workspace is idle. The first repair held only in the terminal
+   branch, so CONT-1 AFTER showed C2/C3/C4's dependents still starting: the branch released B, the tick
+   picked it up. C7 AFTER "held" because the probe read B seconds after A ended and then started B itself -
+   partly a race, recorded as such. The run 1/2 probe projection "kind on item: none" never read
+   item.finishKind (C7 shows it present); a probe projection, not a finding.
+
+2. OVER-REACH (mine). runLifecycle.test 9/0 -> 7/2: its queued follow-up has NO `after` - an independent
+   goal, not a dependent - and the first repair keyed the hold on the FINISHING RUN's verdict for any next
+   item. CONT-1 measured dependents (B after A); nothing measured authorizes holding independent work.
+
+RULE, frozen now: autonomous continuation is judged on the DEPENDENCY EDGE. At every autonomous
+entrance (terminal branch AND tick), after dequeue: if next.after names a predecessor item whose stored
+finishKind is not in CONTINUABLE, the item is released with a note/record (HELD); otherwise the brake
+decides as before. Independent items (no after) start as today. POST /agent/queue/run records the
+override on the dependent as already frozen. One helper, heldByPredecessor(next), used by both entrances.
+
+OPEN, recorded, not decided (CONT-3 candidate): an INDEPENDENT successor still observes the workspace an
+unverified predecessor left behind (X1). Whether workspace sharing is itself a dependency is a contract
+question for the owner, not this repair.
+
+Predictions under the edge rule (probes unchanged): CONT-1 C2/C3/C4 - B NOT started, item queued, A done;
+C1 unchanged; C5 unchanged. C7 - held, then started by the human with the override record. runLifecycle
+back to 9/0; every other consumer at baseline.
