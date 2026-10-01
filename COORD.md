@@ -11560,3 +11560,12 @@ Claimed by: Claude (cid1 / D-COPY / D-CONS session). Files:
 Do not edit the claimed files until this claim is released.
 
 Claim released 2026-10-01 07:35 CDT — D-BIND committed. server/evaluator.js, server/acceptance.js, server/evaluator.test.mjs FREE.
+
+## CLAIM 2026-10-01 — candidate-0 — COMMIT-1 (terminal-state authority boundary)
+
+    CLAIMED   legasus/screen/COMMIT-1_PREREG.md, server/commit1.probe.mjs
+    NOT CLAIMED  acceptance.js, batch.js, governance.js, evaluator.js - this step freezes the
+                 property and stages the K8 counterexample; it repairs nothing.
+
+Checked before writing (the COORD-1 lesson). D-CONS and D-BIND released 07:35; nothing open.
+Do not edit the claimed files until this claim is released.
