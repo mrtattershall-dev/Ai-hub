@@ -11623,3 +11623,10 @@ Claimed by: Claude (finish-gate session). Files:
 Frozen at b965558e; probe 37a41cbd runs BEFORE first, unchanged. Do not edit the claimed files until released.
 
 Claim released 2026-10-01 09:51 CDT — FG-5 RECEIPT committed (5a 93eb8896, 5b above). All FG files FREE. Stopped and reporting per the standing instruction; ESCAPE / symbol check / loop guard NOT started. NEW boundary recorded, unclaimed: agent.js:5604/5617 queue completion + supervisor trigger key on status done alone.
+
+## CLAIM 2026-10-01 09:54 CDT — candidate-0 — CONT-1 (continuation authority), CHARACTERIZATION
+Claimed by: Claude (finish-gate session). Files:
+    CLAIMED   legasus/screen/CONT-1_*, server/cont1.probe.mjs
+    NOT YET   server/agent.js (~5590-5630 terminal block), server/workQueue.js - read only until a policy is frozen;
+              a separate claim precedes any edit
+Independent of the recovery work (Agent 2). Checked before writing.
