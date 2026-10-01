@@ -82,3 +82,33 @@ text is read by the model in any useful way - a campaign question.
 
     tracesIsolation.test.mjs 6/0 - the only test importing runIndex.mjs, finishVerdicts.mjs or tochat.mjs
     plus the nine gate consumers at their FG-4 counts
+
+## Amendment 1 - 2026-10-01 - the repair, split and its exact claims, frozen BEFORE implementation
+
+BEFORE (EH1 2d82b379) fired as predicted: R1a and R1c read ok; R2 has no judged; R6 shows the real writer
+stamping unverified-no-work and the real reader rendering ok. Research question (tatte): can an outcome
+the gate refuses to verify acquire verified semantics downstream? Invariant: a downstream consumer may not
+strengthen an upstream epistemic result.
+
+The smallest production boundary responsible for the strengthening is runIndex.mjs verdictOf (line 63):
+the ONLY site that maps an unrecognised finish kind to ok, plus its unverified count (line 80), with the
+vocabulary in finishVerdicts.mjs lacking the kind FG-3 introduced. tochat.mjs consults the same vocabulary
+and is repaired by the vocabulary alone (R1b). The subject-naming half (judged / finishSubject, rows
+R2-R5) is a DIFFERENT mechanism (what the receipt names, not how strong it is read), so the step is split:
+
+    FG-5a STRENGTHENING  finishVerdicts.mjs: UNVERIFIED gains unverified-no-work; a KNOWN set lists every
+                         value finishVerdict() writes. runIndex.mjs: verdictOf -> the kind when known, the
+                         literal unknown when not (never ok); the unverified count uses the same set; a new
+                         unknown count is reported beside noVerdict so an unrecognised kind is VISIBLE, not
+                         absorbed. tochat.mjs: unchanged (the vocabulary repairs R1b). No other file.
+    FG-5b NAMING         as frozen at b965558e items 3-4 (verify() judged; agent.js note, run.finishSubject,
+                         saveTrace and the index row). Built only after 5a has its AFTER run.
+
+Exact claims for 5a, judged by the UNCHANGED probe: R1a, R1b, R1c, R1d, R6 HOLD; R2, R3, R4, R5 STILL RED
+(they belong to 5b). The probe's after-verdict object will therefore print r2r3 false and r4r5 false after
+5a - expected, and the probe is not edited for it. Consumers: tracesIsolation.test (6/0) and the nine gate
+consumers, re-run after each half.
+
+Not changed by either half: what status done means (a run ENDED), the hub UI, the evaluator's authority
+chain (campaignReport reads accepted/disposition from acceptance, not finishKind), rungoals (it carries
+finishKind through unchanged).

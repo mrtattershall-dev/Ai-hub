@@ -1,0 +1,71 @@
+{
+  "phase": "before",
+  "rows": [
+    {
+      "id": "R1a",
+      "label": "runIndex: finishKind 'unverified-no-work'",
+      "outcome": "reads 'ok' - a no-work finish indexed as clean (red)",
+      "verdict": "ok",
+      "line": "10-01 09:45  done      ok                    1     0      —   probe unverified-no-work"
+    },
+    {
+      "id": "R1b",
+      "label": "tochat: no-work row, 1 block",
+      "outcome": "skipped by block count only: {\"finish gate blocked 1x\":1}",
+      "left": "{\"finish gate blocked 1x\":1}"
+    },
+    {
+      "id": "R1c",
+      "label": "runIndex: an unknown finishKind",
+      "outcome": "reads 'ok' - unknown treated as clean (red)",
+      "verdict": "ok",
+      "line": "10-01 09:45  done      ok                    1     0      —   probe something-new"
+    },
+    {
+      "id": "R1d",
+      "label": "runIndex: 'verified' / absent",
+      "outcome": "ok / ?",
+      "holds": true
+    },
+    {
+      "id": "R2",
+      "label": "verify(): judged {entry, files, id} over the scoped set",
+      "outcome": "no `judged` on the result (red)",
+      "judged": null,
+      "recomputed": null
+    },
+    {
+      "id": "R3",
+      "label": "verify(): judged.id changes with the judged bytes",
+      "outcome": "n/a (no judged)",
+      "before": null,
+      "after": null
+    },
+    {
+      "id": "R4",
+      "label": "hub: Verified note + run.finishSubject",
+      "outcome": "note names the entry, no identity; run has no finishSubject (red)",
+      "note": "Verified (node): all 1 source file(s) pass a syntax check (this goal's scope); all 1 module(s) load without throwing (this goal's scope); `node s1_library.js` r",
+      "finishSubject": null,
+      "recomputed": null
+    },
+    {
+      "id": "R5",
+      "label": "hub: trace row and index row carry finishKind AND finishSubject",
+      "outcome": "finishKind only: trace verified (subject false), index verified (subject false) (red)",
+      "traceKind": "verified",
+      "indexKind": "verified"
+    },
+    {
+      "id": "R6",
+      "label": "hub: the no-work finish, through the real writer and the index reader",
+      "outcome": "writer stamped unverified-no-work; index reads 'ok' (red)",
+      "written": "unverified-no-work",
+      "read": "ok"
+    }
+  ],
+  "verdict": {
+    "mustFire": true,
+    "r1dHolds": true
+  }
+}
