@@ -112,3 +112,15 @@ consumers, re-run after each half.
 Not changed by either half: what status done means (a run ENDED), the hub UI, the evaluator's authority
 chain (campaignReport reads accepted/disposition from acceptance, not finishKind), rungoals (it carries
 finishKind through unchanged).
+
+## Amendment 2 - 2026-10-01 - R1b did NOT hold under 5a; the prediction was wrong, recorded as such
+
+Amendment 1 claimed "tochat.mjs: unchanged (the vocabulary repairs R1b)". AFTER 5a (EH1 0e1ed513) shows
+R1b still "skipped by block count only". Cause, read from tochat.mjs:70-79: the block-count skip runs
+BEFORE the verdict skip, and a no-work finish always carries exactly one block (FG-3 refuses once before
+the UNVERIFIED end), so the verdict branch is never reached for this kind. The row IS dropped - the corpus
+does not gain it - so this is a mis-ATTRIBUTION of the skip reason, not a strengthening, and it is NOT
+repaired in FG-5: reordering tochat's checks is a change to a file this step froze as unchanged, and the
+invariant under test (no downstream strengthening) is not violated by it. R1b stays red through FG-5 and
+is reported NOT CLAIMED; the probe is not edited to match. The probe's r1 verdict will therefore print
+false after 5b as well; R1a/R1c/R1d/R6 are the strengthening rows and they hold.
