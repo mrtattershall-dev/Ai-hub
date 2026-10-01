@@ -74,3 +74,15 @@ That the UNVERIFIED finish is kept out of the training corpus - fatal-09 notes b
 it labelled verified; the corpus filter reads finishKind (agent.js ~3742) and is checked in RECEIPT, not
 here. That an edit which landed on the WRONG file counts as work: it does (a write landed); whether it
 was the goal's file is SUBJECT's question.
+
+## Amendment 1 - 2026-10-01 - NO_WORK yields only when it is the SOLE problem (before the fix)
+
+Found by the consumer re-run after the first repair: finishGateGoalEntry.test 4/0 -> 2/2. Its goal names
+a file whose own code CRASHES and its scripted model lands no write. Under the first repair the first
+finish was refused as NO_WORK (correct), and the SECOND finish ended the run UNVERIFIED - although the
+project does not run. The prereg said "a second finish with still zero writes is allowed to END the run"
+without saying "and nothing else blocks it". That omission let an admission rule override a runtime
+failure. Frozen now: the once-only yield applies ONLY when NO_WORK is the sole problem (verify() returned
+admission NO_WORK and exactly one problem). Any other problem blocks as before, counting toward the
+3-strike cap, and the block names the project failure first. A5 (file loads, lacks the goal) is
+unchanged by this; a new hub row A8 (file crashes, zero writes, finish twice) must STAY BLOCKED twice.
