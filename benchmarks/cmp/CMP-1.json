@@ -1,0 +1,186 @@
+{
+ "sim": "CMP-1",
+ "damaging": 7,
+ "clean": 4,
+ "classA": 4,
+ "classB": 3,
+ "summary": {
+  "baseline": {
+   "caught": 0,
+   "missed": 7,
+   "caughtA": 0,
+   "caughtB": 0,
+   "falseRefusals": 0
+  },
+  "simpleGuard": {
+   "caught": 4,
+   "missed": 3,
+   "caughtA": 4,
+   "caughtB": 0,
+   "falseRefusals": 0
+  },
+  "legasus": {
+   "caught": 7,
+   "missed": 0,
+   "caughtA": 4,
+   "caughtB": 3,
+   "falseRefusals": 0
+  }
+ },
+ "rows": [
+  {
+   "cls": "A",
+   "k": 2,
+   "specimen": "A_load_throw/baseline1-k2-total-undef.js",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "CAUGHT",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": "load: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-6mLjIW\\inventory.js:4\r",
+    "legasus": "seed check failed: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-6mLjIW\\inventory.js:4\r"
+   }
+  },
+  {
+   "cls": "A",
+   "k": 1,
+   "specimen": "A_load_throw/baseline4-k1-remove-undef.js",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "CAUGHT",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": "load: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-uWUpgF\\inventory.js:4\r",
+    "legasus": "seed check failed: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-uWUpgF\\inventory.js:4\r"
+   }
+  },
+  {
+   "cls": "A",
+   "k": 3,
+   "specimen": "A_load_throw/baseline8-k3-restock-undef.js",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "CAUGHT",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": "load: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-qu2WxY\\inventory.js:4\r",
+    "legasus": "seed check failed: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-qu2WxY\\inventory.js:4\r"
+   }
+  },
+  {
+   "cls": "A",
+   "k": 3,
+   "specimen": "A_load_throw/governed5-k3-restock-undef.js",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "CAUGHT",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": "load: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-wh7TTe\\inventory.js:18\r",
+    "legasus": "seed check failed: C:\\Users\\tatte\\AppData\\Local\\Temp\\cmp-wh7TTe\\inventory.js:18\r"
+   }
+  },
+  {
+   "cls": "B",
+   "k": 2,
+   "specimen": "B_loads_breaks_earlier/k2-breaks-inc1",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "MISSED",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": "inc1 check failed: "
+   }
+  },
+  {
+   "cls": "B",
+   "k": 3,
+   "specimen": "B_loads_breaks_earlier/k3-breaks-inc2",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "MISSED",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": "inc2 check failed: "
+   }
+  },
+  {
+   "cls": "B",
+   "k": 4,
+   "specimen": "B_loads_breaks_earlier/k4-breaks-inc3",
+   "damaging": true,
+   "baseline": "MISSED",
+   "simpleGuard": "MISSED",
+   "legasus": "CAUGHT",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": "inc3 check failed: "
+   }
+  },
+  {
+   "cls": "clean",
+   "k": 1,
+   "specimen": "clean/k1",
+   "damaging": false,
+   "baseline": "OK",
+   "simpleGuard": "OK",
+   "legasus": "OK",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": null
+   }
+  },
+  {
+   "cls": "clean",
+   "k": 2,
+   "specimen": "clean/k2",
+   "damaging": false,
+   "baseline": "OK",
+   "simpleGuard": "OK",
+   "legasus": "OK",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": null
+   }
+  },
+  {
+   "cls": "clean",
+   "k": 3,
+   "specimen": "clean/k3",
+   "damaging": false,
+   "baseline": "OK",
+   "simpleGuard": "OK",
+   "legasus": "OK",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": null
+   }
+  },
+  {
+   "cls": "clean",
+   "k": 4,
+   "specimen": "clean/k4",
+   "damaging": false,
+   "baseline": "OK",
+   "simpleGuard": "OK",
+   "legasus": "OK",
+   "why": {
+    "baseline": null,
+    "simpleGuard": null,
+    "legasus": null
+   }
+  }
+ ]
+}
