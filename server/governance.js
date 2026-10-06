@@ -86,7 +86,12 @@ export async function prepareGoverned(workspace, runId, checks, { qualifiedPath,
   }
   const errors = validateChecks(checks);
   if (errors.length) return { ok: false, reason: `checks did not validate: ${errors.join('; ')}` };
-  if (!(await workerAvailable())) return { ok: false, reason: 'the isolated worker is unavailable (Docker), so the starting state cannot be verified' };
+  // CONNECTION REPAIR 3 (worker `.ok`): workerAvailable() returns an OBJECT - { ok: false, error } on failure - which
+  // is truthy, so `!(await workerAvailable())` never refused and the start state was committed BEFORE the worker was
+  // found missing. Acceptance condition (SYSTEMS-INVENTORY-1): refuse BEFORE git init / the start commit.
+  // Regression check: workerOkProbe.mjs (early-check reason; no start commit in the reflog).
+  const worker = await workerAvailable();
+  if (!worker || worker.ok !== true) return { ok: false, reason: `the isolated worker is unavailable (Docker), so the starting state cannot be verified${worker && worker.error ? ` - ${worker.error}` : ''}` };
 
   if (!existsSync(workspace)) mkdirSync(workspace, { recursive: true });
   if (!existsSync(join(workspace, '.git'))) {
