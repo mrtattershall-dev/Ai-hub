@@ -9,7 +9,10 @@ import {
 // Core scaffold files the agent manages — locked so they can't be deleted by accident.
 const PROTECTED = new Set(['index.html', 'style.css', 'script.js', 'main.py']);
 import { useStore } from '../store/useStore.js';
-import { agentStart, agentGet, agentApprove, agentStop, agentResume, agentFollowup, agentList, agentFiles, agentUpload, agentUploadZip, agentDeleteFile, agentReset, AGENT_EXPORT_URL, queueList, queueAdd, queueRemove, queueRunNext } from '../lib/api.js';
+import { agentStart, agentGet, agentApprove, agentStop, agentResume, agentFollowup, agentList, agentFiles, agentUpload, agentUploadZip, agentDeleteFile, agentReset, AGENT_EXPORT_URL, queueList, queueAdd, queueRemove, queueRunNext, getHubToken } from '../lib/api.js';
+// Defect 5 (product path, 2026-10-06): the ledger and escalation log are served from META_DIR behind the hub's auth; send
+// the owner token like projectContext.js does, or a token-protected hub answers 401 and the panel shows nothing.
+const recordHeaders = () => { const t = getHubToken(); return t ? { 'x-hub-token': t } : {}; };
 
 const fileToBase64 = (f) => new Promise((resolve, reject) => {
   const r = new FileReader();
@@ -107,7 +110,7 @@ function LedgerStrip({ active }) {
     let alive = true;
     const read = async () => {
       try {
-        const r = await fetch('/workspace/TASKS.md', { cache: 'no-store' });
+        const r = await fetch('/workspace/TASKS.md', { cache: 'no-store', headers: recordHeaders() });
         if (!alive) return;
         if (!r.ok) { setTasks(null); return; }
         const body = await r.text();
@@ -116,7 +119,7 @@ function LedgerStrip({ active }) {
         setTasks(rows.length ? rows : null);
       } catch { if (alive) setTasks(null); }
       try {
-        const e = await fetch('/workspace/ESCALATIONS.md', { cache: 'no-store' });
+        const e = await fetch('/workspace/ESCALATIONS.md', { cache: 'no-store', headers: recordHeaders() });
         if (!alive) return;
         setEscalations(e.ok ? (await e.text()).split(/^## /m).length - 1 : 0);
       } catch { if (alive) setEscalations(0); }
