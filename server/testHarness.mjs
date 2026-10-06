@@ -66,6 +66,7 @@ export function isolatedEnv(dir, port, extra = {}) {
     AGENT_WORKSPACE: join(dir, 'workspace'),
     AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_RUNS_DIR: join(dir, 'runs'),
+    AGENT_META_DIR: join(dir, 'meta'),   // R1/R2: the hub's own records, outside the governed workspace
     AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'run-index.jsonl'),
     HUB_TOKEN: '',
     ...extra,

@@ -143,6 +143,8 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
     // RESTORED now claims three things, each checked: git reset succeeded, the protected check
     // passes again, and every byte matches the start commit with nothing extra on disk.
     out.disposition = after.protected?.verdict === VERDICT.PASS && bytes.identical ? DISPOSITION.RESTORED : DISPOSITION.RESTORE_FAILED;
+    // R7 (A-5 ruling): the restore keeps its authority; the receipt now names what it restored TO and the recheck of it.
+    out.restoredTo = { startRef, subject: after.subject ?? null, candidateTree: after.candidateTree ?? null, recheck: after.protected?.verdict ?? null, bytes: out.survivingBytes };
     if (!bytes.identical) out.survivingWorkspaceVerdict.note = 'the recheck passed but the bytes on disk are not those of the verified start: ' + out.survivingBytes;
     // Restored means the damage is gone. It does NOT mean the task was completed.
     return out;

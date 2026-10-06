@@ -17,6 +17,10 @@ import { join } from 'node:path';
 
 const ws = mkdtempSync(join(tmpdir(), 'planfiles-'));
 process.env.AGENT_WORKSPACE = ws;
+// R1 (A-5 ruling, 2026-10-06): the task ledger lives OUTSIDE the governed workspace (META_DIR). The in-process agent
+// below reads it from AGENT_META_DIR, so the test seeds and reads the ledger THERE. Behaviour under test is unchanged.
+const meta = mkdtempSync(join(tmpdir(), 'planfiles-meta-'));
+process.env.AGENT_META_DIR = meta;
 process.env.AGENT_TRACES_DIR = join(ws, '..', `planfiles-traces-${Date.now()}`);
 const ledger = await import('./taskLedger.js');
 const { __toolPolicyTest: T } = await import('./agent.js');
@@ -59,20 +63,20 @@ await test('empty and junk input do not throw', () => {
 console.log('\nwhich ledger tasks are THIS run\'s\n');
 
 await test('adopt() marks EVERY prior task carried - done ones too - and still counts only open ones as `carried`', () => {
-  ledger.seed(ws, ['write the stack', 'test the stack', 'add clear()']);
-  ledger.mark(ws, '1', 'done');
-  ledger.mark(ws, '2', 'done');
-  const r = ledger.adopt(ws, 'run-2');
+  ledger.seed(meta, ['write the stack', 'test the stack', 'add clear()']);
+  ledger.mark(meta, '1', 'done');
+  ledger.mark(meta, '2', 'done');
+  const r = ledger.adopt(meta, 'run-2');
   assert.deepEqual(r, { carried: 1, prior: 3 });
-  assert.ok(ledger.read(ws).every((t) => t.carried), 'a prior task was left looking like this run\'s own');
-  const p = ledger.progress(ws);
+  assert.ok(ledger.read(meta).every((t) => t.carried), 'a prior task was left looking like this run\'s own');
+  const p = ledger.progress(meta);
   assert.equal(p.own, 0);
   assert.equal(p.remainingOwn, 0);
   assert.equal(p.carried, 1);
 });
 
 await test('adopt() twice is a no-op the second time', () => {
-  assert.deepEqual(ledger.adopt(ws, 'run-2'), { carried: 0, prior: 0 });
+  assert.deepEqual(ledger.adopt(meta, 'run-2'), { carried: 0, prior: 0 });
 });
 
 await test('closing a LEFT-OVER task does not announce this goal complete (goal 9)', async () => {
@@ -83,14 +87,14 @@ await test('closing a LEFT-OVER task does not announce this goal complete (goal 
 });
 
 await test('the carried marker survives a later rewrite of the ledger', () => {
-  ledger.mark(ws, '1', 'todo');
-  ledger.mark(ws, '1', 'done');
-  assert.ok(ledger.read(ws).every((t) => t.carried));
+  ledger.mark(meta, '1', 'todo');
+  ledger.mark(meta, '1', 'done');
+  assert.ok(ledger.read(meta).every((t) => t.carried));
 });
 
 await test('a task THIS run adds is its own, and closing it reports the goal complete', async () => {
-  ledger.add(ws, ['document the queue']);
-  assert.equal(ledger.progress(ws).own, 1);
+  ledger.add(meta, ['document the queue']);
+  assert.equal(ledger.progress(meta).own, 1);
   const r = String(await T.callTool('task_done', { which: 'document the queue' }));
   assert.match(r, /ALL 1 TASKS FOR THIS GOAL ARE COMPLETE/, r.slice(0, 200));
 });

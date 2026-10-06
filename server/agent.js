@@ -11,7 +11,7 @@ import express from 'express';
 import { launchOptions } from './browser.js';
 import { serveScriptsFromCache } from './engineCache.js';
 import { fileURLToPath } from 'url';
-import { dirname, join, resolve, relative, sep } from 'path';
+import { dirname, basename, join, resolve, relative, sep } from 'path';
 import { governedEdit, editAction, EDIT_FIXTURE }
   from '../legasus/runtime/epistemic-admission/governed-edit.mjs';
 import { fileScope } from '../legasus/runtime/governedWorkspace/workspace.mjs';
@@ -409,6 +409,13 @@ function googleWriteReason(tool, args = {}) {
 export const WORKSPACE = process.env.AGENT_WORKSPACE
   ? resolve(process.env.AGENT_WORKSPACE)
   : join(__dirname, '..', 'workspace');
+// R1/R2 (A-5 ruling, 2026-10-06): the hub's OWN records - the task ledger and the escalation log - live OUTSIDE
+// the governed target. They were written into WORKSPACE after the governed start commit, by no authority and with
+// no receipt line (A-4 W1/W2/W4), and the next governed start then committed them as the verified baseline (A-5).
+// A per-workspace sibling directory keeps them out of every pre/post comparison, snapshot and restore.
+export const META_DIR = process.env.AGENT_META_DIR
+  ? resolve(process.env.AGENT_META_DIR)
+  : join(dirname(WORKSPACE), basename(WORKSPACE) + '.hub-meta');
 const PORT = process.env.PORT || 3001;
 
 // A step COUNT was the right guard when a bad edit was permanent: 30 steps kept a
@@ -550,6 +557,7 @@ const WORKSPACE_MANIFEST = {
 
 function ensureWorkspace() {
   if (!existsSync(WORKSPACE)) mkdirSync(WORKSPACE, { recursive: true });
+  if (!existsSync(META_DIR)) mkdirSync(META_DIR, { recursive: true });   // R1/R2: the hub's records live here, not in the target
   const manifest = join(WORKSPACE, 'package.json');
   if (!existsSync(manifest)) {
     try { writeFileSync(manifest, JSON.stringify(WORKSPACE_MANIFEST, null, 2) + '\n', 'utf8'); }
@@ -1732,8 +1740,11 @@ const tools = {
     const line = `- [${new Date().toISOString().slice(0, 16).replace('T', ' ')}] ${String(text).trim().replace(/\s+/g, ' ').slice(0, 500)}\n`;
     const full = join(WORKSPACE, 'NOTES.md');
     try {
-      if (!existsSync(full)) writeFileSync(full, '# Project notes\n\nWritten by the agent. Read this before deciding anything.\n\n', 'utf8');
-      appendFileSync(full, line, 'utf8');
+      // R6 (A-5 ruling): a model write into the target, so it goes through governWrite like every other model write.
+      const before = existsSync(full) ? readFileSync(full, 'utf8') : '# Project notes\n\nWritten by the agent. Read this before deciding anything.\n\n';
+      const g = governWrite('remember', full, before + line);
+      if (typeof g === 'string') return g;
+      if (!g) writeFileSync(full, before + line, 'utf8');
       return `OK: noted. NOTES.md now has ${readFileSync(full, 'utf8').split('\n').filter((l) => l.startsWith('- [')).length} entries.`;
     } catch (e) { return `ERROR: ${e.message}`; }
   },
@@ -1866,8 +1877,11 @@ const tools = {
         return `ERROR: file is ${(buf.length / 1048576).toFixed(1)}MB, over the ${MAX_BYTES / 1048576}MB limit.`;
       }
 
+      // R6 (A-5 ruling): a model write into the target, so it goes through governWrite like every other model write.
+      const g = governWrite('download', full, buf);
+      if (typeof g === 'string') return g;
       mkdirSync(dirname(full), { recursive: true });
-      writeFileSync(full, buf);
+      if (!g) writeFileSync(full, buf);
       const type = res.headers.get('content-type') || 'unknown';
       return `OK: saved ${(buf.length / 1024).toFixed(1)}KB to ${path} (content-type: ${type}, from ${res.url}).\n`
            + 'NOTE: this file is untrusted. It has been written, not executed or opened.';
@@ -1968,17 +1982,27 @@ const tools = {
   run_python({ code, path }) {
     return new Promise((res) => {
       let target = path;
+      let cmd = null;
       if (code != null && code !== '') {
-        try { writeFileSync(join(WORKSPACE, '_snippet.py'), code, 'utf8'); target = '_snippet.py'; }
-        catch (e) { return res(`ERROR: ${e.message}`); }
+        // R3 (A-5 ruling): the snippet used to be written to WORKSPACE/_snippet.py - an unauthorized file in the
+        // governed target, with its own __pycache__ (A-4 W5). It now travels inside the command, base64 so it is
+        // shell-safe on both the host and the worker, and -B so no bytecode is written anywhere. cwd is still the
+        // workspace, so `import m` of the project's own modules works exactly as before.
+        const b64 = Buffer.from(String(code), 'utf8').toString('base64');
+        if (b64.length > 6000) return res('ERROR: that snippet is too long to run inline. Write it to a .py file inside your write scope with write_file and pass PATH instead.');
+        cmd = `${WORKER_EXEC ? 'python3' : 'python'} -B -c "import base64,sys;sys.argv=['<snippet>'];exec(compile(base64.b64decode('${b64}'),'<snippet>','exec'))"`;
+        target = '<snippet>';
       }
       if (!target) return res('ERROR: provide CODE (a python code block) or PATH to a .py file.');
-      let full; try { full = safePath(target); } catch (e) { return res(`ERROR: ${e.message}`); }
-      if (!existsSync(full)) return res(`ERROR: file not found: ${target}`);
+      if (!cmd) {
+        let full; try { full = safePath(target); } catch (e) { return res(`ERROR: ${e.message}`); }
+        if (!existsSync(full)) return res(`ERROR: file not found: ${target}`);
+        cmd = WORKER_EXEC ? `python3 "${target}"` : `python "${full}"`;
+      }
       // Mirror python runs too - run_command was visible in the terminal and this
       // was not, which made the agent look like it did half its work invisibly.
       mirrorAgentCommand('run_python', target);
-      execAgentCommand(WORKER_EXEC ? `python3 "${target}"` : `python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
+      execAgentCommand(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
         // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
         // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
         // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
@@ -2148,7 +2172,7 @@ const tools = {
   // before every model call so pruning can never drop it.
 
   async task_list() {
-    const b = ledger.contextBlock(WORKSPACE, _toolGoal);
+    const b = ledger.contextBlock(META_DIR, _toolGoal);
     return b || 'No tasks yet. Use task_add to write down what this build needs.';
   },
 
@@ -2195,8 +2219,8 @@ const tools = {
     if (!text || !String(text).trim()) return 'ERROR: provide TEXT — one task per line.';
     const titles = String(text).split('\n').map((s) => s.replace(/^[-*\d.)\s]+/, '').trim()).filter(Boolean);
     if (!titles.length) return 'ERROR: no task text found.';
-    const r = ledger.add(WORKSPACE, titles);
-    const p = ledger.progress(WORKSPACE);
+    const r = ledger.add(META_DIR, titles);
+    const p = ledger.progress(META_DIR);
     // Report what ACTUALLY happened, not what was asked for. The old message said
     // "added N" unconditionally, so once the ledger reached its cap the agent was told
     // it had recorded work that had been silently discarded.
@@ -2204,7 +2228,7 @@ const tools = {
     if (r.added < titles.length) notes.push(`${titles.length - r.added} were already on the list`);
     if (r.evicted) notes.push(`${r.evicted} completed task(s) evicted to make room (still in the git log)`);
     if (r.dropped) notes.push(`WARNING: ${r.dropped} could NOT be recorded - the ledger is at its cap. Close open tasks before adding more`);
-    return `OK: added ${r.added} task(s)${notes.length ? ` - ${notes.join('; ')}` : ''}. Ledger now ${p.done}/${p.total} done.\n${ledger.contextBlock(WORKSPACE, _toolGoal)}`;
+    return `OK: added ${r.added} task(s)${notes.length ? ` - ${notes.join('; ')}` : ''}. Ledger now ${p.done}/${p.total} done.\n${ledger.contextBlock(META_DIR, _toolGoal)}`;
   },
 
   async task_done({ which }) {
@@ -2224,18 +2248,18 @@ const tools = {
     // print a dispatchable header. (agent.js still has three older ones of these in edit_file's,
     // run_command's and the sub-agent's help text - logged, not fixed here.)
     if (!String(which ?? '').trim()) {
-      const block = ledger.contextBlock(WORKSPACE, _toolGoal);
+      const block = ledger.contextBlock(META_DIR, _toolGoal);
       return `ERROR: task_done needs WHICH - the NUMBER of the task you are closing, or enough of its title to match one.\n`
         + `You sent task_done with no WHICH, so nothing was marked done.\n`
         + (block ? `${block}\n` : '')
         + `Put a WHICH line with the task number under your task_done action.`;
     }
-    const r = ledger.mark(WORKSPACE, which, 'done');
+    const r = ledger.mark(META_DIR, which, 'done');
     if (!r.ok) {
-      const block = ledger.contextBlock(WORKSPACE, _toolGoal);
+      const block = ledger.contextBlock(META_DIR, _toolGoal);
       return `ERROR: ${r.error}. These are the open tasks - close one of THESE by its number:\n${block || '(there are no open tasks)'}`;
     }
-    const p = ledger.progress(WORKSPACE);
+    const p = ledger.progress(META_DIR);
     // A task LEFT OVER from an earlier run is not this goal's work, and closing one says
     // nothing about whether THIS goal is finished. It used to: in the 14B data run
     // (2026-09-10, goal 9) the model closed a goal-1 task and was told "ALL 3 TASKS FOR THIS
@@ -2245,7 +2269,7 @@ const tools = {
       const own = !p.own
         ? 'This goal has no tasks of its own on the ledger - before you finish, check its deliverables yourself: every file the goal or your plan names exists and does what was asked.'
         : p.remainingOwn
-          ? `${p.remainingOwn} of this goal's ${p.own} task(s) still open.\n${ledger.contextBlock(WORKSPACE, _toolGoal)}`
+          ? `${p.remainingOwn} of this goal's ${p.own} task(s) still open.\n${ledger.contextBlock(META_DIR, _toolGoal)}`
           : `All ${p.own} task(s) for this goal are done - verify, then finish.`;
       return `OK: "${r.task.title}" done - that task was LEFT OVER from earlier work in this workspace, not part of this goal. ${own}`;
     }
@@ -2253,7 +2277,7 @@ const tools = {
     // from an earlier run must not stop the agent being told it is done.
     return p.remainingOwn === 0
       ? `OK: "${r.task.title}" done. ALL ${p.own} TASKS FOR THIS GOAL ARE COMPLETE — verify, then finish.`
-      : `OK: "${r.task.title}" done (${p.done}/${p.total}). ${p.remainingOwn} left.\n${ledger.contextBlock(WORKSPACE, _toolGoal)}`;
+      : `OK: "${r.task.title}" done (${p.done}/${p.total}). ${p.remainingOwn} left.\n${ledger.contextBlock(META_DIR, _toolGoal)}`;
   },
 
   // ---- looking at the result -------------------------------------------------
@@ -2720,7 +2744,9 @@ function quickCheck(path) {
     if (!path) return res(null);
     let full; try { full = safePath(path); } catch { return res(null); }
     let cmd;
-    if (/\.py$/i.test(path)) cmd = `python -m py_compile "${full}"`;
+    // R4 (A-5 ruling): py_compile WRITES __pycache__ into the governed target (A-4 W6/W8). ast.parse checks the
+    // same syntax and writes nothing; -B for good measure.
+    if (/\.py$/i.test(path)) cmd = `python -B -c "import ast,sys;ast.parse(open(sys.argv[1],'rb').read(),filename=sys.argv[1])" "${full}"`;
     else if (/\.(c|m)?js$/i.test(path)) cmd = `node --check "${full}"`;
     else return res(null);                       // not a checkable language
     exec(cmd, { cwd: WORKSPACE, timeout: 20_000, windowsHide: true }, (err, _o, stderr) => {
@@ -3574,7 +3600,7 @@ function withLedger(history) {
   // The goal scopes carried-over tasks (taskLedger AGED). It lives in the anchor message pruneHistory never drops.
   const anchor = history.find((m) => m.role === 'user' && String(m.content || '').includes('\nGOAL: '));
   const goal = anchor ? String(anchor.content).split('\nGOAL: ')[1].split('\n\nBegin step by step')[0] : null;
-  try { block = ledger.contextBlock(WORKSPACE, goal); } catch { block = null; }
+  try { block = ledger.contextBlock(META_DIR, goal); } catch { block = null; }
   if (block) extra.push({ role: 'user', content: block });
   // The asset library SUMMARY rides along the same way, for the same reason: it has to
   // survive pruning. It is a handful of lines - the full listing is a tool call away.
@@ -3901,7 +3927,7 @@ async function runSubtask(goal, depth, parent) {
     // verify_project's own comment says it fixed (set E: it reported `node q1_stock.js` ran cleanly for
     // a goal about q8_units.py, and the model repeated itself until the guard stopped the run). The fix
     // landed in drive() and not on the sibling paths. task_list/task_add/task_done are the same story:
-    // they render ledger.contextBlock(WORKSPACE, _toolGoal), so a sub-agent closing its OWN task was
+    // they render ledger.contextBlock(META_DIR, _toolGoal), so a sub-agent closing its OWN task was
     // told it was "LEFT OVER from earlier work in this workspace, not part of this goal".
     //
     // Restored in a finally so a nested dispatch cannot leak its context to whatever runs next. A
@@ -4121,10 +4147,10 @@ async function drive(loadDb, run) {
           // so on its own it says what to build but never what is done. Only seed when
           // the ledger is empty - a follow-up must not wipe the progress already made.
           try {
-            if (!ledger.read(WORKSPACE).length) {
+            if (!ledger.read(META_DIR).length) {
               const items = ledger.fromPlan(run.plan);
               if (items.length) {
-                ledger.seed(WORKSPACE, items);
+                ledger.seed(META_DIR, items);
                 pushStep(run, { type: 'note', text: `Task ledger seeded with ${items.length} item(s) from the plan.` });
               }
             }
@@ -4492,7 +4518,7 @@ async function drive(loadDb, run) {
           const hasWeb = !!webPage;
 
           // 1. unfinished work on the ledger
-          const p = ledger.progress(WORKSPACE);
+          const p = ledger.progress(META_DIR);
           // Plan-seeded tasks are a SUGGESTION, not a commitment.
           //
           // The plan-first gate writes a ledger before the agent has done anything, and
@@ -4509,7 +4535,7 @@ async function drive(loadDb, run) {
           // this run never agreed to them, so they are reported, not enforced. Without
           // that, serializing runs meant every run inherited the last one's leftovers
           // and could not finish.
-          const advisory = ledger.isPlanSeeded(WORKSPACE);
+          const advisory = ledger.isPlanSeeded(META_DIR);
           if (advisory && p.remaining > 0) {
             pushStep(run, { type: 'note',
               text: `Finished with ${p.remaining} suggested task(s) from the build plan left open — they were proposals, not commitments.` });
@@ -4519,7 +4545,7 @@ async function drive(loadDb, run) {
           }
           if (!advisory && p.total && p.remainingOwn > 0) {
             blocked(`${p.remainingOwn} task(s) still open — not finished yet.`,
-              `Do NOT finish yet — ${p.remainingOwn} of ${p.total} tasks on your ledger are not done:\n${ledger.contextBlock(WORKSPACE, run.goal)}\n`
+              `Do NOT finish yet — ${p.remainingOwn} of ${p.total} tasks on your ledger are not done:\n${ledger.contextBlock(META_DIR, run.goal)}\n`
               + `Either complete them, or if one is genuinely unnecessary say why and task_done it. Then finish.`);
             continue turn;
           }
@@ -4777,7 +4803,7 @@ async function drive(loadDb, run) {
           run.pendingSince = Date.now();   // the approval timeout measures from HERE
           run.status = 'awaiting_approval';
           pushStep(run, { type: 'approval_request', tool, args, thought, why: verdict.reason });
-          await escalate(WORKSPACE, {
+          await escalate(META_DIR, {
             runId: run.id, goal: run.goal, status: run.status, reason: 'approval',
             detail: `${tool}: ${args.cmd || args.path || ''} — ${verdict.reason}`,
           });
@@ -5404,7 +5430,10 @@ ${result}${syntaxNote}${handedBack}`;
             else if (/\.(c|m)?js$|\.py$/i.test(name)) repairable.push(r);
           }
         };
-        walkRepair(WORKSPACE);
+        // R4 (A-5 ruling): under the bounded configuration no host tool runs inside the target - the finish gate is
+        // already closed for that reason, and this sweep ran anyway, on every file, on every run (A-4 W6).
+        if (ROUTES_BOUNDED) pushStep(run, { type: 'route_closed', route: 'end-of-run parse sweep', text: 'End-of-run host parse sweep is closed in this configuration; files are judged by the independent evaluator only.' });
+        else walkRepair(WORKSPACE);
         const files = repairable;
         for (const f of files.slice(0, 40)) {
           if (!(await quickCheck(f))) continue;                 // parses fine - leave it alone
@@ -5482,7 +5511,7 @@ ${result}${syntaxNote}${handedBack}`;
             run.rolledBack = true;
             (run.restoredFiles || (run.restoredFiles = [])).push({ file: f, from: String(restoredFrom).slice(0, 7), removed });
             if (removed.length) {
-              try { ledger.add(WORKSPACE, [`Re-add ${removed.slice(0, 6).join(', ')} to ${f} - lost when ${f} was rolled back at the end of a run because it did not parse`]); }
+              try { ledger.add(META_DIR, [`Re-add ${removed.slice(0, 6).join(', ')} to ${f} - lost when ${f} was rolled back at the end of a run because it did not parse`]); }
               catch { /* the ledger is a helper, never a reason to fail the run */ }
             }
           } else {
@@ -5493,7 +5522,7 @@ ${result}${syntaxNote}${handedBack}`;
             pushStep(run, { type: 'error', text: `${f} does not parse and no version this run produced parses either, so it was left as the run left it rather than reaching back past this goal. This run did not finish cleanly.` });
             run.repairRefused = true;
             (run.unrepairedFiles || (run.unrepairedFiles = [])).push(f);
-            try { ledger.add(WORKSPACE, [`Fix ${f} - it does not parse, and the end-of-run repair refused to reach back past this goal to a version that predates it`]); }
+            try { ledger.add(META_DIR, [`Fix ${f} - it does not parse, and the end-of-run repair refused to reach back past this goal to a version that predates it`]); }
             catch { /* the ledger is a helper, never a reason to fail the run */ }
           }
         }
@@ -5581,7 +5610,7 @@ ${result}${syntaxNote}${handedBack}`;
         : /could not be parsed/i.test(text) ? 'parse'
         : /Same error persisted/i.test(text) ? 'same_error'
         : run.status === 'interrupted' ? 'tunnel' : 'error';
-      await escalate(WORKSPACE, { runId: run.id, goal: run.goal, status: run.status, reason, detail: text })
+      await escalate(META_DIR, { runId: run.id, goal: run.goal, status: run.status, reason, detail: text })
         .catch(() => {});
 
       // ── Don't leave the chain stranded ────────────────────────────────────────
@@ -6181,7 +6210,7 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   // stays visible without gating THIS run's finish. Only here, never on a follow-up: a
   // follow-up is the same commitment continuing.
   try {
-    const c = ledger.adopt(WORKSPACE, id).carried;
+    const c = ledger.adopt(META_DIR, id).carried;
     if (c) pushStep(run, { type: 'note', text: `${c} unfinished task(s) from earlier work in this workspace are carried over as context, not as commitments.` });
   } catch { /* the ledger is a helper, never a reason a run cannot start */ }
 
@@ -6328,9 +6357,34 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     let gov = null;
     if (governed) {
       const runId = randomUUID();
+      // R8 (A-5 ruling): a governed start must not inherit the residue of a run whose evaluation did not succeed.
+      // prepareGoverned commits WHATEVER is in the workspace as the verified start; A-5 showed a HELD run's
+      // unverified files becoming the next baseline that way, with the untracked-file trace erased by the commit.
+      // Continuation needs a recorded reconciliation - an explicit owner override that names the predecessor and
+      // leaves its verdict exactly as recorded.
+      const predecessor = [...runs.values()].filter((r) => r.governed && r.finalizedAt).sort((x, y) => y.finalizedAt - x.finalizedAt)[0] || null;
+      const predDisposition = predecessor && predecessor.governance && predecessor.governance.disposition;
+      const predUnresolved = !!predecessor && (predDisposition === 'HELD' || predDisposition === 'RESTORE_FAILED' || predecessor.protection === PROTECTION.FAILED_TO_APPLY);
+      const reconciliation = (req.body && req.body.reconciliation) || null;
+      if (predUnresolved) {
+        const ok = reconciliation && reconciliation.predecessorRunId === predecessor.id && reconciliation.override === 'owner' && typeof reconciliation.reason === 'string' && reconciliation.reason.trim();
+        if (!ok) return res.status(409).json({
+          error: `governed run BLOCKED: the previous governed run in this workspace (${predecessor.id}) ended ${predDisposition || predecessor.protection} - its evaluation did not succeed, so the workspace carries unverified residue that a new start would commit as the baseline. Supply reconciliation { predecessorRunId: "${predecessor.id}", override: "owner", reason } to proceed; the predecessor's verdict is preserved either way.`,
+          blocked: true, protection: PROTECTION.NONE, predecessor: { id: predecessor.id, disposition: predDisposition || null, protection: predecessor.protection || null },
+        });
+      }
+      // R5 (A-5 ruling): scaffolding the hub needs in the target (the package.json boundary marker) is written BEFORE
+      // the verified start is committed, under an explicit, recorded authority - not after it, as an unaccounted write.
+      // A BLOCKED start leaves the target as it found it: scaffolding created by THIS request is removed again when
+      // the baseline cannot be verified (E1/P3 showed a refused start leaving package.json behind otherwise).
+      const scaffoldedNow = !existsSync(join(WORKSPACE, 'package.json'));
+      ensureWorkspace();
       const prep = await prepareGoverned(WORKSPACE, runId, governed.checks, { qualifiedPath: WORKER_EXEC && ROUTES_BOUNDED });
+      if (!prep.ok && scaffoldedNow) { try { unlinkSync(join(WORKSPACE, 'package.json')); } catch { /* best effort; reported by the next pre/post comparison if it fails */ } }
       if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
-      gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString() };
+      gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString(),
+        scaffolding: { files: ['package.json'], authority: 'hub scaffolding: workspace boundary marker, initialized before the verified start (R5)', by: 'ensureWorkspace' },
+        reconciliation: predUnresolved ? { predecessorRunId: predecessor.id, predecessorDisposition: predDisposition || predecessor.protection, override: reconciliation.override, reason: reconciliation.reason.trim(), at: new Date().toISOString() } : null };
     }
     const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', writeScope: writeScope || null, budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null, recovery: req.body.recovery || null });
     res.json({ runId: run.id });
@@ -6450,6 +6504,15 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // List the files currently in the workspace. (Must be defined BEFORE '/:id'
   // or Express treats "files" as a run id.)
+  // R1/R2: the task ledger and the escalation log moved out of the target (META_DIR). The client still lists /files;
+  // this serves the records from where they now live. Read-only.
+  router.get('/meta', (req, res) => {
+    ensureWorkspace();
+    const out = { dir: META_DIR, files: {} };
+    for (const name of ['TASKS.md', 'ESCALATIONS.md']) { const p = join(META_DIR, name); out.files[name] = existsSync(p) ? readFileSync(p, 'utf8') : null; }
+    res.json(out);
+  });
+
   router.get('/files', (req, res) => {
     ensureWorkspace();
     const out = [];
