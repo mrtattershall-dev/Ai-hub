@@ -85,3 +85,6 @@ modal-serve/__pycache__/
 
 # test debris: R6 copies eslint rule files here to evaluate them outside an ignored path
 legasus/runtime/epistemic-admission/external-linter/external/
+
+# R1/R2: the hub's own records (META_DIR default), outside the governed workspace
+workspace.hub-meta/
