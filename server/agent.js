@@ -17,7 +17,8 @@ import { governedEdit, editAction, EDIT_FIXTURE }
 import { fileScope } from '../legasus/runtime/governedWorkspace/workspace.mjs';
 import { randomUUID } from 'crypto';
 import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, existsSync, unlinkSync, rmSync, appendFileSync, renameSync } from 'fs';
-import { exec } from 'child_process';
+import { exec, execFileSync } from 'child_process';
+import { allowed as authAllowed, HUB_TOKEN as HUB_OWNER_TOKEN } from './auth.js';   // F2: owner identity is the hub's own auth, not a request field
 import fetch from 'node-fetch';
 import { createRequire } from 'module';
 
@@ -6367,7 +6368,15 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       const predUnresolved = !!predecessor && (predDisposition === 'HELD' || predDisposition === 'RESTORE_FAILED' || predecessor.protection === PROTECTION.FAILED_TO_APPLY);
       const reconciliation = (req.body && req.body.reconciliation) || null;
       if (predUnresolved) {
-        const ok = reconciliation && reconciliation.predecessorRunId === predecessor.id && reconciliation.override === 'owner' && typeof reconciliation.reason === 'string' && reconciliation.reason.trim();
+        // F2: `override: 'owner'` is a request field anyone can send. The OWNER is whoever holds the hub token; with no
+        // token configured (localhost-only mode) there is no owner identity to verify, and the override is refused.
+        const ownerVerified = !!HUB_OWNER_TOKEN && authAllowed(req);
+        const shaped = reconciliation && reconciliation.predecessorRunId === predecessor.id && reconciliation.override === 'owner' && typeof reconciliation.reason === 'string' && reconciliation.reason.trim();
+        if (shaped && !ownerVerified) return res.status(409).json({
+          error: HUB_OWNER_TOKEN ? 'governed run BLOCKED: the reconciliation did not carry the owner\'s verified authority (hub token)' : 'governed run BLOCKED: the reconciliation cannot be verified - this hub has no owner token configured (HUB_TOKEN), so no caller can be identified as the owner',
+          blocked: true, protection: PROTECTION.NONE, predecessor: { id: predecessor.id, disposition: predDisposition || null, protection: predecessor.protection || null }, reconciliationRefused: 'owner authority not verified',
+        });
+        const ok = shaped && ownerVerified;
         if (!ok) return res.status(409).json({
           error: `governed run BLOCKED: the previous governed run in this workspace (${predecessor.id}) ended ${predDisposition || predecessor.protection} - its evaluation did not succeed, so the workspace carries unverified residue that a new start would commit as the baseline. Supply reconciliation { predecessorRunId: "${predecessor.id}", override: "owner", reason } to proceed; the predecessor's verdict is preserved either way.`,
           blocked: true, protection: PROTECTION.NONE, predecessor: { id: predecessor.id, disposition: predDisposition || null, protection: predecessor.protection || null },
@@ -6378,13 +6387,23 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       // A BLOCKED start leaves the target as it found it: scaffolding created by THIS request is removed again when
       // the baseline cannot be verified (E1/P3 showed a refused start leaving package.json behind otherwise).
       const scaffoldedNow = !existsSync(join(WORKSPACE, 'package.json'));
+      // F3: prepareGoverned inits/commits BEFORE it evaluates, so a refused start used to leave .git (or a new commit)
+      // behind. Remember what the target had, and put it back on refusal: no repo -> remove the one we made; a repo
+      // -> reset --mixed to its previous HEAD (index and HEAD restored, working tree untouched, our commit unreferenced).
+      const hadGit = existsSync(join(WORKSPACE, '.git'));
+      let prevHead = null;
+      if (hadGit) { try { prevHead = execFileSync('git', ['-C', WORKSPACE, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8', windowsHide: true }).trim(); } catch { prevHead = null; } }
       ensureWorkspace();
       const prep = await prepareGoverned(WORKSPACE, runId, governed.checks, { qualifiedPath: WORKER_EXEC && ROUTES_BOUNDED });
-      if (!prep.ok && scaffoldedNow) { try { unlinkSync(join(WORKSPACE, 'package.json')); } catch { /* best effort; reported by the next pre/post comparison if it fails */ } }
+      if (!prep.ok) {
+        if (scaffoldedNow) { try { unlinkSync(join(WORKSPACE, 'package.json')); } catch { /* best effort; the next pre/post comparison reports it */ } }
+        if (!hadGit) { try { rmSync(join(WORKSPACE, '.git'), { recursive: true, force: true }); } catch { /* same */ } }
+        else if (prevHead) { try { execFileSync('git', ['-C', WORKSPACE, 'reset', '-q', '--mixed', prevHead], { windowsHide: true }); } catch { /* same */ } }
+      }
       if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
       gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString(),
         scaffolding: { files: ['package.json'], authority: 'hub scaffolding: workspace boundary marker, initialized before the verified start (R5)', by: 'ensureWorkspace' },
-        reconciliation: predUnresolved ? { predecessorRunId: predecessor.id, predecessorDisposition: predDisposition || predecessor.protection, override: reconciliation.override, reason: reconciliation.reason.trim(), at: new Date().toISOString() } : null };
+        reconciliation: predUnresolved ? { predecessorRunId: predecessor.id, predecessorDisposition: predDisposition || predecessor.protection, override: reconciliation.override, reason: reconciliation.reason.trim(), verifiedBy: 'hub-token', at: new Date().toISOString() } : null };
     }
     const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', writeScope: writeScope || null, budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null, recovery: req.body.recovery || null });
     res.json({ runId: run.id });

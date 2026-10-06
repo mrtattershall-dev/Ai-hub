@@ -149,6 +149,7 @@ export async function concludeGoverned(workspace, run, { captureDir, image = WOR
       countsAsCompletion: acceptance.countsAsCompletion,
       capturedAt: acceptance.capturedAt,
       workspaceRestored: acceptance.disposition === DISPOSITION.RESTORED,
+      restoredTo: acceptance.restoredTo ?? null,   // R7 (A-6 follow-up F1): acceptance recorded it; it has to reach the run
       concludedAt: new Date().toISOString(),
     };
   } catch (e) {

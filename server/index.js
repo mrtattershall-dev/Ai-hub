@@ -6,7 +6,7 @@ import { dirname, join } from 'path';
 import { randomUUID } from 'crypto';
 import { readFileSync, writeFileSync, existsSync, openSync, writeSync, fsyncSync, closeSync, renameSync, copyFileSync } from 'fs';
 import fetch from 'node-fetch';
-import agentRouter, { WORKSPACE } from './agent.js';
+import agentRouter, { WORKSPACE, META_DIR } from './agent.js';
 import gameVerifyRouter from './gameVerify.js';
 import godotVerifyRouter from './godotVerify.js';
 import assetsRouter from './assetsRouter.js';
@@ -515,6 +515,15 @@ app.use('/api', (err, req, res, next) => {
 });
 
 // Serve whatever the agent builds so web apps open at http://localhost:3001/workspace/
+// R1/R2 (A-6 follow-up F4): the task ledger and the escalation log live in META_DIR now. The client fetches them at
+// their old URLs (/workspace/TASKS.md, AgentPage + projectContext), so serve those two names from META_DIR here,
+// before the static mount, and the UI keeps working without a client edit. Read-only; nothing else is redirected.
+app.get(['/workspace/TASKS.md', '/workspace/ESCALATIONS.md'], requireAuth, (req, res) => {
+  const name = req.path.split('/').pop();
+  const p = join(META_DIR, name);
+  if (!existsSync(p)) return res.status(404).type('text/plain').send('');
+  res.type('text/markdown; charset=utf-8').send(readFileSync(p, 'utf8'));
+});
 app.use('/workspace', express.static(WORKSPACE));
 
 // A game opened from /workspace/index.html resolves `assets/hero.png` to
