@@ -6113,6 +6113,7 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   const run = {
     id, goal, status: 'running', busy: false, modelCalls: 0, tokens: 0,
     suppliedFiles: supplied.supplied,     // what the opening context handed over, with hashes
+    writeScope: Array.isArray(grantedPaths) ? [...grantedPaths] : [],   // defect 7: the grant this run holds, on its record
     steps: [], pending: null, createdAt: now, budgetStart: now,
     // Declared by the caller (a runner knows its per-task budget; the UI may not). Per-call
     // deadlines derive from these; with neither set, the pre-existing stall/ceiling timers apply.
@@ -6209,6 +6210,17 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
       text: 'no crossing record accompanied this queued item, so NO authority was installed'
         + ' - every governed write in this run will refuse',
       authority: null, installed: [],
+    });
+  } else {
+    // DEFECT 7 (product path, 2026-10-06): the REQUESTER-DECLARED grant (the owner's writeScope from the UI or API) was
+    // installed into runAuthorities but never recorded, so a receipt could not show what the run was authorized to
+    // write. Recorded here like the inherited grant above - including an EMPTY grant, which explains every refusal.
+    // Regression check: receiptScopeProbe.mjs.
+    pushStep(run, {
+      type: 'authority_issued',
+      text: `requester-declared write scope [${(run.writeScope || []).join(', ') || '-'}]; installed [${runAuthorityTargets().join(', ') || '-'}]`
+        + ((run.writeScope || []).length ? '' : ' - NO authority: every governed write in this run will refuse'),
+      writeScope: run.writeScope || [], installed: runAuthorityTargets(),
     });
   }
   // Anything still open in TASKS.md belongs to an earlier run. Mark it inherited so it
