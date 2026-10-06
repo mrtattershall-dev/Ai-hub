@@ -323,7 +323,9 @@ export default function AgentPage() {
     try {
       const r = await agentGet(id);
       setRun(r);
-      if (r.status !== 'running') { stopPolling(); refreshFiles(); }
+      // Defect 6 (product path, 2026-10-06): status flips to 'done' BEFORE a governed run is concluded; the hub keeps
+      // busy:true until the verdict is durable. Stop only when the run is released, or the disposition is never shown.
+      if (r.status !== 'running' && !r.busy) { stopPolling(); refreshFiles(); }
     } catch (e) {
       stopPolling();
       addToast(`Lost the run: ${e.message}`, 'error');
