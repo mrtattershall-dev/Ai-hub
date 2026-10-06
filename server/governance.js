@@ -35,6 +35,7 @@ import { join } from 'node:path';
 import { evaluate, VERDICT } from './evaluator.js';
 import { applyAcceptance, DISPOSITION } from './acceptance.js';
 import { WORKER_IMAGE, workerAvailable } from './worker.js';
+import { cid1 } from './cid1.mjs';   // defect 4: the committed start must be the judged subject
 
 const exec = promisify(execFile);
 const git = async (ws, args) => {
@@ -94,6 +95,26 @@ export async function prepareGoverned(workspace, runId, checks, { qualifiedPath,
   if (!worker || worker.ok !== true) return { ok: false, reason: `the isolated worker is unavailable (Docker), so the starting state cannot be verified${worker && worker.error ? ` - ${worker.error}` : ''}` };
 
   if (!existsSync(workspace)) mkdirSync(workspace, { recursive: true });
+  // DEFECT 4 (product path, 2026-10-06): JUDGE FIRST, COMMIT AFTER. This used to init and commit the start state
+  // before evaluating it, so every refused start left a 'governed start' commit (and the rollback's reset) in the
+  // repository. The evaluator judges a snapshot of the working bytes and never consults git, so the order can be
+  // reversed: nothing is written to the repository unless the start is accepted.
+  // Regression check: refusedStartRepoProbe.mjs (listing, HEAD, status, exact reflog, loose-object count).
+  const startVerdict = await evaluate(workspace, taskOf(runId, checks), { timeoutSec, image });
+  const prot = startVerdict.protected?.verdict;
+  if (prot !== VERDICT.PASS) {
+    return {
+      ok: false,
+      reason: prot === VERDICT.EVALUATION_ERROR
+        ? `the protected check could not be evaluated on the starting state: ${startVerdict.protected?.reason || 'evaluation error'}`
+        : 'the protected check FAILS on the starting state - there is no verified state to protect or restore to',
+      startVerdict,
+    };
+  }
+  if (startVerdict.requested?.verdict === VERDICT.EVALUATION_ERROR) {
+    return { ok: false, reason: `the requested check could not be evaluated on the starting state: ${startVerdict.requested?.reason || 'evaluation error'}`, startVerdict };
+  }
+
   if (!existsSync(join(workspace, '.git'))) {
     const init = await git(workspace, ['init', '-q']);
     if (!init.ok) return { ok: false, reason: `git init failed: ${init.err}` };
@@ -110,19 +131,10 @@ export async function prepareGoverned(workspace, runId, checks, { qualifiedPath,
   const tree = await git(workspace, ['rev-parse', 'HEAD^{tree}']);
   if (!ref.ok || !tree.ok) return { ok: false, reason: 'the starting state has no identity (rev-parse failed)' };
 
-  const startVerdict = await evaluate(workspace, taskOf(runId, checks), { timeoutSec, image });
-  const prot = startVerdict.protected?.verdict;
-  if (prot !== VERDICT.PASS) {
-    return {
-      ok: false,
-      reason: prot === VERDICT.EVALUATION_ERROR
-        ? `the protected check could not be evaluated on the starting state: ${startVerdict.protected?.reason || 'evaluation error'}`
-        : 'the protected check FAILS on the starting state - there is no verified state to protect or restore to',
-      startVerdict,
-    };
-  }
-  if (startVerdict.requested?.verdict === VERDICT.EVALUATION_ERROR) {
-    return { ok: false, reason: `the requested check could not be evaluated on the starting state: ${startVerdict.requested?.reason || 'evaluation error'}`, startVerdict };
+  // The committed state must be the judged state: nothing may have changed between the judgment and the commit.
+  const committed = cid1(workspace);
+  if (!committed.ok || committed.id !== startVerdict.candidateTree) {
+    return { ok: false, reason: `the workspace changed between the start judgment and the start commit (judged ${startVerdict.candidateTree}, committed ${committed.ok ? committed.id : committed.reason}) - the start is not verified`, startVerdict, committedAfterJudgment: true };
   }
   return {
     ok: true, startRef: ref.out, startTree: tree.out,

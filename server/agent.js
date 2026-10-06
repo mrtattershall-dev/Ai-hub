@@ -6402,7 +6402,8 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       if (!prep.ok) {
         if (scaffoldedNow) { try { unlinkSync(join(WORKSPACE, 'package.json')); } catch { /* best effort; the next pre/post comparison reports it */ } }
         if (!hadGit) { try { rmSync(join(WORKSPACE, '.git'), { recursive: true, force: true }); } catch { /* same */ } }
-        else if (prevHead) { try { execFileSync('git', ['-C', WORKSPACE, 'reset', '-q', '--mixed', prevHead], { windowsHide: true }); } catch { /* same */ } }
+        // defect 4: act only if the repository actually moved - a reset to the same HEAD still writes a reflog entry.
+        else if (prevHead) { try { const nowHead = execFileSync('git', ['-C', WORKSPACE, 'rev-parse', '--verify', 'HEAD'], { encoding: 'utf8', windowsHide: true }).trim(); if (nowHead !== prevHead) execFileSync('git', ['-C', WORKSPACE, 'reset', '-q', '--mixed', prevHead], { windowsHide: true }); } catch { /* same */ } }
       }
       if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
       gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString(),
