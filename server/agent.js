@@ -4133,7 +4133,11 @@ async function drive(loadDb, run) {
         const planner = loadDb().api_keys?.ollama_planner;   // optional: a stronger/base model just for planning
         const planMsgs = [
           { role: 'system', content: plannerSystemFor(run.goal) },
-          { role: 'user', content: `${run.history[1]?.content || ('GOAL: ' + run.goal)}\n\n${planTaskFor(run.goal)}` },
+          // CONNECTION REPAIR 1 (planner-goal omission): history[1] is NOTES.md when it exists, else a SUPPLIED FILE when
+          // the goal names one, else the goal - and both planner prompts are goal-free constants. So the planner saw the
+          // goal only when there was no memory and no named file. The opening context is kept; the goal is stated
+          // whenever that context does not already carry it. Regression check: plannerGoalProbe.mjs (C, S, N).
+          { role: 'user', content: (() => { const ctx = run.history[1]?.content || ('GOAL: ' + run.goal); return `${ctx}${String(ctx).includes(run.goal) ? '' : `\n\nGOAL: ${run.goal}`}\n\n${planTaskFor(run.goal)}`; })() },
         ];
         const planCall = beginCall(run, 'plan');
         let planText;
