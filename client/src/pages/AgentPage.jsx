@@ -221,6 +221,8 @@ export default function AgentPage() {
   // Empty = ordinary run, which the server labels as having no behavioral acceptance protection.
   const [checksText, setChecksText] = useState('');
   const [showChecks, setShowChecks] = useState(false);
+  // CONNECTION REPAIR 2: the owner's write scope for a governed run - workspace-relative paths, comma or newline separated.
+  const [scopeText, setScopeText] = useState('');
   const [run, setRun] = useState(null);
   const [runId, setRunId] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -345,7 +347,9 @@ export default function AgentPage() {
     }
     setBusy(true);
     try {
-      const { runId: id } = await agentStart(goal.trim(), false, governed);
+      const writeScope = governed ? scopeText.split(/[\n,]/).map((s) => s.trim()).filter(Boolean) : null;
+      if (governed && !writeScope.length) addToast('Governed run with NO write scope: every write will be refused. Declare the files this run may change.', 'warning');
+      const { runId: id } = await agentStart(goal.trim(), false, governed, writeScope);
       setRunId(id);
       setRun({ status: 'running', goal: goal.trim(), steps: [], protection: governed ? 'BEHAVIORAL_ACCEPTANCE' : 'NONE' });
       setGoal('');
@@ -723,6 +727,17 @@ export default function AgentPage() {
               placeholder={'{ "requested": { "script": "python3 /check/req.py", "files": { "req.py": "..." } },\n  "protected": { "script": "python3 /check/prot.py", "files": { "prot.py": "..." } } }\nScripts run in the isolated worker with the candidate mounted read-only at /candidate. Protected must PASS on the starting state or the start is BLOCKED.'}
               value={checksText}
               onChange={e => setChecksText(e.target.value)}
+              disabled={isRunning || awaiting}
+            />
+          )}
+          {showChecks && (
+            <input
+              className="chat-input"
+              aria-label="Write scope"
+              style={{ width: '100%', marginTop: 6, fontFamily: 'monospace', fontSize: 12 }}
+              placeholder="Write scope: files this run may change, e.g. m.py, src/app.js"
+              value={scopeText}
+              onChange={e => setScopeText(e.target.value)}
               disabled={isRunning || awaiting}
             />
           )}

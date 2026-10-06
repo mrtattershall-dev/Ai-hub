@@ -122,7 +122,10 @@ export async function chatStream(body, onDelta, onDone, onError, signal) {
 // `governed` = { checks: { requested: { script, files? }, protected: { script, files? } } } opts a run
 // into behavioral acceptance: verified start, evaluation in the isolated worker, rollback if
 // protected behaviour breaks. Omitted = an ordinary run, labelled as unprotected by the server.
-export const agentStart   = (goal, queueIfBusy = false, governed = null) => req('/agent/start', { method: 'POST', body: JSON.stringify({ goal, queueIfBusy, ...(governed ? { governed } : {}) }) });
+// CONNECTION REPAIR 2 (UI writeScope omission): the server mints write authority ONLY from a requester-declared
+// `writeScope`, and the client never sent one, so a governed run from the UI could not write anything. The owner's
+// declared scope is passed through unchanged; omitted = no scope, exactly as before.
+export const agentStart   = (goal, queueIfBusy = false, governed = null, writeScope = null) => req('/agent/start', { method: 'POST', body: JSON.stringify({ goal, queueIfBusy, ...(governed ? { governed } : {}), ...(Array.isArray(writeScope) && writeScope.length ? { writeScope } : {}) }) });
 export const agentGet     = (id)          => req(`/agent/${id}`);
 export const agentApprove = (id, approve) => req(`/agent/${id}/approve`, { method: 'POST', body: JSON.stringify({ approve }) });
 export const agentStop    = (id)          => req(`/agent/${id}/stop`, { method: 'POST' });
