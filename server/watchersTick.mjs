@@ -43,8 +43,10 @@ lines.push(`watchers spend: $${spent().toFixed(4)} of $${process.env.WATCHERS_BU
 // ── at most one inspection ──
 const q = JSON.parse(readFileSync(QUEUE, 'utf8'));
 const now = Date.now();
-const next = q.find((e) => !e.fixed && (!e.triedAt || now - Date.parse(e.triedAt) > 24 * 3600_000));
-if (!next) lines.push('inspect: backlog clear or every entry tried in the last 24h');
+// --health: refresh the status only. No test is run and no credit is spent (the `legasus-status` command).
+const next = process.argv.includes('--health') ? null : q.find((e) => !e.fixed && (!e.triedAt || now - Date.parse(e.triedAt) > 24 * 3600_000));
+if (process.argv.includes('--health')) lines.push(`inspect: (health check only) last result - ${(q.filter((e) => e.lastResult || e.fixed).at(-1) || {}).lastResult || 'none yet'}`.slice(0, 300));
+else if (!next) lines.push('inspect: backlog clear or every entry tried in the last 24h');
 else {
   next.triedAt = new Date().toISOString();
   const t = spawnSync(process.execPath, [join(HERE, next.test)], { cwd: REPO, encoding: 'utf8', timeout: 15 * 60_000, maxBuffer: 16 << 20 });
