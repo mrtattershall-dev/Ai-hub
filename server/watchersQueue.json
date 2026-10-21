@@ -1,0 +1,8 @@
+[
+  { "test": "mockLoop.test.mjs", "files": ["server/mockLoop.test.mjs"], "note": "Likely the same apparatus gap fixed in fuzzLoop (APPARATUS-FAIL-2): the harness never sets AGENT_META_DIR, so the hub's records land in workspace.hub-meta beside the workspace." },
+  { "test": "finishGateEntry.test.mjs", "files": ["server/finishGateEntry.test.mjs", "server/verifyProject.js"], "note": "It reports a '(known)' case that now PASSES (known-open count 2, expected 3)." },
+  { "test": "recoveryController.test.mjs", "files": ["server/recoveryController.test.mjs"] },
+  { "test": "shadowHint.test.mjs", "files": ["server/shadowHint.test.mjs"] },
+  { "test": "loopSmoke.test.mjs", "files": ["server/loopSmoke.test.mjs"] },
+  { "test": "persistTerminal.test.mjs", "files": ["server/persistTerminal.test.mjs"], "note": "It reports COMPLETED WORK CAN STILL BE ON DISK AS RUNNING; the cause may be in agent.js's persist/teardown path, which is outside this scope." }
+]

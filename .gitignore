@@ -101,3 +101,7 @@ data/inspector/
 data/*.log
 # fuzz campaigns kept locally as evidence (incl. labelled apparatus failures)
 fuzz-out-*/
+
+# deep-research working notes and reports (local)
+research_notes/
+reports/
