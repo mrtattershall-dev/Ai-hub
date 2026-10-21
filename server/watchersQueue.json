@@ -1,8 +1,45 @@
 [
-  { "test": "mockLoop.test.mjs", "files": ["server/mockLoop.test.mjs"], "note": "Likely the same apparatus gap fixed in fuzzLoop (APPARATUS-FAIL-2): the harness never sets AGENT_META_DIR, so the hub's records land in workspace.hub-meta beside the workspace." },
-  { "test": "finishGateEntry.test.mjs", "files": ["server/finishGateEntry.test.mjs", "server/verifyProject.js"], "note": "It reports a '(known)' case that now PASSES (known-open count 2, expected 3)." },
-  { "test": "recoveryController.test.mjs", "files": ["server/recoveryController.test.mjs"] },
-  { "test": "shadowHint.test.mjs", "files": ["server/shadowHint.test.mjs"] },
-  { "test": "loopSmoke.test.mjs", "files": ["server/loopSmoke.test.mjs"] },
-  { "test": "persistTerminal.test.mjs", "files": ["server/persistTerminal.test.mjs"], "note": "It reports COMPLETED WORK CAN STILL BE ON DISK AS RUNNING; the cause may be in agent.js's persist/teardown path, which is outside this scope." }
+  {
+    "test": "mockLoop.test.mjs",
+    "files": [
+      "server/mockLoop.test.mjs"
+    ],
+    "note": "Likely the same apparatus gap fixed in fuzzLoop (APPARATUS-FAIL-2): the harness never sets AGENT_META_DIR, so the hub's records land in workspace.hub-meta beside the workspace.",
+    "triedAt": "2026-10-21T15:52:07.193Z",
+    "lastResult": "inspector 2026-10-21-fc0338d4: 1 file(s), 12471 chars, 1 evidence items, worst case $0.339 | diagnose: 1 finding(s), $0.045754. notes: The cause is in the test apparatus (server/mockLoop.test.mjs), not the hub code. The proof is a static source check because the full loop run is long and slow, so it is not used as the failing test. T |   2026-10-21-fc0338d4-mockloop-meta-dir-not-isolated: COMMITTE",
+    "fixed": "2026-10-21 merged 1ab153f8"
+  },
+  {
+    "test": "finishGateEntry.test.mjs",
+    "files": [
+      "server/finishGateEntry.test.mjs",
+      "server/verifyProject.js"
+    ],
+    "note": "It reports a '(known)' case that now PASSES (known-open count 2, expected 3)."
+  },
+  {
+    "test": "recoveryController.test.mjs",
+    "files": [
+      "server/recoveryController.test.mjs"
+    ]
+  },
+  {
+    "test": "shadowHint.test.mjs",
+    "files": [
+      "server/shadowHint.test.mjs"
+    ]
+  },
+  {
+    "test": "loopSmoke.test.mjs",
+    "files": [
+      "server/loopSmoke.test.mjs"
+    ]
+  },
+  {
+    "test": "persistTerminal.test.mjs",
+    "files": [
+      "server/persistTerminal.test.mjs"
+    ],
+    "note": "It reports COMPLETED WORK CAN STILL BE ON DISK AS RUNNING; the cause may be in agent.js's persist/teardown path, which is outside this scope."
+  }
 ]
