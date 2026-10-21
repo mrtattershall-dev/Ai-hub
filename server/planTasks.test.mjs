@@ -94,5 +94,43 @@ test('empty and junk input do not throw', () => {
   assert.ok(Array.isArray(fromPlan('no bullets here at all')));
 });
 
+// Shaped exactly like the 2026-10-21 Claude plan: BUILD ORDER grouped under bold labels, with
+// italic "Result"/"Stretch goals" notes, and 13 real steps.
+const GROUPED_PLAN = [
+  '**5. BUILD ORDER**',
+  '- **First playable slice (MVP):**',
+  '  1. Grid render plus a player moving on the grid.',
+  '  2. Action key that tills, plants and waters the targeted tile.',
+  '  3. "Sleep" key that advances the day.',
+  '  4. Harvesting that adds coins directly.',
+  '  5. HUD showing day and coins.',
+  '  - *Result:* the core loop is playable.',
+  '- **Then add, in order:**',
+  '  6. Tool selection plus inventory.',
+  '  7. Shop: sell produce and buy seeds.',
+  '  8. Energy system.',
+  '  9. Dry days leading to dead crops.',
+  '  10. Win/lose condition, day 30 limit and end screen.',
+  '  11. Save/load to localStorage.',
+  '  12. Polish: title screen, help panel, sounds.',
+  '  13. Balancing pass plus unit tests on the crop/day logic.',
+  '  - *Stretch goals:* weather, seasons.',
+];
+
+test('group labels and italic notes are not tasks', () => {
+  const tasks = fromPlan(GROUPED_PLAN.join('\n')).join(' | ');
+  assert.doesNotMatch(tasks, /First playable slice|Then add|Result:|Stretch goals/);
+});
+
+test('every real build step survives - none pushed off the end by labels', () => {
+  const tasks = fromPlan(GROUPED_PLAN.join('\n'));
+  assert.equal(tasks.length, 13);
+  assert.match(tasks.at(-1), /^Balancing pass/);
+});
+
+test('a plain "Label: work" bullet is still a task', () => {
+  assert.ok(fromPlan(GROUPED_PLAN.join('\n')).some((t) => t.startsWith('Shop: sell produce')));
+});
+
 console.log(`\n${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);

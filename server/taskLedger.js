@@ -349,6 +349,10 @@ export function contextBlock(workspace, goal = null) {
  * Pull a task list out of a BUILD PLAN. The planner is told to emit a numbered list,
  * so numbered lines are the signal; bullets are the fallback for when it does not.
  */
+// Seeding cap. 12 dropped real build steps off the end of a 13-step plan with no notice; the
+// ledger summary already shows 12 at a time with "... and N more", so seeding a few more is cheap.
+const PLAN_TASK_CAP = 16;
+
 export function fromPlan(planText) {
   const lines = String(planText || '').split(/\r?\n/);
   // Strip markdown emphasis BEFORE anything is matched. The heading skip below was
@@ -356,6 +360,14 @@ export function fromPlan(planText) {
   // every section heading was surviving as a work item.
   const clean = (t) => t.replace(/\*\*/g, '').replace(/^#+\s*/, '').trim();
   const isHeading = (l) => /^(?:\d+\.)?\s*[A-Z][A-Z\s/&-]{3,}:?$/.test(clean(l));
+  // A bullet can be STRUCTURE rather than work. Measured 2026-10-21 on a live Claude run: BUILD
+  // ORDER was grouped as "- **First playable slice (MVP):**" / "- **Then add, in order:**" with
+  // "- *Result:* ..." and "- *Stretch goals:* ..." notes, and all of them became tasks. Worse, those
+  // three took slots under the cap and silently pushed the last four REAL steps (win/lose, save,
+  // polish, tests) off the ledger - the run then "completed every task" without them.
+  //   - a group label ends in a colon and has nothing after it
+  //   - a note opens with an emphasised label: "*Result:* ...", "_Stretch goals:_ ..."
+  const isLabel = (t) => /:$/.test(t) || /^([*_])[^*_]{1,40}:\1\s/.test(t);
 
   const bulletsIn = (ls) => {
     const out = [];
@@ -363,7 +375,7 @@ export function fromPlan(planText) {
       const l = clean(raw);
       if (!l || isHeading(l)) continue;
       const m = l.match(/^(?:\d+\.\d+|\d+[.)]|[-*•])\s+(.{4,})$/);
-      if (m) out.push(m[1].trim());
+      if (m && !isLabel(m[1].trim())) out.push(m[1].trim());
     }
     return out;
   };
@@ -386,9 +398,9 @@ export function fromPlan(planText) {
       if (isHeading(lines[i]) && !/BUILD\s*ORDER/i.test(clean(lines[i]))) { endIdx = i; break; }
     }
     const ordered = bulletsIn(lines.slice(startIdx + 1, endIdx));
-    if (ordered.length) return ordered.slice(0, 12);
+    if (ordered.length) return ordered.slice(0, PLAN_TASK_CAP);
   }
-  return bulletsIn(lines).slice(0, 12);
+  return bulletsIn(lines).slice(0, PLAN_TASK_CAP);
 }
 
 /**
