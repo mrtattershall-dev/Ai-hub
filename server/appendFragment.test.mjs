@@ -10,8 +10,8 @@
  * rollback restores the last version that parsed, and a file born broken never had one.
  *
  * The rule pinned here: a NEW .js/.py created by append must parse on its own, or nothing is
- * written. Everything else append_file does is unchanged - pinned too, so the fix cannot
- * quietly widen into refusing ordinary appends.
+ * written. A fragment may complete an existing file when the resulting source parses;
+ * ordinary valid appends remain supported.
  */
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
@@ -54,11 +54,11 @@ await test('a COMPLETE file appended to a missing .js is still created (unchange
   assert.equal(readFileSync(join(ws, 'fresh.js'), 'utf8'), body);
 });
 
-await test('appending a fragment to an EXISTING .js still appends (unchanged)', async () => {
-  writeFileSync(join(ws, 'have.js'), 'const list = {\n');
+await test('a fragment can complete an EXISTING .js when the result parses', async () => {
+  writeFileSync(join(ws, 'have.js'), 'const list = () => {\n');
   const r = await append('have.js', FRAGMENT);
   assert.match(r, /^OK: appended/, r.slice(0, 120));
-  assert.equal(readFileSync(join(ws, 'have.js'), 'utf8'), 'const list = {\n' + FRAGMENT);
+  assert.equal(readFileSync(join(ws, 'have.js'), 'utf8'), 'const list = () => {\n' + FRAGMENT);
 });
 
 await test('a missing file in a language the checker does not know is still created (unchanged)', async () => {

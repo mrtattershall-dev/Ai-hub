@@ -16,7 +16,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
-import { mkdtempSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -121,7 +121,8 @@ await test('an append that breaks an EXISTING file is flagged to the model', asy
   const { reqs } = await runGoal('Add a helper to base.js', [write('base.js', 'module.exports = { a: 1 };'), BROKEN, finish('x')]);
   const a = answerTo(reqs, BROKEN);
   assert.ok(a, 'the append was never answered');
-  assert.match(a, /SYNTAX CHECK FAILED for base\.js/, 'no syntax verdict after a breaking append: ' + a.slice(0, 200));
+  assert.match(a, /rejected before writing.*SyntaxError/s, 'breaking append was not refused before mutation: ' + a.slice(0, 200));
+  assert.equal(readFileSync(join(ws, 'base.js'), 'utf8').trim(), 'module.exports = { a: 1 };');
 });
 
 const GOOD = append('good.js', 'function two() { return 2; }\nmodule.exports.two = two;');

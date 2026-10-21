@@ -24,7 +24,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..');
 const QUEUE = join(HERE, 'watchersQueue.json');
 const STATUS = join(REPO, 'data', 'watch-status.txt');
-const sh = (cmd, args, opts = {}) => { try { return execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000, ...opts }).trim(); } catch (e) { return `ERR ${String(e.message).split('\n')[0]}`; } };
+const sh = (cmd, args, opts = {}) => { try { return execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000, ...opts }).trim(); } catch (e) { const out = String(e.stdout || '').trim(); return out || `ERR ${String(e.message).split('\n')[0]}`; } };
 const tail = (f, n = 3) => { try { return readFileSync(f, 'utf8').trim().split('\n').slice(-n).join('\n'); } catch { return '(none)'; } };
 
 // ── health ──
@@ -39,6 +39,11 @@ if (existsSync(batches)) {
   lines.push(`fuzz batches: ${rows.length}, ${last ? `${last.totalClean}/${last.totalRuns} clean` : '-'}${stray ? ` | WARNING: ${stray} batch(es) still show STRAY - the apparatus fix did not hold` : ' | no STRAY (apparatus fix holds)'}`);
 }
 if (existsSync(join(REPO, 'data', 'gather', 'PAUSED-memory-policy.json'))) lines.push('REL-1/REL-2: paused; operational collection uses data/gather-memory-v1');
+const repairReport = join(REPO, 'benchmarks', 'fuzz', '2026-10-21_RECHECK.json');
+if (existsSync(repairReport)) {
+  const repair = JSON.parse(readFileSync(repairReport, 'utf8'));
+  lines.push(`fuzz repair: ${repair.passed}/${repair.replayed} historical failing seeds passed recheck (excluding legacy ESM); cumulative totals retain old observations`);
+}
 for (const x of ['rel1', 'rel2']) lines.push(`${x}: ${tail(join(REPO, 'data', 'gather', `${x}.log`), 1)}`);
 lines.push(`watchers spend: $${spent().toFixed(4)} of $${process.env.WATCHERS_BUDGET_USD || '10'}`);
 

@@ -8,6 +8,7 @@
 
 import { createHash } from 'node:crypto';
 import express from 'express';
+import { sourceSyntaxError } from './sourceSyntax.mjs';
 import { recoverInterrupted } from './autoRecover.mjs';
 import { acquireLease, isManagedLocal, resourceStatus } from './resourceLease.mjs';
 import { launchOptions } from './browser.js';
@@ -911,6 +912,16 @@ export function issueWriteScope(paths, repository = 'workspace') {
 // circuiting here. A wrapper that decided refusals itself would be a second implementation of the
 // rule, and two implementations that happen to agree are not one rule.
 function governWrite(tool, fullPath, contents) {
+  // A checkpoint can recover work, but cannot make a destructive candidate safe to land.
+  // AGENT_SOURCE_SYNTAX=0 is only for replaying the historical diagnostic control.
+  if (process.env.AGENT_SOURCE_SYNTAX !== '0' && ['write_file', 'edit_file', 'append_file'].includes(tool)) {
+    const syntax = sourceSyntaxError(fullPath, contents);
+    if (syntax) {
+      const rel = relative(WORKSPACE, fullPath);
+      const state = existsSync(fullPath) ? 'The existing file is unchanged.' : 'The file does not exist; nothing was created. Use write_file with a COMPLETE file.';
+      return `ERROR: ${tool} candidate for ${rel} was rejected before writing. ${syntax}. ${state}`;
+    }
+  }
   if (!GOVERNED_WRITES) return null;
   const rel = relative(WORKSPACE, fullPath).split(sep).join('/');
   const matched = runAuthorities.find((a) => a && a.context && a.context.implementation === rel);

@@ -1,0 +1,206 @@
+{
+  "at": "2026-10-21T19:23:55.842388+00:00",
+  "originalIterations": 333,
+  "originalUncleanIterations": 25,
+  "originalViolations": {
+    "BROKEN": 24,
+    "FALSEVERIFIED": 2
+  },
+  "replayed": 25,
+  "passed": 25,
+  "excludedLegacyKinds": [
+    "ESM"
+  ],
+  "regressionSuites": [
+    "appendFile.test.mjs",
+    "appendFragment.test.mjs",
+    "appendSyntax.test.mjs",
+    "editTruth.test.mjs",
+    "finishEvidence.test.mjs",
+    "fuzzInvariants.test.mjs",
+    "sourceSyntax.test.mjs"
+  ],
+  "sourceSha256": {
+    "server/agent.js": "75b292c5f44d3e760b6c515a5c62b21cb5022fe14a94b8a1d36d2d0e62a82bb3",
+    "server/sourceSyntax.mjs": "166682467bcc2d5f4ca58b1a082875896ad8dd745dcd40df38110bd13b1484f4",
+    "server/fuzzLoop.mjs": "c406c5ad1bc6cc48a4ea08eb96114bdb7f8d73c849a1120743a51cb2d1e2fe39",
+    "server/testdata/fuzz-write-regressions.json": "17375021c7bb570bbe5bbedf0ecbd8006cb1e9e7919233e0788bba54fcdc5535"
+  },
+  "results": [
+    {
+      "seed": 100102,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 2
+    },
+    {
+      "seed": 100131,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 1
+    },
+    {
+      "seed": 100142,
+      "goals": 4,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100181,
+      "goals": 4,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100184,
+      "goals": 4,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100212,
+      "goals": 4,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100216,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100217,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100220,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100221,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100240,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 1
+    },
+    {
+      "seed": 100242,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100253,
+      "goals": 4,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100256,
+      "goals": 4,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100262,
+      "goals": 4,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100277,
+      "goals": 4,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100296,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100300,
+      "goals": 4,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 1
+    },
+    {
+      "seed": 100301,
+      "goals": 4,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100371,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100400,
+      "goals": 4,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100408,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100410,
+      "goals": 6,
+      "hostile": true,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100412,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    },
+    {
+      "seed": 100414,
+      "goals": 6,
+      "hostile": false,
+      "passed": true,
+      "legacyEsmObservations": 0
+    }
+  ]
+}

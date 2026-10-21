@@ -305,6 +305,8 @@ async function iteration(seed) {
       AGENT_SUPERVISOR: CHAIN ? '1' : '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '', AGENT_RECOVERY_DIR: recovDir,
       // chain: the shortest tick and approval timeout the hub accepts (its floors are 15s / 1 min).
       ...(CHAIN ? { AGENT_TICK_S: '15', AGENT_APPROVAL_TIMEOUT_MIN: '1' } : {}),
+      // Operational replay must use the same self-test finish safeguard as live collection.
+      AGENT_FINISH_EVIDENCE: process.env.AGENT_FINISH_EVIDENCE ?? '1',
       AGENT_MAX_STEPS: '14', AGENT_MAX_MINUTES: '3', MODEL_FIRST_BYTE_S: '30', MODEL_STALL_S: '30', MODEL_TIMEOUT_S: '60' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -432,6 +434,7 @@ async function iteration(seed) {
     env: { start: envStart, end: envEnd },
     hub: { pid: hub.pid, exitCode: hub.exitCode, signal: hub.signalCode, logBytes: hubLog.length, ...(interesting ? { logTail: hubLog.slice(-3000) } : {}) },
     postmortem: pm,
+    safeguards: { sourceSyntax: process.env.AGENT_SOURCE_SYNTAX !== '0', finishEvidence: (process.env.AGENT_FINISH_EVIDENCE ?? '1') === '1' },
   };
   hub.kill(); live.delete(hub); mock.close();
   if (interesting && process.env.FUZZ_EVIDENCE) {

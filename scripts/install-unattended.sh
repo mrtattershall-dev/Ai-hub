@@ -36,6 +36,7 @@ UNIT
 done
 # Inspector is a periodic maintenance task, never a tight restart loop.
 sed -i 's/Type=simple/Type=oneshot/; s/Restart=always/Restart=no/' "$units/legasus-watchers.service"
+sed -i '/Restart=no/a SuccessExitStatus=SIGTERM' "$units/legasus-watchers.service"
 cat > "$units/legasus-client.service" <<UNIT
 [Unit]
 Description=Legasus web client
