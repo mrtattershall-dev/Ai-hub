@@ -42,6 +42,11 @@ import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { reviewRun } from './watchers.js';   // the Watchers: a paid reviewer reads finished local-model runs (WATCHERS=1)
 import { lastSelfTestFailure } from './finishEvidence.mjs';
+import { quarantineWeb } from './webQuarantine.mjs';
+// LegaGate: web text reaches the model inside a marked untrusted block (webQuarantine.test.mjs). Off by default so
+// frozen experiments keep the tool output they were frozen on; the Linux launchers and gather.mjs turn it on.
+const WEB_QUARANTINE = process.env.AGENT_WEB_QUARANTINE === '1';
+const webOut = (text, source) => (WEB_QUARANTINE ? quarantineWeb(text, source) : text);
 // LegaVerify: refuse finish while the agent's own last test is failing (finishEvidence.test.mjs). Off by default so
 // frozen experiments keep the gate they were frozen against; the Linux launchers and gather.mjs turn it on.
 const FINISH_EVIDENCE = process.env.AGENT_FINISH_EVIDENCE === '1';
@@ -2066,8 +2071,8 @@ const tools = {
     while ((m = sre.exec(html)) && snips.length < max_results) snips.push(m[1].replace(/<[^>]+>/g, '').trim());
 
     if (!titles.length) return `(no results for "${query}")`;
-    return titles.map((t, i) =>
-      `${i + 1}. ${t.title}\n   ${t.href}\n   ${(snips[i] || '').slice(0, 240)}`).join('\n\n')
+    return webOut(titles.map((t, i) =>
+      `${i + 1}. ${t.title}\n   ${t.href}\n   ${(snips[i] || '').slice(0, 240)}`).join('\n\n'), `a web search for "${query}"`)
       + `\n\n(Use web_fetch on the most relevant URL to read its content.)`;
   },
 
@@ -2096,8 +2101,8 @@ const tools = {
       .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
       .replace(/\s+/g, ' ').trim();
-    return `[${url} — ${text.length} chars of text extracted]\n${text.slice(0, max_chars)}`
-      + (text.length > max_chars ? '\n... (truncated)' : '');
+    return `[${url} — ${text.length} chars of text extracted]\n`
+      + webOut(text.slice(0, max_chars) + (text.length > max_chars ? '\n... (truncated)' : ''), url);
   },
 
   // Load the web app in a headless browser, click its controls, and report

@@ -119,7 +119,7 @@ for (let seed = FIRST; ; seed++) {
         AGENT_GOVERNED_WRITES: '', AGENT_SUPERVISOR: '',
         // LegaVerify / LegaGate (2026-10-21): no finish over a failing self-test; a memory and CPU ceiling on the
         // command worker. 1g, not more: the 7b already takes ~6 GB of this laptop's ~6.6 GB and the rest swaps.
-        AGENT_FINISH_EVIDENCE: '1', AGENT_WORKER_MEMORY: process.env.AGENT_WORKER_MEMORY || '1g', AGENT_WORKER_CPUS: process.env.AGENT_WORKER_CPUS || '2',
+        AGENT_FINISH_EVIDENCE: '1', AGENT_WEB_QUARANTINE: '1', AGENT_WORKER_MEMORY: process.env.AGENT_WORKER_MEMORY || '1g', AGENT_WORKER_CPUS: process.env.AGENT_WORKER_CPUS || '2',
         AGENT_TRACES_DIR: join(OUT, 'traces'), RUN_INDEX: join(OUT, 'run-index.jsonl'),
         WATCHERS: keys.claude ? '1' : '0', WATCHERS_BUDGET_USD: process.env.WATCHERS_BUDGET_USD || '10',
       },

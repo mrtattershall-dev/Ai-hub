@@ -25,6 +25,8 @@ export AGENT_BOUND_ROUTES=1
 export AGENT_GOVERNED_WRITES=1
 # LegaVerify: no finish while the agent's own last test is failing (server/finishEvidence.mjs).
 export AGENT_FINISH_EVIDENCE=1
+# LegaGate: web text reaches the model inside a marked untrusted block (server/webQuarantine.mjs).
+export AGENT_WEB_QUARANTINE=1
 # LegaGate: a ceiling on the command worker. 1g because the local 7b already uses most of this laptop's RAM.
 export AGENT_WORKER_MEMORY="${AGENT_WORKER_MEMORY:-1g}"
 export AGENT_WORKER_CPUS="${AGENT_WORKER_CPUS:-2}"
