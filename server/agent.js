@@ -41,6 +41,10 @@ import { SYSTEM_PROMPT, systemPromptFor } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { reviewRun } from './watchers.js';   // the Watchers: a paid reviewer reads finished local-model runs (WATCHERS=1)
+import { lastSelfTestFailure } from './finishEvidence.mjs';
+// LegaVerify: refuse finish while the agent's own last test is failing (finishEvidence.test.mjs). Off by default so
+// frozen experiments keep the gate they were frozen against; the Linux launchers and gather.mjs turn it on.
+const FINISH_EVIDENCE = process.env.AGENT_FINISH_EVIDENCE === '1';
 import { lostDefs, lostExports, defCounts, exportNames } from './defNames.js';
 // STATIC on purpose: write_file and edit_file are not async, so an awaited dynamic import inside them
 // is a SyntaxError. The whole static closure of governed-edit.mjs is three files - governed-edit,
@@ -4534,6 +4538,14 @@ async function drive(loadDb, run) {
         };
 
         if ((run.finishBlocks || 0) < 3) {
+          // 0. the agent's OWN last test. Everything below judges the file the goal names; none of it read what the
+          // agent ran, so an entry that loads while the agent's check of it exits 1 was finished "Verified".
+          const selfFail = FINISH_EVIDENCE ? lastSelfTestFailure(run.steps) : null;
+          if (selfFail) {
+            blocked(`Your last test failed (\`${selfFail.command}\` exited ${selfFail.exit}) - not finished.`,
+              `Do NOT finish yet - the last thing you ran, \`${selfFail.command}\` (step ${selfFail.step}), exited ${selfFail.exit}:\n\n${selfFail.tail || '(no output)'}\n\nFix the problem it shows and run it again. Finish only after it passes.`);
+            continue turn;
+          }
           const webPage = webPageFor(run);          // the page this run worked on (index.html by default)
           const hasWeb = !!webPage;
 

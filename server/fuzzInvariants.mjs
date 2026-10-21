@@ -16,6 +16,8 @@
  *   RUNFILE  a persisted run truncated, losing its history
  *   TRANSCRIPT  a run's <id>.transcript.jsonl with a line that is not JSON (it is JSONL: one record per line)
  *   INDEX    a run-index line that no longer parses, silently skewing every trend
+ *   FALSEVERIFIED  a run recorded Verified while its own last test exited non-zero (LegaVerify, 2026-10-21;
+ *            the failure inferstep/ATLAS shipped: its best failing candidate reported as verified)
  *
  * checkQueueInvariants (chain mode, below) adds three for the backlog: STRANDED, ORPHAN,
  * QUEUEFILE.
@@ -25,6 +27,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve, basename } from 'node:path';
+import { lastSelfTestFailure } from './finishEvidence.mjs';
 
 // What the harness itself puts beside the workspace. Anything else there is a stray write.
 // 'meta' is the hub's own records (AGENT_META_DIR, R1/R2), which fuzzLoop places here. Left unset, the hub puts
@@ -96,7 +99,13 @@ export function checkInvariants(dir, { hubExitCode = null, hubLog = '' } = {}) {
         if (bad >= 0) v.push(`TRANSCRIPT: ${f} line ${bad + 1} is not valid JSON`);
         continue;
       }
-      try { JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { v.push(`RUNFILE: ${f} is not valid JSON`); }
+      let run;
+      try { run = JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { v.push(`RUNFILE: ${f} is not valid JSON`); continue; }
+      // FALSEVERIFIED: a run recorded Verified while its own last test was failing. The same definition the finish
+      // gate uses (finishEvidence.mjs), so the fuzzer and the gate cannot disagree about what "failed" means.
+      const verified = run && run.status === 'done' && (run.finishKind === 'verified' || (run.verified === true && !run.finishKind));
+      const selfFail = verified ? lastSelfTestFailure(run.steps || []) : null;
+      if (selfFail) v.push(`FALSEVERIFIED: ${f} recorded Verified while its last test (${selfFail.command}) exited ${selfFail.exit}`);
     }
   }
 

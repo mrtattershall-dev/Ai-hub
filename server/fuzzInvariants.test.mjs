@@ -130,6 +130,21 @@ test('RUNFILE fires on a truncated persisted run', () => {
   assert.deepEqual(kinds(checkInvariants(dir)), ['RUNFILE']);
 });
 
+// FALSEVERIFIED (LegaVerify): the failure ATLAS shipped - a failing result reported as verified. Fires only on the
+// combination; an honest UNVERIFIED finish over a failing test, or Verified over a passing one, is not it.
+const execStep = (n, result) => ({ n, type: 'tool', tool: 'run_command', args: { cmd: 'node check.js' }, result });
+test('FALSEVERIFIED fires on a run recorded Verified while its own last test exited non-zero', () => {
+  const { dir } = healthy();
+  writeFileSync(join(dir, 'runs', 'r4.json'), JSON.stringify({ id: 'r4', status: 'done', verified: true, steps: [execStep(1, 'STDOUT:\nbad\nEXIT: 1')] }), 'utf8');
+  assert.deepEqual(kinds(checkInvariants(dir)), ['FALSEVERIFIED']);
+});
+test('FALSEVERIFIED stays quiet on Verified over a passing test, and on an honest forced finish over a failing one', () => {
+  const { dir } = healthy();
+  writeFileSync(join(dir, 'runs', 'r5.json'), JSON.stringify({ id: 'r5', status: 'done', verified: true, steps: [execStep(1, 'EXIT: 1'), execStep(2, 'EXIT: 0')] }), 'utf8');
+  writeFileSync(join(dir, 'runs', 'r6.json'), JSON.stringify({ id: 'r6', status: 'done', finishKind: 'forced', steps: [execStep(1, 'EXIT: 1')] }), 'utf8');
+  assert.deepEqual(kinds(checkInvariants(dir)), []);
+});
+
 test('INDEX fires on a run-index line that no longer parses', () => {
   const { dir } = healthy();
   writeFileSync(join(dir, 'index.jsonl'), JSON.stringify({ id: 'r1' }) + '\n{"id":"r2",\n', 'utf8');
