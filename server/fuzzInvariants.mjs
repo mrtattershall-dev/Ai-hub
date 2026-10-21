@@ -27,7 +27,9 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve, basename } from 'node:path';
 
 // What the harness itself puts beside the workspace. Anything else there is a stray write.
-const HARNESS_FILES = new Set(['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'traces']);
+// 'meta' is the hub's own records (AGENT_META_DIR, R1/R2), which fuzzLoop places here. Left unset, the hub puts
+// them in workspace.hub-meta beside the workspace, and every iteration read as a STRAY (APPARATUS-FAIL-2).
+const HARNESS_FILES = new Set(['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'traces', 'meta']);
 
 export function checkInvariants(dir, { hubExitCode = null, hubLog = '' } = {}) {
   const v = [];
