@@ -47,6 +47,10 @@ import { quarantineWeb } from './webQuarantine.mjs';
 // frozen experiments keep the tool output they were frozen on; the Linux launchers and gather.mjs turn it on.
 const WEB_QUARANTINE = process.env.AGENT_WEB_QUARANTINE === '1';
 const webOut = (text, source) => (WEB_QUARANTINE ? quarantineWeb(text, source) : text);
+// REL-1 treatment (benchmarks/REL-1_REPEAT-WARN_PREREG.md, frozen at be11fb53): the first time either repetition
+// guard would stop a run, warn the model instead; the second detection stops it as before. One warning per run.
+const REPEAT_WARN = process.env.AGENT_REPEAT_WARN === '1';
+const loopWarning = (what) => `WARNING: you are repeating yourself - ${what}. Doing it again will not change the result, and if it happens once more this run will be stopped. Do something DIFFERENT now: read the error or the output you already have, change your approach, or finish if the goal is met.`;
 // LegaVerify: refuse finish while the agent's own last test is failing (finishEvidence.test.mjs). Off by default so
 // frozen experiments keep the gate they were frozen against; the Linux launchers and gather.mjs turn it on.
 const FINISH_EVIDENCE = process.env.AGENT_FINISH_EVIDENCE === '1';
@@ -4366,6 +4370,15 @@ async function drive(loadDb, run) {
         run.recentAt = run.recent.map((r, i) => (r === norm ? null : run.recentAt[i])).filter((x) => x !== null).concat([landed]);
         run.recent = run.recent.filter((r) => r !== norm).concat([norm]);
         pushStep(run, { type: 'note', text: 'Repeat pardoned once: the model had just been handed new information and had not had a turn to use it.' });
+      } else if (seenTimes >= 3 && REPEAT_WARN && !run.repeatWarned) {
+        // REL-1: warn instead of stopping, once. The identical reply is not executed again; the window forgets it,
+        // so a second stop needs three more identical replies - the "second detection" of the preregistration.
+        run.repeatWarned = true;
+        run.recentAt = run.recent.map((r, i) => (r === norm ? null : run.recentAt[i])).filter((x) => x !== null);
+        run.recent = run.recent.filter((r) => r !== norm);
+        pushStep(run, { type: 'note', text: `Repeat warned (REL-1): the same response ${seenTimes} times in the last ${run.recent.length + seenTimes} steps; the model was told to change approach instead of being stopped.` });
+        run.history.push({ role: 'user', content: loopWarning(`you sent the identical response ${seenTimes} times`) });
+        continue turn;
       } else if (seenTimes >= 3) {
         run.status = 'stopped';
         // WHO repeated? This guard keys on the model's REPLY, but three identical replies after three identical
@@ -4967,6 +4980,16 @@ async function drive(loadDb, run) {
         const stalled = run.callRepeatsAt[callKey] === (run.distinctCalls || 0);
         run.callRepeats[callKey] = (run.callRepeats[callKey] || 0) + 1;
         run.callRepeatsAt[callKey] = run.distinctCalls || 0;
+        if (run.callRepeats[callKey] >= 4 && stalled && REPEAT_WARN && !run.repeatWarned) {
+          // REL-1: warn instead of stopping, once. The counter restarts for this call, so the second stop needs the
+          // same run of repeats again. The call's own result is still handed back with the warning.
+          run.repeatWarned = true;
+          run.callRepeats[callKey] = 0;
+          pushStep(run, { type: 'tool', tool, args, thought, result });
+          pushStep(run, { type: 'note', text: `Repeat warned (REL-1): the same call (${tool} ${args && args.path ? args.path : ''}`.trim() + ') was about to be stopped as a loop; the model was told to change approach instead.' });
+          run.history.push({ role: 'user', content: `${String(result ?? '')}\n\n${loopWarning(`you have sent the same ${tool} call 5 times and it succeeded every time, so its answer is already in front of you`)}` });
+          continue turn;
+        }
         if (run.callRepeats[callKey] >= 4 && stalled) {
           // DELIBERATELY NOT "identical answer" OR "same response". Those phrases map to 'tool_loop' and
           // 'loop' at ~:4323, and repairGoalFor turns 'tool_loop' into "the tool was the problem, not the
