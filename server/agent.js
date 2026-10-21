@@ -40,6 +40,7 @@ import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT, systemPromptFor } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
+import { reviewRun } from './watchers.js';   // the Watchers: a paid reviewer reads finished local-model runs (WATCHERS=1)
 import { lostDefs, lostExports, defCounts, exportNames } from './defNames.js';
 // STATIC on purpose: write_file and edit_file are not async, so an awaited dynamic import inside them
 // is a SyntaxError. The whole static closure of governed-edit.mjs is three files - governed-edit,
@@ -2834,6 +2835,14 @@ function agentProvider(db) {
 let lastModelCall = null;
 export function getLastModelCall() { return lastModelCall; }
 
+/**
+ * The call IN FLIGHT, updated per streamed chunk. A long reply (a whole file in one tool call)
+ * looked exactly like a hang: the run file and the UI only change when the reply is complete.
+ * Measured 2026-10-21 - a Claude call streamed for minutes while the Agent page showed nothing,
+ * and the owner reasonably concluded it was stuck. The bytes were already flowing through take().
+ */
+let liveCall = null;
+
 /** How many tokens of history this provider can actually take. */
 export function contextTokensFor(db) {
   const prov = agentProvider(db);
@@ -2915,10 +2924,14 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
         options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT, ...SAMPLING_EXTRA } }
     // OpenAI-compatible. num_ctx/num_predict are Ollama options and are ignored here, so
     // an explicit max_tokens is the ONLY generation bound this path has.
-    : { model, messages, stream: true, temperature: TEMPERATURE, ...(SEED !== null ? { seed: SEED } : {}),
+    // Claude (via Anthropic's OpenAI-compatible endpoint) rejects temperature and seed on
+    // current models, so they are only sent to other providers.
+    : { model, messages, stream: true,
+        ...(prov.name === 'claude' ? {} : { temperature: TEMPERATURE, ...(SEED !== null ? { seed: SEED } : {}) }),
         ...(NUM_PREDICT > 0 ? { max_tokens: NUM_PREDICT } : {}) };
 
   const t0 = Date.now();
+  liveCall = { startedAt: t0, chars: 0 };
   const promptTok = estimateTokens(messages);
   let full = '', buf = '', attempts = 0, firstByteMs = null;
   let ac = null, stallTimer = null, stalled = false;
@@ -3001,6 +3014,7 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
         const j = JSON.parse(t);
         if (isOllama) { if (j.message?.content) full += j.message.content; }
         else { const d = j.choices?.[0]?.delta?.content; if (d) full += d; }
+        if (liveCall) liveCall.chars = full.length;
       } catch {}
     };
 
@@ -3041,6 +3055,7 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
     const ms = Date.now() - t0;
     const outTok = Math.ceil(full.length / 4);
     const tokPerSec = ms > 0 ? +(outTok / (ms / 1000)).toFixed(1) : 0;
+    liveCall = null;
     lastModelCall = { provider: prov.name, model, ms, chars: full.length, outTok, promptTok,
                       tokPerSec, firstByteMs, attempts, at: Date.now() };
     if (tokPerSec && tokPerSec < SLOW_TOK_S) {
@@ -5589,6 +5604,7 @@ ${result}${syntaxNote}${handedBack}`;
     if (['done', 'error', 'stopped', 'refused_d2', 'stopped_d2_restored'].includes(run.status)) {
       run.finalizedAt = Date.now();
       saveTrace(run); recordRunIndex(run);
+      reviewRun(run, loadDb);   // queued and fire-and-forget: never delays release, never throws
     }
     persist(run);   // durable BEFORE release (incl. 'interrupted' and 'awaiting_approval')
 
@@ -6573,7 +6589,9 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     // busy IS reported: a terminal status with busy still set means teardown (the syntax
     // rollback) is in progress, and the workspace is not yet in its final state.
     const { history, busy, ...view } = run;
-    res.json({ ...view, busy: !!busy });
+    const live = view.status === 'running' && liveCall
+      ? { liveCall: { chars: liveCall.chars, secs: Math.round((Date.now() - liveCall.startedAt) / 1000) } } : {};
+    res.json({ ...view, busy: !!busy, ...live });
   });
 
   // Approve or reject a pending run_command, then resume.
@@ -6743,6 +6761,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     if (!run.busy && !run.finalizedAt) {
       run.finalizedAt = Date.now();
       try { saveTrace(run); recordRunIndex(run); } catch { /* evidence, never a reason to fail the stop */ }
+      reviewRun(run, loadDb);   // the Watchers too: a stopped paused run is exactly the kind they must see
     }
     persist(run);
     res.json({ ok: true });

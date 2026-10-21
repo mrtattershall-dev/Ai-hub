@@ -495,6 +495,11 @@ export default function AgentPage() {
         <div style={{ padding: '9px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '0.5px solid var(--border)' }}>
           {isRunning && <Loader2 size={14} className="spin" style={{ color: 'var(--accent)' }} />}
           <span style={{ fontWeight: 600, fontSize: 13, color: run.status === 'done' ? 'var(--success)' : run.status === 'error' ? 'var(--danger)' : run.status === 'interrupted' ? '#f59e0b' : 'var(--text)' }}>{STATUS_LABEL[run.status] || run.status}</span>
+          {isRunning && run.liveCall && (
+            <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+              · {run.liveCall.chars ? `model writing: ${run.liveCall.chars.toLocaleString()} chars` : 'waiting for the model'}, {run.liveCall.secs}s
+            </span>
+          )}
           {typeof run.modelCalls === 'number' && <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>· {run.steps?.length || 0} steps</span>}
           {/* PROTECTION STATUS - on every run. Unprotected says so in words, not by omission. */}
           <span

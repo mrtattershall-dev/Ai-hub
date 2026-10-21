@@ -149,7 +149,7 @@ function saveDb(db) {
 
 // ── Provider config ───────────────────────────────────────────────────────────
 const PROVIDER_DEFAULTS = {
-  claude:    { base_url: 'https://api.anthropic.com',   model: 'claude-sonnet-4-6', type: 'anthropic', name: 'Claude' },
+  claude:    { base_url: 'https://api.anthropic.com',   model: 'claude-opus-5-5',   type: 'anthropic', name: 'Claude' },
   openai:    { base_url: 'https://api.openai.com',      model: 'gpt-4o',            type: 'openai',    name: 'OpenAI' },
   deepseek:  { base_url: 'https://api.deepseek.com',    model: 'deepseek-coder',    type: 'openai',    name: 'DeepSeek' },
   kimi:      { base_url: 'https://api.moonshot.cn',     model: 'moonshot-v1-8k',    type: 'openai',    name: 'Kimi (Moonshot)' },
@@ -573,7 +573,8 @@ function buildRequest(type, base_url, apiKey, model, convo, temperature, stream)
     url: `${base_url}/v1/messages`,
     headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
     // Anthropic takes system as a top-level field, not a message.
-    body: { model, max_tokens: 4096, temperature, stream, ...(system ? { system } : {}), messages: msgs }
+    // Current Claude models reject sampling params (temperature/top_p) with a 400, so none are sent.
+    body: { model, max_tokens: 16000, stream, ...(system ? { system } : {}), messages: msgs }
   };
   if (type === 'ollama') {
     // /api/generate takes a single prompt string — flatten the conversation with

@@ -88,3 +88,16 @@ legasus/runtime/epistemic-admission/external-linter/external/
 
 # R1/R2: the hub's own records (META_DIR default), outside the governed workspace
 workspace.hub-meta/
+
+# fuzzForever campaign output (local evidence, not source)
+fuzz-out/
+
+# gather.mjs output: live local-model sessions (evidence, not source)
+data/gather/
+
+# copied read-only from the USB backup, 2026-10-21
+reference/fuzz/
+data/inspector/
+data/*.log
+# fuzz campaigns kept locally as evidence (incl. labelled apparatus failures)
+fuzz-out-*/
