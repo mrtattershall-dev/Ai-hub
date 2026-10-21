@@ -1,4 +1,5 @@
 import express from 'express';
+import { acquireLease, isManagedLocal } from './resourceLease.mjs';
 import { readJsonSafe, refreshBackup } from './safeJson.js';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
@@ -281,7 +282,12 @@ app.post('/api/chat', async (req, res) => {
     saveDb(db2);
   };
 
+  let releaseResource = () => {};
+  const admission = new AbortController();
+  const cancelAdmission = () => admission.abort();
+  res.once('close', cancelAdmission);
   try {
+    if (type === 'ollama' && isManagedLocal(base_url)) releaseResource = await acquireLease('chat', { signal: admission.signal });
     if (stream) {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
@@ -412,6 +418,9 @@ app.post('/api/chat', async (req, res) => {
     } else {
       try { res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`); res.end(); } catch {}
     }
+  } finally {
+    res.removeListener('close', cancelAdmission);
+    releaseResource();
   }
 });
 
@@ -585,7 +594,7 @@ function buildRequest(type, base_url, apiKey, model, convo, temperature, stream)
     return {
       url: `${base_url}/api/generate`,
       headers: { 'Content-Type': 'application/json' },
-      body: { model, prompt: flat, stream, options: { temperature, num_ctx: 32768, num_predict: -1 } }
+      body: { model, prompt: flat, stream, keep_alive: process.env.OLLAMA_KEEP_ALIVE || '30m', options: { temperature, num_ctx: Number(process.env.NUM_CTX) || 32768, num_predict: -1 } }
     };
   }
   // OpenAI-compatible (incl. perplexity): system is a normal leading message.

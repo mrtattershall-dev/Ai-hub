@@ -8,6 +8,8 @@
 
 import { createHash } from 'node:crypto';
 import express from 'express';
+import { recoverInterrupted } from './autoRecover.mjs';
+import { acquireLease, isManagedLocal, resourceStatus } from './resourceLease.mjs';
 import { launchOptions } from './browser.js';
 import { serveScriptsFromCache } from './engineCache.js';
 import { fileURLToPath } from 'url';
@@ -2951,6 +2953,7 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
         ...(prov.name === 'claude' ? {} : { temperature: TEMPERATURE, ...(SEED !== null ? { seed: SEED } : {}) }),
         ...(NUM_PREDICT > 0 ? { max_tokens: NUM_PREDICT } : {}) };
 
+  const releaseResource = isOllama && isManagedLocal(base) ? await acquireLease('model', { signal }) : () => {};
   const t0 = Date.now();
   liveCall = { startedAt: t0, chars: 0 };
   const promptTok = estimateTokens(messages);
@@ -3108,6 +3111,9 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
       : `Model call hit the ${MODEL_TIMEOUT_MS / 1000}s ceiling`;
     const got = full.length ? ` ${full.length} chars had already arrived.` : ' Nothing arrived.';
     throw new Error(`${what}.${got} ${describeProbe(pr, base, prov.name)}`);
+  } finally {
+    releaseResource();
+    liveCall = null;
   }
 }
 
@@ -3234,7 +3240,9 @@ function reapRuns() {
 function persist(run) {
   try {
     mkdirSync(RUNS_DIR, { recursive: true });
-    writeFileSync(join(RUNS_DIR, `${run.id}.json`), JSON.stringify(slimForDisk(run)));
+    const path = join(RUNS_DIR, `${run.id}.json`);
+    writeFileSync(path + '.tmp', JSON.stringify(slimForDisk(run)));
+    renameSync(path + '.tmp', path);
   } catch {}
 }
 
@@ -6069,6 +6077,7 @@ function supervisorTick(loadDb) {
     const stalled = all
       .filter((r) => r.status === 'interrupted' && !r.depth && !r.busy)
       .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+    if (stalled && process.env.AGENT_AUTO_RECOVER === '1') return; // dedicated bounded recovery owns it
     if (stalled) {
       stalled.status = 'running';
       pushStep(stalled, { type: 'note', text: 'Resumed automatically (supervisor).' });
@@ -6366,6 +6375,36 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
   // reads like one, which is exactly what wiring.test.mjs exists to catch. Started here
   // because this is where loadDb becomes available; it no-ops unless the supervisor is on.
   startSupervisorTick(loadDb);
+  if (process.env.AGENT_AUTO_RECOVER === '1') {
+    let checking = false;
+    const timer = setInterval(async () => {
+      if (checking || activeTopLevelRun()) return;
+      checking = true;
+      try {
+        const run = [...runs.values()].filter(r => !r.depth)
+          .sort((a,b) => b.createdAt - a.createdAt)[0];
+        // A later stopped/completed task must not resurrect an older abandoned request.
+        if (!run || run.status !== 'interrupted' || run.busy || run.pending) return;
+        const prov = agentProvider(loadDb());
+        const base = (prov.row?.base_url || 'http://localhost:11434').replace(/\/+$/, '');
+        if (prov.kind !== 'ollama') return;
+        await recoverInterrupted(run, {
+          healthy: async () => (await probeBackend(base, true, {})).state === 'reachable',
+          save: persist,
+          report: (state, detail) => resourceStatus('recovery', state, { runId: run.id, ...detail }),
+          resume: async r => {
+            r.status = 'running';
+            pushStep(r, { type: 'note', text: `Automatic Ollama recovery attempt ${r.autoRecovery.attempts}/6; history preserved.` });
+            persist(r);
+            driveDetached(loadDb, r);
+          },
+        });
+      } catch (e) { console.error('[recovery]', e.message); }
+      finally { checking = false; }
+    }, 15000);
+    timer.unref();
+  }
+
   if (supervisorEnabled) console.log(`[agent] unattended tick every ${TICK_MS / 1000}s (stale approvals DENIED after ${APPROVAL_TIMEOUT_MS / 60000} min, interrupted runs resumed, queued work picked up)`);
 
   // Hand the already-registered Google tools a real database. Until this runs they exist

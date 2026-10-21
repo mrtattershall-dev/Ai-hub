@@ -25,11 +25,12 @@
  *   s<seed>/         that session's hub: workspace, runs, transcripts - kept, it is the evidence
  *   gather.pid       this process
  */
-import { readFileSync, writeFileSync, appendFileSync, mkdirSync, chmodSync } from 'node:fs';
+import { readFileSync, writeFileSync, appendFileSync, mkdirSync, chmodSync, existsSync, renameSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startHub } from './testHarness.mjs';
+import { resourceStatus } from './resourceLease.mjs';
 import { enochPath } from './watchers.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -45,6 +46,7 @@ const RUN_MINUTES = parseInt(process.env.GATHER_RUN_MINUTES || '240', 10);
 const FIRST_BYTE_S = process.env.GATHER_FIRST_BYTE_S || '1200';
 const APPROVAL_WAIT = 2 * 60_000;
 const log = (s) => process.stdout.write(`${new Date().toISOString().slice(0, 19)} ${s}\n`);
+const atomic = (path, value) => { writeFileSync(path + '.tmp', JSON.stringify(value)); renameSync(path + '.tmp', path); };
 const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 
 // The fuzzer's pool, verbatim, so live and replay results are about the same work. Checked against
@@ -110,10 +112,11 @@ async function session(seed, { tag = '', env: armEnv = {}, meta = {}, model = nu
   const sk = model ? { ...keys, ollama: { ...keys.ollama, model } } : keys;
   const dir = join(OUT, `s${seed}${tag ? '-' + tag : ''}`);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, 'hub.json'), JSON.stringify({ api_keys: sk, history: [], settings: {} }));
+  if (!existsSync(join(dir, 'hub.json'))) writeFileSync(join(dir, 'hub.json'), JSON.stringify({ api_keys: sk, history: [], settings: {} }));
   chmodSync(join(dir, 'hub.json'), 0o600);
   const goals = withPrerequisites(shuffle(GOAL_POOL, rng(seed)).slice(0, PER));
 
+  if (existsSync(join(dir, 'complete.json'))) return true;
   let h;
   try {
     h = await startHub(dir, {
@@ -138,18 +141,35 @@ async function session(seed, { tag = '', env: armEnv = {}, meta = {}, model = nu
 
   const sessionIds = [];
   for (const [i, goal] of goals.entries()) {
-    const t0 = Date.now();
+    const resultFile = join(dir, `result-${i}.json`);
+    if (existsSync(resultFile)) continue;
+    const checkpointFile = join(dir, `goal-${i}.json`);
+    let checkpoint;
+    try { checkpoint = JSON.parse(readFileSync(checkpointFile, 'utf8')); } catch { checkpoint = { startedAt: Date.now() }; }
+    const t0 = checkpoint.startedAt;
+    atomic(checkpointFile, checkpoint);
     const row = { at: new Date().toISOString(), seed, ...meta, i, goal, model: sk.ollama.model };
     try {
-      const started = await h.api('/agent/start', { method: 'POST', body: JSON.stringify({ goal }) });
+      // Reconcile the hub's durable run with our intent after a crash between start and checkpoint.
+      const previous = (await h.api('/agent/list')).find(r => r.goal === goal);
+      const started = checkpoint.runId ? { runId: checkpoint.runId } : previous ? { runId: previous.id }
+        : await h.api('/agent/start', { method: 'POST', body: JSON.stringify({ goal }) });
       if (!started.runId) throw new Error(`start refused: ${started.error || JSON.stringify(started).slice(0, 200)}`);
       const id = row.runId = started.runId;
+      checkpoint.runId = id;
+      atomic(checkpointFile, checkpoint);
       sessionIds.push(id);
       let run, askedAt = null;
       for (;;) {
         await sleep(5000);
         if (h.died()) throw new Error(`hub died: ${h.died()}`);
         run = await h.api(`/agent/${id}`);
+        if (!run.status) throw new Error('Checkpoint run missing from hub; refusing to duplicate work');
+        resourceStatus('gather', run.status, { seed, goal: i + 1, runId: id, modelCalls: run.modelCalls, recovery: run.autoRecovery || null });
+        if (run.status === 'interrupted' && run.autoRecovery?.attempts >= 6) {
+          row.infrastructureFailure = 'Ollama recovery exhausted';
+          await h.api(`/agent/${id}/stop`, { method: 'POST', body: '{}' });
+        }
         if (TERMINAL.includes(run.status) && !run.busy) break;
         if (run.status === 'awaiting_approval') {
           askedAt ??= Date.now();
@@ -167,9 +187,13 @@ async function session(seed, { tag = '', env: armEnv = {}, meta = {}, model = nu
       }
       Object.assign(row, { status: run.status, finish: run.finishKind || null, modelCalls: run.modelCalls, steps: run.steps?.length || 0 });
     } catch (e) {
-      row.error = String(e.message).slice(0, 300);
+      // Let systemd restart the whole hub/collector group. Keep this goal pending.
+      try { h.hub.kill(); } catch {}
+      resourceStatus('gather', 'recovering collector', { error: String(e.message).slice(0, 300) });
+      throw e;
     }
     row.minutes = +((Date.now() - t0) / 60000).toFixed(1);
+    atomic(resultFile, row);
     appendFileSync(join(OUT, 'sessions.jsonl'), JSON.stringify(row) + '\n');
     log(`s${seed}${tag ? '-' + tag : ''} ${i + 1}/${goals.length} ${row.status || 'ERROR'}${row.finish ? '/' + row.finish : ''} ${row.minutes}m ${row.modelCalls ?? '-'} calls | ${goal.slice(0, 60)}${row.error ? ' | ' + row.error : ''}`);
     if (row.error && h.died()) break;
@@ -191,6 +215,7 @@ async function session(seed, { tag = '', env: armEnv = {}, meta = {}, model = nu
   }
   try { h.hub.kill(); } catch { /* already gone */ }
   await sleep(3000);
+  atomic(join(dir, 'complete.json'), { at: new Date().toISOString() });
   return true;
 }
 
@@ -222,9 +247,15 @@ if (experiment) {
     for (const arm of x.order(seed)) {
       let tries = 0;
       while (!(await session(seed, { tag: `${experiment}-${arm}`, env: x.arms[arm], meta: { experiment, arm }, model: x.model })) && ++tries < 5) { /* same seed again */ }
+      if (tries >= 5) throw new Error(`Experiment ${experiment} incomplete: session startup failed`);
     }
   }
   log(`experiment ${experiment} complete - stopping (the plan is fixed; no extension)`);
   process.exit(0);
 }
-for (let seed = FIRST; ; seed++) await session(seed);
+let seed = FIRST;
+try { seed = Math.max(FIRST, JSON.parse(readFileSync(join(OUT, 'cursor.json'), 'utf8')).seed); } catch {}
+for (;; seed++) {
+  atomic(join(OUT, 'cursor.json'), { seed });
+  if (!await session(seed)) throw new Error('hub startup failed; retry same seed after restart');
+}

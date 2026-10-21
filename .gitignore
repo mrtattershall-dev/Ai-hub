@@ -105,3 +105,7 @@ fuzz-out-*/
 # deep-research working notes and reports (local)
 research_notes/
 reports/
+
+# Local unattended campaigns contain copied provider credentials and live state.
+data/gather-*/
+data/watch-status.txt

@@ -4,6 +4,9 @@
 cd "$(dirname "$0")"
 if [ -f .env ]; then set -a; . ./.env; set +a; fi
 
+# Conservative local resource limits also apply to manual/desktop launches.
+source scripts/unattended-env.sh
+
 # The owner token. Kept OUTSIDE the repo, created once, never printed.
 TOKEN_FILE="$HOME/.ai-hub/owner-token"
 if [ ! -f "$TOKEN_FILE" ]; then
@@ -30,6 +33,8 @@ export AGENT_WEB_QUARANTINE=1
 # LegaGate: a ceiling on the command worker. 1g because the local 7b already uses most of this laptop's RAM.
 export AGENT_WORKER_MEMORY="${AGENT_WORKER_MEMORY:-1g}"
 export AGENT_WORKER_CPUS="${AGENT_WORKER_CPUS:-2}"
+
+if [[ "${HUB_SERVER_ONLY:-}" == 1 ]]; then exec node server/index.js; fi
 
 echo "=================================================="
 echo "   AI Coding Hub - governed (product-path-1)"

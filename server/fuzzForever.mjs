@@ -19,6 +19,7 @@
  * finishes on its own (at most one batch), and that batch's results are still streamed to
  * its own JSONL file.
  */
+import { acquireLease, unloadLocalModel } from './resourceLease.mjs';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, rmSync, writeFileSync, appendFileSync, mkdirSync } from 'node:fs';
 import { tmpdir, hostname, cpus, totalmem } from 'node:os';
@@ -63,9 +64,14 @@ try {
 } catch (e) { log(`OUTDIR WRITE FAILED: ${e.message}`); }
 
 let seed = FIRST, batchNo = 0, totalRuns = 0, totalClean = 0;
+try { const last = JSON.parse(readFileSync(join(OUTDIR, 'status.json'), 'utf8')); seed = Math.max(FIRST, last.nextSeed); batchNo = last.batchNo; totalRuns = last.totalRuns; totalClean = last.totalClean; } catch {}
 log(`fuzzForever: batches of ${BATCH} from seed ${seed}, alternating 4 and 6 goals per iteration, until stopped`);
 
 for (;;) {
+  const release = await acquireLease('fuzz');
+  if (process.env.LEGASUS_RESOURCE_GUARD === '1') {
+    try { await unloadLocalModel(); } catch (e) { release(); console.error(e.message); await new Promise(r => setTimeout(r, 30000)); continue; }
+  }
   batchNo += 1;
   const per = batchNo % 2 ? 4 : 6;
   // Every third batch serves ONLY the hostile corpus (fuzzCorpus.mjs: multi-action replies,
@@ -138,4 +144,7 @@ for (;;) {
   } catch { /* cleanup is best-effort */ }
 
   seed += BATCH;
+  release();
+  // Give queued inference a turn before the next maintenance batch.
+  await new Promise(r => setTimeout(r, 15000));
 }

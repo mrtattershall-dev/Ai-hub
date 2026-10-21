@@ -80,17 +80,21 @@ export async function startHub(dir, { port, env = {}, waitMs = 60_000 } = {}) {
   const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
     env: isolatedEnv(dir, p, env), stdio: ['ignore', 'pipe', 'pipe'],
   });
-  hub.stdout.on('data', (d) => log.push(d.toString()));
-  hub.stderr.on('data', (d) => log.push(d.toString()));
+  let logBytes = 0;
+  const keepLog = d => { const text = d.toString().slice(-65536); log.push(text); logBytes += text.length; while (logBytes > 262144 && log.length > 1) logBytes -= log.shift().length; };
+  hub.stdout.on('data', keepLog);
+  hub.stderr.on('data', keepLog);
   let exited = null;
   hub.on('exit', (c, s) => { exited = `code=${c} signal=${s}`; });
 
   const base = `http://127.0.0.1:${p}/api`;
   const deadline = Date.now() + waitMs;
+  let ready = false;
   while (Date.now() < deadline) {
     if (exited) throw new Error(`hub exited before it listened: ${exited}\n${log.join('').slice(-800)}`);
-    try { await fetch(base + '/auth/hint'); break; } catch { await new Promise((r) => setTimeout(r, 200)); }
+    try { const r = await fetch(base + '/auth/hint', { signal: AbortSignal.timeout(2000) }); if (r.ok) { ready = true; break; } } catch { await new Promise((r) => setTimeout(r, 200)); }
   }
+  if (!ready) { hub.kill(); throw new Error('hub startup timed out'); }
   const api = async (path, opts) => {
     const r = await fetch(base + path, {
       headers: { 'Content-Type': 'application/json' }, ...opts,

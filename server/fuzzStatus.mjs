@@ -14,6 +14,7 @@
  * minutes under load, so "stale" means more than 30 minutes, not more than a few.
  */
 import { readFileSync, existsSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,7 +34,10 @@ const st = rd('status.json');
 const id = rd('identity.json');
 const hbMin = hb ? (Date.now() - Date.parse(hb.at)) / 60000 : Infinity;
 
-const verdict = alive && hbMin <= STALE_MIN ? 'RUNNING' : alive ? `STALLED (pid ${pid} alive, heartbeat ${ago(hb?.at)})` : 'DEAD (no such process)';
+let lease;
+try { lease = JSON.parse(readFileSync(join(process.env.LEGASUS_STATUS_DIR || join(homedir(), '.local/state/legasus/status'), `fuzz-${pid}.json`), 'utf8')); } catch {}
+const waiting = alive && lease?.pid === pid && /waiting|idle/.test(lease.state);
+const verdict = waiting ? `WAITING (${lease.state})` : alive && hbMin <= STALE_MIN ? 'RUNNING' : alive ? `STALLED (pid ${pid} alive, heartbeat ${ago(hb?.at)})` : 'DEAD (no such process)';
 console.log(`verdict : ${verdict}`);
 console.log(`pid     : ${pid ?? '?'}   started ${ago(id?.startedAt)}   code ${id?.code?.head?.slice(0, 8) ?? '?'} on ${id?.code?.branch ?? '?'}`);
 console.log(`heartbeat: ${hb ? `${hb.phase} seed ${hb.seed}, ${hb.iterationsDone}/${hb.of} in batch, ${ago(hb.at)}` : 'none yet'}`);
@@ -47,4 +51,4 @@ if (batches.length) {
     console.log(`  #${String(b.batchNo).padStart(3)} ${b.hostile ? 'HOSTILE' : 'default'} ${b.per} goals  ${b.clean}/${b.rows} clean  ${(b.ms / 60000).toFixed(1)} min  kinds ${JSON.stringify(b.kinds)}${b.rows === 0 ? '  <-- NO RESULTS' : ''}${b.timedOut ? '  <-- TIMED OUT' : ''}`);
   }
 }
-process.exit(verdict === 'RUNNING' ? 0 : 1);
+process.exit(waiting || verdict === 'RUNNING' ? 0 : 1);

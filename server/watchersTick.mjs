@@ -13,6 +13,7 @@
  * its own gates - RED, governedEdit, GREEN, STRESS 10/10 - and commits only to a watchers/<id> branch. Merging is the
  * owner's decision. The Watchers' hard cap (WATCHERS_BUDGET_USD) applies to every call.
  */
+import { acquireLease, unloadLocalModel } from './resourceLease.mjs';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -37,6 +38,7 @@ if (existsSync(batches)) {
   const last = rows.at(-1);
   lines.push(`fuzz batches: ${rows.length}, ${last ? `${last.totalClean}/${last.totalRuns} clean` : '-'}${stray ? ` | WARNING: ${stray} batch(es) still show STRAY - the apparatus fix did not hold` : ' | no STRAY (apparatus fix holds)'}`);
 }
+if (existsSync(join(REPO, 'data', 'gather', 'PAUSED-memory-policy.json'))) lines.push('REL-1/REL-2: paused; operational collection uses data/gather-memory-v1');
 for (const x of ['rel1', 'rel2']) lines.push(`${x}: ${tail(join(REPO, 'data', 'gather', `${x}.log`), 1)}`);
 lines.push(`watchers spend: $${spent().toFixed(4)} of $${process.env.WATCHERS_BUDGET_USD || '10'}`);
 
@@ -48,6 +50,9 @@ const next = process.argv.includes('--health') ? null : q.find((e) => !e.fixed &
 if (process.argv.includes('--health')) lines.push(`inspect: (health check only) last result - ${(q.filter((e) => e.lastResult || e.fixed).at(-1) || {}).lastResult || 'none yet'}`.slice(0, 300));
 else if (!next) lines.push('inspect: backlog clear or every entry tried in the last 24h');
 else {
+  const release = await acquireLease('inspector');
+  try {
+  if (process.env.LEGASUS_RESOURCE_GUARD === '1') await unloadLocalModel();
   next.triedAt = new Date().toISOString();
   const t = spawnSync(process.execPath, [join(HERE, next.test)], { cwd: REPO, encoding: 'utf8', timeout: 15 * 60_000, maxBuffer: 16 << 20 });
   const out = `${t.stdout || ''}${t.stderr || ''}`;
@@ -66,6 +71,7 @@ else {
     lines.push(`inspect: ${next.test} -> ${summary}`);
   }
   writeFileSync(QUEUE, JSON.stringify(q, null, 2) + '\n');
+  } finally { release(); }
 }
 writeFileSync(STATUS, lines.join('\n') + '\n');
 console.log(lines.join('\n'));
