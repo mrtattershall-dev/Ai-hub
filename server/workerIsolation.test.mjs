@@ -113,7 +113,7 @@ try {
   // BEFORE its absence in the worker means anything. Checked on the host, where it exists.
   const hostSees = existsSync(q.bundle) && readFileSync(q.bundle).length > 0;
   say(hostSees, `the probe path names a real, non-empty artifact ON THE HOST (${q.bundle})`);
-  say(bundleIn.startsWith('/') === false && /:/.test(bundleIn), 'and it is passed to the worker in a well-formed absolute form');
+  say(/^[A-Za-z]:\//.test(bundleIn) || (process.platform !== 'win32' && bundleIn.startsWith('/')), 'and it is passed to the worker in a well-formed absolute form');
   note('Without these two, an ENOENT below would be indistinguishable from a typo.');
   const a1 = await runInWorker(WS, `cat "${bundleIn}" 2>&1; ls "${q.dir.replace(/\\/g, '/')}" 2>&1`);
   say(!/PACK|v2 git bundle/.test(a1.out), `the known audit path yields nothing (${a1.out.replace(/\s+/g, ' ').trim().slice(0, 60)})`);
