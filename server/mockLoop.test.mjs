@@ -122,6 +122,7 @@ const hub = spawn(process.execPath, [join(HERE, 'index.js')], {
     ...process.env, PORT: String(hubPort), HUB_DB: join(dir, 'hub.json'),
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'index.jsonl'),
+    AGENT_META_DIR: join(dir, 'meta'),   // the hub's own records, kept out of the workspace and out of 'stray'
     AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
     AGENT_MAX_STEPS: '14', AGENT_MAX_MINUTES: '3',
     MODEL_FIRST_BYTE_S: '30', MODEL_STALL_S: '30', MODEL_TIMEOUT_S: '60',
@@ -210,7 +211,7 @@ await test('INVARIANT: no unparseable code is left behind', () => {
 });
 
 await test('INVARIANT: nothing was written outside the workspace', () => {
-  const stray = readdirSync(dir).filter((f) => !['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'traces'].includes(f));
+  const stray = readdirSync(dir).filter((f) => !['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'traces', 'meta'].includes(f));
   assert.equal(stray.length, 0, `files appeared beside the workspace: ${stray.join(', ')}`);
 });
 
