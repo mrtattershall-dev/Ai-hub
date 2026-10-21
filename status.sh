@@ -6,6 +6,6 @@ cd "$(dirname "$0")" && node server/watchersTick.mjs --health && echo
 # files fails once the file has moved on (agent.js changes daily).
 waiting=0
 for b in $(git branch --list 'watchers/*' --format='%(refname:short)'); do
-  if git diff "$(git merge-base HEAD "$b")" "$b" | git apply -R --check 2>/dev/null; then echo "  in your code:     $b"; else echo "  WAITING FOR YOU:  $b"; waiting=$((waiting+1)); fi
+  if grep -q "^$b " server/watchersApplied.txt 2>/dev/null || git diff "$(git merge-base HEAD "$b")" "$b" | git apply -R --check 2>/dev/null; then echo "  in your code:     $b"; else echo "  WAITING FOR YOU:  $b"; waiting=$((waiting+1)); fi
 done
 echo "fixes waiting for you to merge: $waiting"

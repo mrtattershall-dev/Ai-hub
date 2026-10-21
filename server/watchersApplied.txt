@@ -1,0 +1,3 @@
+# Inspector fixes applied to product-path-1 by hand (patch, cherry-pick or extended), one branch per line.
+# status.sh trusts this list before its own patch check, because an applied-and-extended fix no longer reverses.
+watchers/2026-10-21-f37c6b56-stop-skips-finalization-on-paused-run  3ac59a38 + reviewRun on the stop path (6228c43e)
