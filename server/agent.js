@@ -6739,6 +6739,11 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     run.pending = null;
     try { run.abort?.abort(); } catch {}
     pushStep(run, { type: 'error', text: 'Stopped by user.' });
+    // No drive loop is running (paused/interrupted/awaiting approval), so nothing else will finalize this run.
+    if (!run.busy && !run.finalizedAt) {
+      run.finalizedAt = Date.now();
+      try { saveTrace(run); recordRunIndex(run); } catch { /* evidence, never a reason to fail the stop */ }
+    }
     persist(run);
     res.json({ ok: true });
   });

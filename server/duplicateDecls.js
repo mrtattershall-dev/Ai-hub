@@ -20,7 +20,7 @@
  * silent case.
  */
 
-const JS_DECL = /^(?:export\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(/;
+const JS_DECL = /^(?:export\s+)?(?:async\s+)?function(?:\s*\*\s*|\s+)([A-Za-z_$][\w$]*)\s*\(/;
 const PY_DECL = /^(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(/;
 
 /** [{ name, lines }] for every top-level function declared more than once. */

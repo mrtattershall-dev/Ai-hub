@@ -70,7 +70,12 @@ export function stripLineNumberPrefixes(text) {
  */
 export function parseActions(text, lastPath, max = 6) {
   if (!text) return [];
-  const starts = [...text.matchAll(/^[ \t]*ACTION:[ \t]*[a-z_]+/gim)].map((m) => m.index);
+  const all = [...text.matchAll(/^[ \t]*ACTION:[ \t]*[a-z_]+/gim)].map((m) => m.index);
+  // An ACTION: line inside a fenced body is the model's file content, not a new action (parseAction already
+  // ignores it). If EVERY header is fenced the whole reply is wrapped in a fence, so keep them all.
+  const spans = [...text.matchAll(/```[\s\S]*?```/g)].map((m) => [m.index, m.index + m[0].length]);
+  const bare = all.filter((s) => !spans.some(([a, b]) => s > a && s < b));
+  const starts = bare.length ? bare : all;
   if (starts.length <= 1) { const one = parseAction(text, lastPath); return one && one.tool ? [one] : []; }
   // AN `ACTION:` LINE IS NOT ALWAYS A NEW ACTION.
   //
