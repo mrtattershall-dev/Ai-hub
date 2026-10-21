@@ -71,6 +71,18 @@ export async function workerAvailable() {
  * list rather than on a description of it - a comment claiming "--network none" is not evidence
  * that the flag is passed, and this project has already asserted a bug from the wrong side twice.
  */
+// MEMORY AND CPU CEILING (workerLimits.test.mjs). --pids-limit alone let one runaway script take every core and all
+// the RAM of a laptop that is also serving the model. Read per call, and unset means no flag at all, so frozen
+// experiments keep the boundary they were frozen against; the Linux launchers set it. A value that is not a plain
+// docker size or count is dropped rather than passed through.
+function ceiling() {
+  const mem = process.env.AGENT_WORKER_MEMORY, cpus = process.env.AGENT_WORKER_CPUS;
+  return [
+    ...(/^\d+(\.\d+)?[bkmg]?$/i.test(mem || '') ? ['--memory', mem, '--memory-swap', mem] : []),
+    ...(/^\d+(\.\d+)?$/.test(cpus || '') ? ['--cpus', cpus] : []),
+  ];
+}
+
 export function workerArgs(workspace, cmd, { image = WORKER_IMAGE, name = null } = {}) {
   return [
     'run',
@@ -88,6 +100,7 @@ export function workerArgs(workspace, cmd, { image = WORKER_IMAGE, name = null }
     '--security-opt', 'no-new-privileges',
     '--user', '1000:1000',            // not root inside the namespace either
     '--pids-limit', '512',
+    ...ceiling(),
     '-v', `${workspace}:/work`,       // THE ONLY MOUNT. No audit store, no other runs, no socket.
     '-w', '/work',
     image,

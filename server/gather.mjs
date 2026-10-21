@@ -117,6 +117,9 @@ for (let seed = FIRST; ; seed++) {
         AGENT_PROVIDER: 'ollama', AGENT_APPROVAL_MODE: 'build', AGENT_MAX_MINUTES: String(RUN_MINUTES), MODEL_FIRST_BYTE_S: FIRST_BYTE_S,
         AGENT_WORKER_EXEC: '1', AGENT_BOUND_ROUTES: '1', AGENT_WORKER_IMAGE: image,
         AGENT_GOVERNED_WRITES: '', AGENT_SUPERVISOR: '',
+        // LegaVerify / LegaGate (2026-10-21): no finish over a failing self-test; a memory and CPU ceiling on the
+        // command worker. 1g, not more: the 7b already takes ~6 GB of this laptop's ~6.6 GB and the rest swaps.
+        AGENT_FINISH_EVIDENCE: '1', AGENT_WORKER_MEMORY: process.env.AGENT_WORKER_MEMORY || '1g', AGENT_WORKER_CPUS: process.env.AGENT_WORKER_CPUS || '2',
         AGENT_TRACES_DIR: join(OUT, 'traces'), RUN_INDEX: join(OUT, 'run-index.jsonl'),
         WATCHERS: keys.claude ? '1' : '0', WATCHERS_BUDGET_USD: process.env.WATCHERS_BUDGET_USD || '10',
       },
