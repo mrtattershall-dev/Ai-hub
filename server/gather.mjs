@@ -2,7 +2,7 @@
  * gather.mjs - collect real local-model runs, unattended, until stopped.
  *
  *   node server/gather.mjs [firstSeed=1] [goalsPerSession=5]
- *   node server/gather.mjs --experiment REL-1      a preregistered experiment's fixed plan, then stop
+ *   node server/gather.mjs --experiment REL-1      a preregistered experiment's fixed plan, then stop (REL-1, REL-2)
  *
  * The fuzzer replays RECORDED replies, so it can find damage but never shows what the model does next.
  * This is the live counterpart: the real model (AGENT_PROVIDER=ollama, qwen2.5-coder:7b) against the SAME
@@ -202,6 +202,14 @@ const EXPERIMENTS = {
     model: 'qwen3.5:4b',   // Amendment 1 (benchmarks/REL-1_AMENDMENT-1.md): the 7b was oom-killed twice on this laptop
     seeds: Array.from({ length: 10 }, (_, k) => 101 + k),
     arms: { control: { AGENT_REPEAT_WARN: '' }, treatment: { AGENT_REPEAT_WARN: '1' } },
+    order: (seed) => (seed % 2 ? ['control', 'treatment'] : ['treatment', 'control']),
+  },
+  // REL-2 (benchmarks/REL-2_SPLIT-PROTOCOL_PREREG.md, frozen at c6dd4a8e): the split protocol. AGENT_REPEAT_WARN is
+  // unset in both arms, so REL-1's treatment cannot leak into this comparison.
+  'REL-2': {
+    model: 'qwen3.5:4b',
+    seeds: Array.from({ length: 10 }, (_, k) => 201 + k),
+    arms: { control: { AGENT_JSON_ACTIONS: '', AGENT_REPEAT_WARN: '' }, treatment: { AGENT_JSON_ACTIONS: '1', AGENT_REPEAT_WARN: '' } },
     order: (seed) => (seed % 2 ? ['control', 'treatment'] : ['treatment', 'control']),
   },
 };

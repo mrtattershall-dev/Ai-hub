@@ -43,6 +43,7 @@ import { duplicateNote } from './duplicateDecls.js';
 import { reviewRun } from './watchers.js';   // the Watchers: a paid reviewer reads finished local-model runs (WATCHERS=1)
 import { lastSelfTestFailure } from './finishEvidence.mjs';
 import { quarantineWeb } from './webQuarantine.mjs';
+import { actionSchema, needsBody, bodyRequest, extractBody, assemble } from './splitProtocol.mjs';
 // LegaGate: web text reaches the model inside a marked untrusted block (webQuarantine.test.mjs). Off by default so
 // frozen experiments keep the tool output they were frozen on; the Linux launchers and gather.mjs turn it on.
 const WEB_QUARANTINE = process.env.AGENT_WEB_QUARANTINE === '1';
@@ -50,6 +51,13 @@ const webOut = (text, source) => (WEB_QUARANTINE ? quarantineWeb(text, source) :
 // REL-1 treatment (benchmarks/REL-1_REPEAT-WARN_PREREG.md, frozen at be11fb53): the first time either repetition
 // guard would stop a run, warn the model instead; the second detection stops it as before. One warning per run.
 const REPEAT_WARN = process.env.AGENT_REPEAT_WARN === '1';
+// REL-2 treatment (benchmarks/REL-2_SPLIT-PROTOCOL_PREREG.md, frozen at c6dd4a8e): JSON for the action, plain text
+// for the code. Ollama only - its `format` grammar is what makes the action valid by construction.
+const JSON_ACTIONS = process.env.AGENT_JSON_ACTIONS === '1';
+const SPLIT_INSTRUCTION = 'Reply with ONE JSON object: "thought", "action" (one of the tools), and only the fields that action takes'
+  + ' (path, lines, command, query, url, which, goal, message, sha, occurrence, remove, duplicate, summary, rules, text).'
+  + ' Do NOT put file content or code in it: for write_file, append_file, edit_file or inline run_python give only the'
+  + ' header fields - you will be asked for the code next, as a normal code block.';
 const loopWarning = (what) => `WARNING: you are repeating yourself - ${what}. Doing it again will not change the result, and if it happens once more this run will be stopped. Do something DIFFERENT now: read the error or the output you already have, change your approach, or finish if the goal is met.`;
 // LegaVerify: refuse finish while the agent's own last test is failing (finishEvidence.test.mjs). Off by default so
 // frozen experiments keep the gate they were frozen against; the Linux launchers and gather.mjs turn it on.
@@ -2916,7 +2924,7 @@ class CallDeadlineError extends Error {
     this.code = 'CALL_DEADLINE'; this.deadlineMs = deadlineMs; this.chars = chars;
   }
 }
-async function callModel(loadDb, messages, signal, override, { deadlineMs = null } = {}) {
+async function callModel(loadDb, messages, signal, override, { deadlineMs = null, format = null } = {}) {
   const db = loadDb();
   const prov = agentProvider(db);
   const o = prov.row || {};
@@ -2933,7 +2941,7 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
   // Streaming keeps bytes flowing per token, and it is what makes a stall timer possible
   // at all: silence becomes observable.
   const payload = isOllama
-    ? { model, messages, stream: true, keep_alive: KEEP_ALIVE,
+    ? { model, messages, stream: true, keep_alive: KEEP_ALIVE, ...(format ? { format } : {}),
         options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT, ...SAMPLING_EXTRA } }
     // OpenAI-compatible. num_ctx/num_predict are Ollama options and are ignored here, so
     // an explicit max_tokens is the ONLY generation bound this path has.
@@ -4123,6 +4131,28 @@ function closeBatch(run, batch) {
 
 // Drive the loop until it finishes, errors, hits the step ceiling, or needs
 // approval. Auto-tools execute inline; run_command pauses the run.
+/**
+ * REL-2: one turn as two calls. Call 1 is grammar-constrained to the action schema (no field can hold code); call 2,
+ * only for a body-carrying action, asks for the body as a plain fenced block. The answer is assembled into the
+ * ordinary reply and returned to the caller, which parses it exactly as it parses a plain-text reply. A call 1 that
+ * is somehow not JSON is returned as it came, so the ordinary parser judges it and parseLog records it honestly.
+ */
+async function splitTurn(loadDb, msgs, run, deadlineMs) {
+  if (!run.splitStats || typeof run.splitStats !== 'object') run.splitStats = { turns: 0, bodyCalls: 0, notJson: 0 };
+  const schema = actionSchema([...new Set([...Object.keys(tools), 'finish'])]);
+  const head = await callModel(loadDb, [...msgs, { role: 'user', content: SPLIT_INSTRUCTION }], run.abort.signal, undefined, { deadlineMs, format: schema });
+  let f = null;
+  try { f = JSON.parse(head); } catch { /* judged below by the ordinary parser */ }
+  if (!f || typeof f !== 'object' || typeof f.action !== 'string') { run.splitStats.notJson++; return head; }
+  run.splitStats.turns++;
+  const kind = needsBody(f);
+  if (!kind) return assemble(f);
+  const bodyText = await callModel(loadDb, [...msgs, { role: 'assistant', content: head }, { role: 'user', content: bodyRequest(f, kind) }],
+    run.abort.signal, undefined, { deadlineMs });
+  run.splitStats.bodyCalls++;
+  return assemble(f, extractBody(bodyText, kind));
+}
+
 async function drive(loadDb, run) {
   if (run.busy) return;
   run.busy = true;
@@ -4251,7 +4281,9 @@ async function drive(loadDb, run) {
       if (pc1) msgs.push({ role: 'user', content: pc1.instruction() });
       const call = beginCall(run, 'turn');
       try {
-        raw = await callModel(loadDb, msgs, run.abort.signal, undefined, { deadlineMs: call.deadlineMs });
+        raw = JSON_ACTIONS && agentProvider(loadDb()).kind === 'ollama'
+          ? await splitTurn(loadDb, msgs, run, call.deadlineMs)
+          : await callModel(loadDb, msgs, run.abort.signal, undefined, { deadlineMs: call.deadlineMs });
         noteModelCall(run);
         // A reply can ARRIVE after the run was stopped (the stream delivered its bytes, then
         // the abort landed). It completed; it is recorded; it is NOT acted on - the status
